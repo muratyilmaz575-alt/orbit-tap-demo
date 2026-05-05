@@ -4,7 +4,7 @@
   <!-- Orbit Tap V35 Presentation Build: stable local HTML test version -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Orbit Tap Cloudflare Stable</title>
+  <title>Orbit Tap GitHub Stable</title>
   <style>
     :root{
       --bg1:#07101f;
@@ -748,104 +748,32 @@
       .centerMsg .big{font-size:42px}
     }
   
-/* CLOUDFLARE STABLE START OVERLAY */
-#hardStart{
-  position:fixed;
-  inset:0;
-  z-index:99999;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:22px;
-  background:
-    radial-gradient(circle at 50% 10%,rgba(53,231,255,.18),transparent 32%),
-    radial-gradient(circle at 85% 25%,rgba(255,79,216,.12),transparent 30%),
-    #050913;
-  color:#fff;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-}
-#hardStart.hide{display:none}
-.hardCard{
-  width:min(92vw,420px);
-  border:1px solid rgba(255,255,255,.16);
-  background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.06));
-  border-radius:32px;
-  padding:22px;
-  box-shadow:0 24px 80px rgba(0,0,0,.45);
-  text-align:center;
-}
-.hardLogo{
-  width:82px;
-  height:82px;
-  margin:0 auto 14px;
-  border-radius:30px;
-  background:radial-gradient(circle at 35% 25%,#fff,#35e7ff 42%,#ff4fd8);
-  box-shadow:0 0 36px rgba(53,231,255,.30);
-}
-.hardCard h1{
-  margin:0;
-  font-size:42px;
-  line-height:1;
-  letter-spacing:-.08em;
-}
-.hardCard p{
-  margin:12px 0 18px;
-  color:#cbd5e1;
-  font-size:15px;
-  line-height:1.4;
-}
-.hardBtn{
-  width:100%;
-  min-height:58px;
-  border:0;
-  border-radius:22px;
-  color:#fff;
-  font-size:18px;
-  font-weight:1000;
-  background:linear-gradient(135deg,#35e7ff,#ff4fd8);
-  box-shadow:0 18px 42px rgba(0,0,0,.35);
-}
-.hardSmall{
-  margin-top:12px;
-  color:#94a3b8;
-  font-size:12px;
-}
-body.hardPlaying #hardStart{display:none!important}
-body.hardPlaying .top,
-body.hardPlaying .hint,
-body.hardPlaying .controls{display:none!important}
-body.hardPlaying .app{padding:0!important;align-items:stretch!important}
-body.hardPlaying .phone{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;gap:0!important;display:block!important}
-body.hardPlaying .gameWrap{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;border-radius:0!important;border:none!important;padding:0!important;background:#050913!important;box-shadow:none!important}
-body.hardPlaying canvas{width:100%!important;height:100%!important;border-radius:0!important}
-body.hardPlaying .overlay{display:none!important}
-body.hardPlaying .centerMsg,
-body.hardPlaying .bottomMsg,
-body.hardPlaying .runEndCard{display:none!important}
-body.hardPlaying .hud{top:calc(env(safe-area-inset-top,0px) + 12px)!important;left:10px!important;right:10px!important;gap:5px!important}
-body.hardPlaying .hudPill{padding:7px 8px!important;font-size:11px!important;background:rgba(8,15,29,.62)!important}
+/* GitHub Stable Mobile Build */
+body{background:#050913!important;overscroll-behavior:none}
+.app{padding:0!important;align-items:stretch!important}
+.phone{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;gap:0!important;display:block!important}
+.top,.hint,.controls{display:none!important}
+.gameWrap{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;border-radius:0!important;border:none!important;padding:0!important;background:#050913!important;box-shadow:none!important}
+canvas{width:100%!important;height:100%!important;border-radius:0!important}
+.hud{top:calc(env(safe-area-inset-top,0px) + 12px)!important;left:10px!important;right:10px!important;gap:5px!important}
+.hudPill{padding:7px 8px!important;font-size:11px!important;background:rgba(8,15,29,.62)!important}
+.bigScore{top:18%!important;font-size:76px!important}
+.overlay{position:fixed!important;inset:0!important;padding:calc(env(safe-area-inset-top,0px) + 12px) 12px calc(env(safe-area-inset-bottom,0px) + 12px)!important;background:radial-gradient(circle at 50% 0%,rgba(53,231,255,.16),transparent 34%),radial-gradient(circle at 90% 15%,rgba(255,79,216,.12),transparent 28%),rgba(2,6,23,.88)!important}
+.modal{width:min(94vw,430px)!important;max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 28px)!important;border-radius:32px!important}
+body.cleanPlaying .centerMsg,
+body.cleanPlaying .bottomMsg,
+body.cleanPlaying .runEndCard{display:none!important}
 
 </style>
 </head>
 <body>
-
-<div id="hardStart">
-  <div class="hardCard">
-    <div class="hardLogo"></div>
-    <h1>Orbit Tap</h1>
-    <p>Tippe, fliege durch die Gates und sammle Coins. Diese Version ist extra stabil für Cloudflare gebaut.</p>
-    <button class="hardBtn" id="hardPlayBtn">Spiel starten</button>
-    <div class="hardSmall">Clean Build · keine störenden Texte im Run</div>
-  </div>
-</div>
-
 <div class="app">
   <div class="phone" id="phone">
     <header class="top">
       <div class="brand">
-        <div class="label">Cloudflare Stable</div>
+        <div class="label">GitHub Stable</div>
         <h1>Orbit Tap</h1>
-        <p>Cloudflare stable build</p>
+        <p>GitHub stable build</p>
       </div>
       <div class="stat">
         <div class="label">Coins</div>
@@ -855,7 +783,7 @@ body.hardPlaying .hudPill{padding:7px 8px!important;font-size:11px!important;bac
 
     <section class="hint">
       <div class="hintMain">Ziel: <b>Ein Tap hebt dich hoch.</b> Flieg durch die <b>Energy Gates</b> und überlebe so lange wie möglich.</div>
-      <div class="hintSmall">Cloudflare stabile Testversion.</div>
+      <div class="hintSmall">GitHub stabile Spielversion.</div>
     </section>
 
     <main class="gameWrap" id="touchArea">
@@ -1384,9 +1312,11 @@ function selectTheme(theme){
     save.unlockedThemes.push(theme);
     save.theme = theme;
     saveGame();
-showThemes();
+    showCenter("UNLOCKED", item.title, COLORS.gold, 700);
+    showThemes();
   }else{
-}
+    showCenter("COINS", "Nicht genug Coins", COLORS.red, 700);
+  }
 }
 function selectSkin(skin){
   const item = SKIN_ITEMS.find(s=>s.key===skin);
@@ -1402,9 +1332,11 @@ function selectSkin(skin){
     save.unlockedSkins.push(skin);
     save.skin = skin;
     saveGame();
-showSkins();
+    showCenter("UNLOCKED", item.title, COLORS.gold, 700);
+    showSkins();
   }else{
-}
+    showCenter("COINS", "Nicht genug Coins", COLORS.red, 700);
+  }
 }
 
 function rarityClassName(r){
@@ -1912,11 +1844,12 @@ function modalBase(title,text,extra){
   `;
 }
 function showMenu(){
+  document.body.classList.remove("cleanPlaying");
   status = "menu";
   const next = getNextUnlock();
   modalBase(
     "Orbit Tap",
-    "Stabile Testversion mit Shop, Daily Challenge, Rankings-Demo und sichtbarem Coin-System.",
+    "GitHub Stable Build: Original-Spielkern, mobile Ansicht, Crash zurück ins Menü.",
     `
       <div class="heroCard">
         <div class="heroTop">
@@ -2018,6 +1951,7 @@ function showMenu(){
       </div>
     `
   );
+  showCenter("ORBIT TAP", "V35 Stable Build", COLORS.gold, 1200);
 }
 function howTo(){
   modalBase(
@@ -2061,9 +1995,7 @@ function showRunEnd(){
 }
 
 function showGameOver(){
-  document.body.classList.remove("hardPlaying");
-  const hard = document.getElementById("hardStart");
-  if(hard) hard.classList.remove("hide");
+  document.body.classList.remove("cleanPlaying");
   showMenu();
 }
 function toggleSound(){
@@ -2113,7 +2045,7 @@ window.startDailyChallenge = startDailyChallenge;
 window.startNormalGame = startNormalGame;
 
 function startGame(){
-  document.body.classList.add("hardPlaying");
+  document.body.classList.add("cleanPlaying");
   startAmbientMusic();
   if(dailyMode){
     dailyDateKey = dailyDateKey || getTodayKey();
@@ -2153,7 +2085,8 @@ function startGame(){
     trail: [],
     dead:false
   };
-els.bottomMsg.textContent = "Tap für Auftrieb";
+  showCenter("GO", "Tap to fly", COLORS.green, 600);
+  els.bottomMsg.textContent = "Tap für Auftrieb";
   beep("start");
   updateHud();
 }
@@ -2189,22 +2122,47 @@ function getGapForScore(s){
 }
 
 function getSpawnDelayForScore(s){
-  // Gates bleiben bis 40 etwas fairer auseinander.
-  if(s < 10) return 1.56;
-  if(s < 25) return clamp(1.56 - (s - 10) * 0.008, 1.44, 1.56);
-  if(s < 40) return clamp(1.44 - (s - 25) * 0.010, 1.29, 1.44);
-  return clamp(1.29 - (s - 40) * 0.006, 1.08, 1.29);
+  if(s < 15) return 1.70;
+  if(s < 35) return clamp(1.70 - (s - 15) * 0.006, 1.58, 1.70);
+  if(s < 60) return clamp(1.58 - (s - 35) * 0.006, 1.43, 1.58);
+  return clamp(1.43 - (s - 60) * 0.004, 1.18, 1.43);
 }
 
 
 
 
-function
+function spawnCoinPopup(x, y, amount){
+  coinPopups.push({
+    x,
+    y,
+    amount,
+    life:1.0,
+    vy:-42
+  });
 }
 
-function updateCoinPopups(dt){}
+function updateCoinPopups(dt){
+  for(const c of coinPopups){
+    c.y += c.vy * dt;
+    c.life -= dt * 1.15;
+  }
+  coinPopups = coinPopups.filter(c => c.life > 0);
+}
 
-function drawCoinPopups(){}
+function drawCoinPopups(){
+  for(const c of coinPopups){
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, c.life);
+    ctx.fillStyle = COLORS.gold;
+    ctx.shadowColor = COLORS.gold;
+    ctx.shadowBlur = 18;
+    ctx.font = "1000 18px system-ui";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("🪙 +" + c.amount, c.x, c.y);
+    ctx.restore();
+  }
+}
 
 function getGateCoinPosition(ob){
   const gapTop = ob.gapY - ob.gap / 2;
@@ -2279,7 +2237,9 @@ function tryCollectGateCoin(ob){
     const coinGain = (score % 5 === 0 ? 2 : 1) * (coinBoostTimer > 0 ? 2 : 1);
     coinsRun += coinGain;
     save.coins += coinGain;
-spawnParticles(pos.x, pos.y, COLORS.gold, coinGain >= 2 ? 18 : 12, 120);
+
+    spawnCoinPopup(pos.x, pos.y - 18, coinGain);
+    spawnParticles(pos.x, pos.y, COLORS.gold, coinGain >= 2 ? 18 : 12, 120);
     shock(pos.x, pos.y, COLORS.gold, false);
     beep("pass");
     updateHud();
@@ -2353,11 +2313,15 @@ function collectPowerup(p){
   if(p.type === "shield"){
     shieldActive = true;
     shieldTimer = 10.0;
-}else if(p.type === "slow"){
+    showCenter("SHIELD", "10 Sekunden Schutz", COLORS.green, 650);
+  }else if(p.type === "slow"){
     slowTimer = 4.4;
-}else if(p.type === "coin"){
+    showCenter("SLOW", "Gates langsamer", COLORS.cyan, 520);
+  }else if(p.type === "coin"){
     coinBoostTimer = 7.0;
-}
+    spawnCoinPopup(p.x, p.y - 24, 2);
+    showCenter("COIN x2", "Coins doppelt", COLORS.gold, 600);
+  }
   beep("combo");
   updateHud();
 }
@@ -2459,14 +2423,16 @@ function passObstacle(){
   score++;
   if(save.best > 3 && !highscoreWarned && score === save.best - 1){
     highscoreWarned = true;
-screenShake = .28;
+    showCenter("BEST?", "Noch 1 Punkt", COLORS.gold, 520);
+    screenShake = .28;
   }
 
   if(score > save.best){
     save.best = score;
     if(!newBestShown){
       newBestShown = true;
-confetti(20);
+      showCenter("NEW BEST", "weiter weiter!", COLORS.green, 620);
+      confetti(20);
       screenShake = .35;
     }
   }
@@ -2477,19 +2443,24 @@ confetti(20);
   saveGame();
 
   if(score === 5){
-confetti(16);
+    showCenter("SPEED UP", "Jetzt wird es schneller", COLORS.gold, 560);
+    confetti(16);
     beep("combo");
   }else if(score === 10){
-confetti(22);
+    showCenter("FLOW MODE", "Bleib ruhig", COLORS.pink, 620);
+    confetti(22);
     beep("combo");
   }else if(score === 20){
-confetti(28);
+    showCenter("PRO ZONE", "Jetzt wird es ernst", COLORS.red, 660);
+    confetti(28);
     beep("combo");
   }else if(score % 5 === 0){
-confetti(16);
+    showCenter("+"+score, "Hot streak", COLORS.gold, 480);
+    confetti(16);
     beep("combo");
   }else{
-beep("pass");
+    showCenter("+"+score, score < 5 ? "Easy..." : "Clean gate", COLORS.green, 320);
+    beep("pass");
   }
 }
 
@@ -2507,7 +2478,8 @@ function crash(reason="CRASH"){
     screenShake = .45;
     spawnParticles(player.x, player.y, COLORS.green, 26, 150);
     shock(player.x, player.y, COLORS.green, true);
-beep("combo");
+    showCenter("SHIELD", Math.ceil(shieldTimer)+"s", COLORS.green, 420);
+    beep("combo");
 
     // Aus der Kollisionszone rausdrücken, Shield bleibt aber aktiv.
     player.vy = -Math.min(height*0.42, 285);
@@ -2524,17 +2496,19 @@ beep("combo");
     return;
   }
 
+  document.body.classList.remove("cleanPlaying");
   status = "dead";
   player.dead = true;
   screenShake = .9;
   spawnParticles(player.x, player.y, COLORS.red, 40, 200);
   shock(player.x, player.y, COLORS.red, true);
-const nextUnlock = getNextUnlock();
+  showCenter("CRASH", reason, COLORS.red, 780);
+  const nextUnlock = getNextUnlock();
   els.bottomMsg.textContent = nextUnlock ? `Noch ${Math.max(0,nextUnlock.cost - (save.coins || 0))} Coins bis ${nextUnlock.title}` : "Tippe für Neustart";
   beep("fail");
   updateHud();
   saveGame();
-  setTimeout(showGameOver, 260);
+  setTimeout(showGameOver, 350);
 }
 
 function update(dt){
@@ -3664,15 +3638,9 @@ requestAnimationFrame(loop);
 
 <script>
 window.addEventListener("load", function(){
-  var btn = document.getElementById("hardPlayBtn");
-  if(btn){
-    btn.addEventListener("click", function(){
-      document.body.classList.add("hardPlaying");
-      var hard = document.getElementById("hardStart");
-      if(hard) hard.classList.add("hide");
-      if(typeof startGame === "function") startGame();
-    });
-  }
+  setTimeout(function(){
+    try{ if(typeof showMenu === "function") showMenu(); }catch(e){}
+  }, 250);
 });
 </script>
 
