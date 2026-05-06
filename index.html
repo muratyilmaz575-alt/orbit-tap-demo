@@ -4,7 +4,7 @@
   <!-- Orbit Tap V35 Presentation Build: stable local HTML test version -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Orbit Tap Alternating Gates</title>
+  <title>Orbit Tap 3 Types Tight Gaps</title>
   <style>
     :root{
       --bg1:#07101f;
@@ -748,7 +748,7 @@
       .centerMsg .big{font-size:42px}
     }
   
-/* ALTERNATING GATES BUILD */
+/* 3 TYPES TIGHT GAPS BUILD */
 body{background:#050913!important;overscroll-behavior:none}
 .app{padding:0!important;align-items:stretch!important}
 .phone{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;gap:0!important;display:block!important}
@@ -806,6 +806,41 @@ body.cleanPlaying .runEndCard{display:none!important}
   text-transform:uppercase;
 }
 
+
+/* 3 TYPES TIGHT GAPS BUILD */
+body{background:#050913!important;overscroll-behavior:none}
+.app{padding:0!important;align-items:stretch!important}
+.phone{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;gap:0!important;display:block!important}
+.top,.hint,.controls{display:none!important}
+.gameWrap{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;border-radius:0!important;border:none!important;padding:0!important;background:#050913!important;box-shadow:none!important}
+canvas{width:100%!important;height:100%!important;border-radius:0!important}
+.hud{top:calc(env(safe-area-inset-top,0px) + 12px)!important;left:10px!important;right:10px!important;gap:5px!important;opacity:.92}
+.hudPill{padding:7px 8px!important;font-size:11px!important;background:rgba(8,15,29,.45)!important}
+.bigScore{
+  top:calc(env(safe-area-inset-top,0px) + 62px)!important;
+  font-size:58px!important;
+  font-weight:1000!important;
+  color:#fff!important;
+  opacity:1!important;
+  text-shadow:
+    -4px -4px 0 #111,
+     4px -4px 0 #111,
+    -4px  4px 0 #111,
+     4px  4px 0 #111,
+     0 8px 0 rgba(0,0,0,.25)!important;
+  letter-spacing:-.08em!important;
+}
+.overlay{position:fixed!important;inset:0!important;padding:calc(env(safe-area-inset-top,0px) + 12px) 12px calc(env(safe-area-inset-bottom,0px) + 12px)!important;background:radial-gradient(circle at 50% 0%,rgba(53,231,255,.16),transparent 34%),radial-gradient(circle at 90% 15%,rgba(255,79,216,.12),transparent 28%),rgba(2,6,23,.88)!important}
+.modal{width:min(94vw,430px)!important;max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 28px)!important;border-radius:32px!important}
+body.cleanPlaying .centerMsg,
+body.cleanPlaying .bottomMsg,
+body.cleanPlaying .runEndCard{display:none!important}
+.buildMark{margin-top:10px;padding:10px 12px;border-radius:16px;border:1px solid rgba(255,209,102,.40);background:rgba(255,209,102,.16);color:#ffe7a3;font-size:13px;font-weight:1000;text-align:center}
+.lastScoreCard{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lastScoreBox{border:1px solid rgba(255,255,255,.13);background:rgba(2,6,23,.30);border-radius:18px;padding:10px 8px;text-align:center}
+.lastScoreBox b{display:block;font-size:24px;color:#fff;line-height:1}
+.lastScoreBox span{display:block;margin-top:5px;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+
 </style>
 </head>
 <body>
@@ -813,9 +848,9 @@ body.cleanPlaying .runEndCard{display:none!important}
   <div class="phone" id="phone">
     <header class="top">
       <div class="brand">
-        <div class="label">ALTERNATING GATES</div>
+        <div class="label">3 TYPES TIGHT GAPS</div>
         <h1>Orbit Tap</h1>
-        <p>Alternating gates · score style</p>
+        <p>3 Types · tighter gaps</p>
       </div>
       <div class="stat">
         <div class="label">Coins</div>
@@ -825,7 +860,7 @@ body.cleanPlaying .runEndCard{display:none!important}
 
     <section class="hint">
       <div class="hintMain">Ziel: <b>Ein Tap hebt dich hoch.</b> Flieg durch die <b>Energy Gates</b> und überlebe so lange wie möglich.</div>
-      <div class="hintSmall">Alternating Gates Build.</div>
+      <div class="hintSmall">3 Types Build.</div>
     </section>
 
     <main class="gameWrap" id="touchArea">
@@ -1896,7 +1931,7 @@ function showMenu(){
   const next = getNextUnlock();
   modalBase(
     "Orbit Tap",
-    "ALTERNATING GATES: Normal → gerade Cluster → Normal → schräge Cluster. Letzter Score wird im Menü angezeigt.",
+    "3 TYPES TIGHT GAPS: Normal → gerade Cluster → Normal → schräge Cluster. Letzter Score wird im Menü angezeigt.",
     `
       <div class="heroCard">
         <div class="heroTop">
@@ -1926,7 +1961,7 @@ function showMenu(){
         </div>
       </div>
 
-      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">ALTERNATING GATES aktiv: Normal → gerade Cluster → Normal → schräge Cluster</div>
+      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">3 TYPES TIGHT GAPS aktiv: Typ 1 Treppen-Gates · Typ 2 schräge Cluster · Typ 3 normale Gates · engere Öffnungen</div><div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">3 TYPES TIGHT GAPS aktiv: Normal → gerade Cluster → Normal → schräge Cluster</div>
 
       <div class="demoNotice"><b>Hinweis:</b> Rankings, Freunde und Daily-Ranking sind in dieser HTML-Version Demo-Daten. Der Spielkern, Coins, Shop, Powerups und Daily-Seed laufen lokal.</div>
 
@@ -2157,25 +2192,25 @@ function tapFly(){
 
 
 function getSpeedForScore(s){
-  if(s < 20) return 0.72 + s * 0.018;
-  if(s < 55) return 1.08 + (s - 20) * 0.010;
-  return Math.min(1.82, 1.43 + (s - 55) * 0.004);
+  if(s < 20) return 0.76 + s * 0.018;
+  if(s < 55) return 1.12 + (s - 20) * 0.010;
+  return Math.min(1.86, 1.47 + (s - 55) * 0.004);
 }
 
 function getGapForScore(s){
-  const base = height * 0.39;
+  const base = height * 0.31;
   let shrink;
-  if(s < 20) shrink = s * 0.55;
-  else if(s < 55) shrink = 11 + (s - 20) * 0.50;
-  else shrink = 29 + (s - 55) * 0.42;
-  return clamp(base - shrink, 164, 270);
+  if(s < 20) shrink = s * 0.45;
+  else if(s < 55) shrink = 9 + (s - 20) * 0.40;
+  else shrink = 23 + (s - 55) * 0.28;
+  return clamp(base - shrink, 128, 195);
 }
 
 function getSpawnDelayForScore(s){
   if(formationQueue.length > 0){
-    return formationQueue[0].cluster ? 0.62 : 1.42;
+    return formationQueue[0].tight ? 0.22 : 1.05;
   }
-  return 1.25;
+  return 1.00;
 }
 
 
@@ -2436,36 +2471,101 @@ function enqueueFormation(gap){
   }
 }
 
+
+function clampFormationY(y, gap){
+  const margin = 65;
+  return clamp(y, margin + gap/2, height - margin - gap/2);
+}
+
+function makeNextFormation(gap){
+  // Bewusster Wechsel:
+  // Typ 1 = Treppen-Gates
+  // Typ 3 = Normale Gates
+  // Typ 2 = Schräge Cluster-Gates
+  // Typ 3 = Normale Gates
+  const cycle = ["stair", "normal", "slanted", "normal"];
+  const mode = cycle[formationIndex % cycle.length];
+  formationIndex++;
+
+  const baseY = height * 0.50 + rand(-height*0.03, height*0.03);
+  const step = Math.min(52, height * 0.072);
+
+  if(mode === "stair"){
+    const dir = gameRandom() < 0.5 ? 1 : -1;
+    const ys = [
+      baseY + dir * step * 1.30,
+      baseY + dir * step * 0.45,
+      baseY - dir * step * 0.35,
+      baseY - dir * step * 1.15
+    ].map(v => clampFormationY(v, gap - 10));
+
+    ys.forEach(y => formationQueue.push({
+      gateKind: "stair",
+      tight: true,
+      y,
+      slant: 0
+    }));
+  }else if(mode === "slanted"){
+    const dir = gameRandom() < 0.5 ? 1 : -1;
+    const ys = [
+      baseY + dir * step * 0.78,
+      baseY,
+      baseY - dir * step * 0.78
+    ].map(v => clampFormationY(v, gap - 8));
+
+    ys.forEach(y => formationQueue.push({
+      gateKind: "slanted",
+      tight: true,
+      y,
+      slant: dir * Math.min(42, width * 0.05)
+    }));
+  }else{
+    const count = 2;
+    for(let i=0;i<count;i++){
+      formationQueue.push({
+        gateKind: "normal",
+        tight: false,
+        y: clampFormationY(baseY + rand(-step*1.10, step*1.10), gap + 4),
+        slant: 0
+      });
+    }
+  }
+}
+
 function spawnObstacle(){
-  const gap = getGapForScore(score);
+  const baseGap = getGapForScore(score);
 
   if(formationQueue.length === 0){
-    enqueueFormation(gap);
+    makeNextFormation(baseGap);
   }
 
   const item = formationQueue.shift();
   const gateIndex = obstacleCount++;
-  gatesSinceShieldSpawn++;
-
-  const type = item.kind === "slantedCluster" ? "slanted" : (gateIndex % 9 === 5 ? "pulse" : "normal");
-  const x = width + 76;
+  const x = width + 78;
   const phase = rand(0, Math.PI*2);
 
+  let gap = baseGap;
+  if(item.gateKind === "stair") gap = clamp(baseGap - 12, 122, 182);
+  if(item.gateKind === "slanted") gap = clamp(baseGap - 10, 124, 184);
+  if(item.gateKind === "normal") gap = clamp(baseGap + 2, 130, 194);
+
+  gatesSinceShieldSpawn++;
+
   const coinPlacement = gateIndex % 3 === 0 ? "before" : gateIndex % 3 === 1 ? "inside" : "after";
-  const coinOffsetY = rand(-gap * 0.08, gap * 0.08);
+  const coinOffsetY = rand(-gap * 0.06, gap * 0.06);
 
   obstacles.push({
     x,
-    w: item.cluster ? 86 : 68,
+    w: item.tight ? 88 : 72,
     gapY: item.y,
     baseGapY: item.y,
-    gap: type === "pulse" ? gap + 10 : gap,
-    baseGap: type === "pulse" ? gap + 10 : gap,
+    gap: gap,
+    baseGap: gap,
     passed:false,
     phase,
-    color: item.kind === "slantedCluster" ? COLORS.gold : (gateIndex % 2 === 0 ? COLORS.cyan : COLORS.pink),
-    type,
-    gateKind: item.kind,
+    color: item.gateKind === "slanted" ? COLORS.gold : (gateIndex % 2 === 0 ? COLORS.cyan : COLORS.pink),
+    type: item.gateKind === "slanted" ? "slanted" : "normal",
+    gateKind: item.gateKind,
     slant: item.slant || 0,
     motionAmp: 0,
     motionSpeed: 0,
@@ -2480,16 +2580,11 @@ function spawnObstacle(){
 
 function obstacleCollide(ob){
   if(player.x + player.r < ob.x || player.x - player.r > ob.x + ob.w) return false;
-
-  const t = clamp((player.x - ob.x) / Math.max(1, ob.w), 0, 1);
-  const s = ob.slant || 0;
-  const topEdge = (ob.gapY - ob.gap/2) + (-s + 2*s*t);
-  const bottomEdge = (ob.gapY + ob.gap/2) + (-s + 2*s*t);
-
-  const forgive = 8;
+  const topEdge = ob.gapY - ob.gap/2;
+  const bottomEdge = ob.gapY + ob.gap/2;
+  const forgive = 5;
   if(player.y - player.r < topEdge + forgive) return true;
   if(player.y + player.r > bottomEdge - forgive) return true;
-
   return false;
 }
 
@@ -2570,6 +2665,8 @@ function crash(reason="CRASH"){
     return;
   }
 
+  document.body.classList.remove("cleanPlaying");
+  lastRunScore = score;
   document.body.classList.remove("cleanPlaying");
   lastRunScore = score;
   status = "dead";
@@ -2662,12 +2759,7 @@ function update(dt){
 
     for(const ob of obstacles){
       ob.x -= speedPx * dt;
-
       ob.gapY = ob.baseGapY;
-
-      if(ob.type === "pulse"){
-        ob.gap = ob.baseGap + Math.sin(bgT*3.2 + ob.phase) * 8;
-      }
 
       // Coin wird sofort beim echten Berühren eingesammelt.
       tryCollectGateCoin(ob);
@@ -3027,17 +3119,12 @@ function drawBackground(){
 function drawObstacle(ob){
   const topH = ob.gapY - ob.gap/2;
   const botY = ob.gapY + ob.gap/2;
-  const s = ob.slant || 0;
   const x = ob.x;
   const w = ob.w;
-  const color = ob.type === "pulse" ? "#ffd166" : (ob.color || COLORS.cyan);
-
-  ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 18;
+  const color = ob.gateKind === "slanted" ? "#ffd166" : (ob.color || COLORS.cyan);
 
   const gradTop = ctx.createLinearGradient(x, 0, x+w, Math.max(1, topH));
-  gradTop.addColorStop(0, "rgba(255,255,255,.20)");
+  gradTop.addColorStop(0, "rgba(255,255,255,.22)");
   gradTop.addColorStop(.45, color);
   gradTop.addColorStop(1, "rgba(6,16,31,.96)");
 
@@ -3046,66 +3133,98 @@ function drawObstacle(ob){
   gradBot.addColorStop(.45, color);
   gradBot.addColorStop(1, "rgba(6,16,31,.98)");
 
-  // Top piece
-  ctx.fillStyle = gradTop;
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 18;
   ctx.strokeStyle = color;
   ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(x, 0);
-  ctx.lineTo(x+w, 0);
-  ctx.lineTo(x+w, topH + s);
-  ctx.lineTo(x, topH - s);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
 
-  // Bottom piece
-  ctx.fillStyle = gradBot;
-  ctx.beginPath();
-  ctx.moveTo(x, botY - s);
-  ctx.lineTo(x+w, botY + s);
-  ctx.lineTo(x+w, height);
-  ctx.lineTo(x, height);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
+  if(ob.gateKind === "slanted"){
+    // Gate-Körper schräg, Öffnung bleibt horizontal
+    const lean = ob.slant || 34;
 
-  // Gate edge lines
-  ctx.shadowBlur = 24;
-  ctx.lineWidth = 6;
-  ctx.lineCap = "round";
-  ctx.strokeStyle = color;
-  ctx.beginPath();
-  ctx.moveTo(x+7, topH - s);
-  ctx.lineTo(x+w-7, topH + s);
-  ctx.moveTo(x+7, botY - s);
-  ctx.lineTo(x+w-7, botY + s);
-  ctx.stroke();
-
-  ctx.shadowBlur = 0;
-  ctx.globalAlpha = .72;
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = "#ffffff";
-  ctx.beginPath();
-  ctx.moveTo(x+12, topH - s + 6);
-  ctx.lineTo(x+w-12, topH + s + 6);
-  ctx.moveTo(x+12, botY - s - 6);
-  ctx.lineTo(x+w-12, botY + s - 6);
-  ctx.stroke();
-
-  // Vertical segment lines to make straight cluster feel like pipes
-  ctx.globalAlpha = .30;
-  ctx.lineWidth = 3;
-  ctx.strokeStyle = "#ffffff";
-  const segs = 3;
-  for(let i=1;i<segs;i++){
-    const xx = x + (w/segs)*i;
+    // Top block
+    ctx.fillStyle = gradTop;
     ctx.beginPath();
-    ctx.moveTo(xx, Math.max(8, topH - Math.abs(s) - 90));
-    ctx.lineTo(xx + s*.18, topH + s*(i/segs - .5));
-    ctx.moveTo(xx, botY - s*(i/segs - .5));
-    ctx.lineTo(xx + s*.18, Math.min(height-8, botY + Math.abs(s) + 90));
+    ctx.moveTo(x - lean, 0);
+    ctx.lineTo(x + w - lean, 0);
+    ctx.lineTo(x + w, topH);
+    ctx.lineTo(x, topH);
+    ctx.closePath();
+    ctx.fill();
     ctx.stroke();
+
+    // Bottom block
+    ctx.fillStyle = gradBot;
+    ctx.beginPath();
+    ctx.moveTo(x, botY);
+    ctx.lineTo(x + w, botY);
+    ctx.lineTo(x + w + lean, height);
+    ctx.lineTo(x + lean, height);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Horizontal opening edges
+    ctx.shadowBlur = 24;
+    ctx.lineWidth = 6;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(x+6, topH);
+    ctx.lineTo(x+w-6, topH);
+    ctx.moveTo(x+6, botY);
+    ctx.lineTo(x+w-6, botY);
+    ctx.stroke();
+
+    // Segment lines inside slanted gates
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = .28;
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#ffffff";
+    for(let i=1;i<3;i++){
+      const xx = x + (w/3)*i;
+      ctx.beginPath();
+      ctx.moveTo(xx - lean*0.95, 8);
+      ctx.lineTo(xx, topH - 3);
+      ctx.moveTo(xx, botY + 3);
+      ctx.lineTo(xx + lean*0.95, height - 8);
+      ctx.stroke();
+    }
+  }else{
+    // Gerade Gates
+    ctx.fillStyle = gradTop;
+    ctx.fillRect(x, 0, w, topH);
+    ctx.strokeRect(x, 0, w, topH);
+
+    ctx.fillStyle = gradBot;
+    ctx.fillRect(x, botY, w, height - botY);
+    ctx.strokeRect(x, botY, w, height - botY);
+
+    // Horizontal opening edges
+    ctx.shadowBlur = 22;
+    ctx.lineWidth = 6;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(x+6, topH);
+    ctx.lineTo(x+w-6, topH);
+    ctx.moveTo(x+6, botY);
+    ctx.lineTo(x+w-6, botY);
+    ctx.stroke();
+
+    // Pipe segment lines
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = .26;
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#ffffff";
+    for(let i=1;i<3;i++){
+      const xx = x + (w/3)*i;
+      ctx.beginPath();
+      ctx.moveTo(xx, 8);
+      ctx.lineTo(xx, topH - 6);
+      ctx.moveTo(xx, botY + 6);
+      ctx.lineTo(xx, height - 8);
+      ctx.stroke();
+    }
   }
 
   ctx.restore();
