@@ -4,7 +4,7 @@
   <!-- Orbit Tap V35 Presentation Build: stable local HTML test version -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Orbit Tap Clean Formation Build</title>
+  <title>Orbit Tap Flappy Clean Balance</title>
   <style>
     :root{
       --bg1:#07101f;
@@ -748,7 +748,7 @@
       .centerMsg .big{font-size:42px}
     }
   
-/* CLEAN FORMATION BUILD */
+/* FLAPPY CLEAN BALANCE */
 body{background:#050913!important;overscroll-behavior:none}
 .app{padding:0!important;align-items:stretch!important}
 .phone{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;gap:0!important;display:block!important}
@@ -776,7 +776,7 @@ canvas{width:100%!important;height:100%!important;border-radius:0!important}
 body.cleanPlaying .centerMsg,
 body.cleanPlaying .bottomMsg,
 body.cleanPlaying .runEndCard{display:none!important}
-.buildMark{margin-top:10px;padding:10px 12px;border-radius:16px;border:1px solid rgba(255,209,102,.40);background:rgba(255,209,102,.16);color:#ffe7a3;font-size:13px;font-weight:1000;text-align:center}
+.buildMark{margin-top:10px;padding:10px 12px;border-radius:16px;border:1px solid rgba(53,231,255,.35);background:rgba(53,231,255,.12);color:#bff7ff;font-size:13px;font-weight:1000;text-align:center}
 .lastScoreCard{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .lastScoreBox{border:1px solid rgba(255,255,255,.13);background:rgba(2,6,23,.30);border-radius:18px;padding:10px 8px;text-align:center}
 .lastScoreBox b{display:block;font-size:24px;color:#fff;line-height:1}
@@ -789,9 +789,9 @@ body.cleanPlaying .runEndCard{display:none!important}
   <div class="phone" id="phone">
     <header class="top">
       <div class="brand">
-        <div class="label">CLEAN FORMATION BUILD</div>
+        <div class="label">FLAPPY CLEAN BALANCE</div>
         <h1>Orbit Tap</h1>
-        <p>Clean formations · 3 gate types</p>
+        <p>Flappy clean balance</p>
       </div>
       <div class="stat">
         <div class="label">Coins</div>
@@ -801,7 +801,7 @@ body.cleanPlaying .runEndCard{display:none!important}
 
     <section class="hint">
       <div class="hintMain">Ziel: <b>Ein Tap hebt dich hoch.</b> Flieg durch die <b>Energy Gates</b> und überlebe so lange wie möglich.</div>
-      <div class="hintSmall">Clean Formation Build.</div>
+      <div class="hintSmall">Flappy Clean Balance Build.</div>
     </section>
 
     <main class="gameWrap" id="touchArea">
@@ -894,7 +894,6 @@ let musicIntensity = 0;
 
 let player = null;
 let obstacles = [];
-let formationIndex = 0;
 let obstacleCount = 0;
 let gatesSinceShieldSpawn = 999;
 let lastRunScore = 0;
@@ -1871,7 +1870,7 @@ function showMenu(){
   const next = getNextUnlock();
   modalBase(
     "Orbit Tap",
-    "CLEAN FORMATION BUILD: Typ 3 normal, Typ 1 Treppe, Typ 3 normal, Typ 2 schräg. Engere Öffnungen, keine Überlappung.",
+    "FLAPPY CLEAN BALANCE: altes Spielgefühl zurück, 3 Typen dezent, 1 Abschnitt = 1 Punkt.",
     `
       <div class="heroCard">
         <div class="heroTop">
@@ -1901,7 +1900,7 @@ function showMenu(){
         </div>
       </div>
 
-      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">CLEAN FORMATION BUILD aktiv: Normal → Treppe → Normal → Schräg · engere Öffnungen · keine Überlappung</div>
+      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">FLAPPY CLEAN BALANCE aktiv: Spaßgefühl zurück · 3 Typen dezent · keine Wände · 1 Abschnitt = 1 Punkt</div>
 
       <div class="demoNotice"><b>Hinweis:</b> Rankings, Freunde und Daily-Ranking sind in dieser HTML-Version Demo-Daten. Der Spielkern, Coins, Shop, Powerups und Daily-Seed laufen lokal.</div>
 
@@ -2086,7 +2085,6 @@ function startGame(){
   shockwaves = [];
   coinPopups = [];
   obstacles = [];
-  formationIndex = 0;
   obstacleCount = 0;
   gatesSinceShieldSpawn = 999;
   powerups = [];
@@ -2131,26 +2129,26 @@ function tapFly(){
 
 
 function getSpeedForScore(s){
-  // Nicht zu schnell, weil Cluster kompakter sind.
-  if(s < 20) return 0.76 + s * 0.018;
-  if(s < 55) return 1.12 + (s - 20) * 0.010;
-  return Math.min(1.86, 1.47 + (s - 55) * 0.004);
+  if(s < 20) return 0.78 + s * 0.019;
+  if(s < 55) return 1.16 + (s - 20) * 0.011;
+  return Math.min(1.92, 1.55 + (s - 55) * 0.004);
 }
 
 function getGapForScore(s){
-  // Engere Öffnung: fair, aber nicht gratis.
-  // Verhältnis ungefähr 22-25% der Höhe, später etwas kleiner.
-  const base = height * 0.245;
+  // Zurück zu sauberem Spielgefühl: nicht riesig, nicht unfair.
+  const base = height * 0.285;
   let shrink;
   if(s < 20) shrink = s * 0.35;
-  else if(s < 55) shrink = 7 + (s - 20) * 0.28;
-  else shrink = 17 + (s - 55) * 0.18;
-  return clamp(base - shrink, 118, 158);
+  else if(s < 55) shrink = 7 + (s - 20) * 0.24;
+  else shrink = 16 + (s - 55) * 0.14;
+  return clamp(base - shrink, 132, 188);
 }
 
 function getSpawnDelayForScore(s){
-  // Wird nach Formation gesetzt; diese Funktion ist nur Fallback.
-  return 1.15;
+  // Normale Flappy-Distanz, keine Wand-Cluster.
+  if(s < 20) return 1.32;
+  if(s < 55) return 1.24;
+  return 1.16;
 }
 
 
@@ -2268,7 +2266,7 @@ function spawnPowerup(){
   }
 
   const upcoming = obstacles
-    .filter(ob => ob.x > player.x + 110 && !ob.powerupReserved)
+    .filter(ob => ob.x > player.x + 125 && !ob.powerupReserved)
     .sort((a,b) => a.x - b.x);
 
   if(!upcoming.length) return;
@@ -2365,31 +2363,69 @@ function drawPowerups(){
 
 
 
-function clampFormationY(y, gap){
-  const margin = 58;
+function clampSectionY(y, gap){
+  const margin = 62;
   return clamp(y, margin + gap/2, height - margin - gap/2);
 }
 
-function pushGate(x, gapY, gap, kind, slant, w){
-  const gateIndex = obstacleCount++;
+function getSectionKind(i){
+  // Dezent: Typ 3 Normal ist Basis, Typ 1/2 kommen selten.
+  // Ablauf: Normal, Normal, Treppe, Normal, Normal, Schräg
+  const cycle = ["normal","normal","stair","normal","normal","slanted"];
+  return cycle[i % cycle.length];
+}
+
+function sectionGapY(kind, gap, i){
+  const mid = height * 0.50;
+  const amp = Math.min(78, height * 0.14);
+  if(kind === "normal"){
+    const wave = Math.sin(i * 1.35) * amp * 0.70;
+    return clampSectionY(mid + wave + rand(-amp*.18, amp*.18), gap);
+  }
+  if(kind === "stair"){
+    const stair = [-0.55, -0.18, 0.18, 0.55][Math.floor(i/6)%4] || 0;
+    return clampSectionY(mid + stair * amp, gap);
+  }
+  const diag = [-0.42, 0, 0.42][Math.floor(i/6)%3] || 0;
+  return clampSectionY(mid + diag * amp, gap);
+}
+
+function spawnObstacle(){
+  const i = obstacleCount++;
+  const kind = getSectionKind(i);
+  const gap = getGapForScore(score);
+
+  const w = Math.max(58, Math.min(84, width * 0.115));
+  const x = width + 88;
+  const y = sectionGapY(kind, gap, i);
+
+  // Wichtig: jeder Abschnitt ist ein Hindernis und zählt nur 1 Punkt.
+  const visualCount = kind === "stair" ? 3 : kind === "slanted" ? 3 : 1;
+  const visualStep = w * 0.62; // optisch nah, aber kein echter Mehrfach-Punkte-Cluster
+  const sectionW = kind === "normal" ? w : w + visualStep * (visualCount - 1);
+  const lean = kind === "slanted" ? (i % 2 === 0 ? 1 : -1) * Math.min(14, width * 0.018) : 0;
+
   gatesSinceShieldSpawn++;
 
   obstacles.push({
     x,
-    w,
-    gapY,
-    baseGapY: gapY,
+    w: sectionW,
+    pipeW: w,
+    visualCount,
+    visualStep,
+    gapY: y,
+    baseGapY: y,
     gap,
     baseGap: gap,
     passed:false,
     phase: rand(0, Math.PI*2),
-    color: kind === "slanted" ? "#ffd166" : (gateIndex % 2 === 0 ? COLORS.cyan : COLORS.pink),
+    color: kind === "slanted" ? "#ffd166" : (i % 2 === 0 ? COLORS.cyan : COLORS.pink),
     type: kind,
     gateKind: kind,
-    slant: slant || 0,
+    slant: lean,
     motionAmp: 0,
     motionSpeed: 0,
-    coinPlacement: gateIndex % 3 === 0 ? "before" : gateIndex % 3 === 1 ? "inside" : "after",
+    coinPlacement: i % 3 === 0 ? "before" : i % 3 === 1 ? "inside" : "after",
     coinOffsetY: rand(-gap * 0.05, gap * 0.05),
     coinCollected:false,
     bobAmp: 0,
@@ -2398,83 +2434,20 @@ function pushGate(x, gapY, gap, kind, slant, w){
   });
 }
 
-function spawnNormalFormation(gap){
-  const x = width + 92;
-  const y = clampFormationY(height * rand(0.36, 0.66), gap);
-  pushGate(x, y, clamp(gap + 6, 124, 166), "normal", 0, Math.max(58, width * 0.105));
-}
-
-function spawnStairFormation(gap){
-  // Typ 1: gerade Treppen-Gates, direkt aneinander, kein Abstand.
-  const w = Math.max(62, width * 0.112);
-  const x0 = width + 88;
-  const dir = gameRandom() < 0.5 ? 1 : -1;
-  const center = height * rand(0.46, 0.54);
-  const step = Math.min(42, height * 0.055);
-  const tightGap = clamp(gap - 6, 116, 150);
-
-  const ys = [
-    center + dir * step * 1.20,
-    center + dir * step * 0.45,
-    center - dir * step * 0.35,
-    center - dir * step * 1.05
-  ];
-
-  for(let i=0;i<4;i++){
-    pushGate(x0 + i*(w-1), clampFormationY(ys[i], tightGap), tightGap, "stair", 0, w);
-  }
-}
-
-function spawnSlantedFormation(gap){
-  // Typ 2: 3 schräge Gate-Körper, direkt aneinander, Öffnung bleibt horizontal.
-  const w = Math.max(66, width * 0.118);
-  const x0 = width + 88;
-  const dir = gameRandom() < 0.5 ? 1 : -1;
-  const center = height * rand(0.46, 0.54);
-  const step = Math.min(34, height * 0.045);
-  const tightGap = clamp(gap - 4, 118, 152);
-  const lean = dir * Math.min(22, width * 0.030); // nur leicht schräg, nicht unmöglich
-
-  const ys = [
-    center + dir * step * 0.85,
-    center,
-    center - dir * step * 0.85
-  ];
-
-  for(let i=0;i<3;i++){
-    pushGate(x0 + i*(w-1), clampFormationY(ys[i], tightGap), tightGap, "slanted", lean, w);
-  }
-}
-
-function spawnObstacle(){
-  // Exakter Wechsel:
-  // Typ 3 Normal -> Typ 1 Treppe -> Typ 3 Normal -> Typ 2 Schräg -> wiederholen
-  const gap = getGapForScore(score);
-  const mode = formationIndex % 4;
-  formationIndex++;
-
-  if(mode === 0){
-    spawnNormalFormation(gap);
-    spawnTimer = 1.18;      // normaler Abstand
-  }else if(mode === 1){
-    spawnStairFormation(gap);
-    spawnTimer = 1.42;      // nach Cluster Luft
-  }else if(mode === 2){
-    spawnNormalFormation(gap);
-    spawnTimer = 1.18;      // normaler Abstand
-  }else{
-    spawnSlantedFormation(gap);
-    spawnTimer = 1.44;      // nach schrägem Cluster Luft
-  }
-}
-
 function obstacleCollide(ob){
   if(player.x + player.r < ob.x || player.x - player.r > ob.x + ob.w) return false;
 
-  // Hitbox bleibt fair: Öffnung horizontal, auch bei schrägen Gate-Körpern.
-  const topEdge = ob.gapY - ob.gap/2;
-  const bottomEdge = ob.gapY + ob.gap/2;
-  const forgive = 5;
+  let gapY = ob.gapY;
+  if(ob.gateKind === "stair" || ob.gateKind === "slanted"){
+    const t = clamp((player.x - ob.x) / Math.max(1, ob.w), 0, 1);
+    const count = ob.visualCount || 1;
+    const localStep = ob.gateKind === "stair" ? Math.min(30, height*0.045) : Math.min(24, height*0.035) * (ob.slant >= 0 ? -1 : 1);
+    gapY = clampSectionY(ob.gapY + (t * (count-1) - (count-1)/2) * localStep, ob.gap);
+  }
+
+  const topEdge = gapY - ob.gap/2;
+  const bottomEdge = gapY + ob.gap/2;
+  const forgive = 6;
 
   if(player.y - player.r < topEdge + forgive) return true;
   if(player.y + player.r > bottomEdge - forgive) return true;
@@ -2624,6 +2597,7 @@ function update(dt){
     spawnTimer -= dt;
     if(spawnTimer <= 0){
       spawnObstacle();
+      spawnTimer = getSpawnDelayForScore(score);
     }
 
     powerupSpawnTimer -= dt;
@@ -3008,102 +2982,88 @@ function drawBackground(){
 
 
 function drawObstacle(ob){
-  const topH = ob.gapY - ob.gap/2;
-  const botY = ob.gapY + ob.gap/2;
-  const x = ob.x;
-  const w = ob.w;
+  const count = ob.visualCount || 1;
+  const pipeW = ob.pipeW || ob.w;
+  const step = ob.visualStep || pipeW;
   const color = ob.gateKind === "slanted" ? "#ffd166" : (ob.color || COLORS.cyan);
 
-  const gradTop = ctx.createLinearGradient(x, 0, x+w, Math.max(1, topH));
-  gradTop.addColorStop(0, "rgba(255,255,255,.22)");
-  gradTop.addColorStop(.45, color);
-  gradTop.addColorStop(1, "rgba(6,16,31,.96)");
-
-  const gradBot = ctx.createLinearGradient(x, botY, x+w, height);
-  gradBot.addColorStop(0, "rgba(255,255,255,.18)");
-  gradBot.addColorStop(.45, color);
-  gradBot.addColorStop(1, "rgba(6,16,31,.98)");
-
   ctx.save();
-  ctx.shadowColor = color;
-  ctx.shadowBlur = 18;
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 3;
-
-  if(ob.gateKind === "slanted"){
-    // Gate-Körper schräg, Öffnung bleibt horizontal.
-    const lean = ob.slant || 18;
-
-    ctx.fillStyle = gradTop;
-    ctx.beginPath();
-    ctx.moveTo(x - lean, 0);
-    ctx.lineTo(x + w - lean, 0);
-    ctx.lineTo(x + w, topH);
-    ctx.lineTo(x, topH);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    ctx.fillStyle = gradBot;
-    ctx.beginPath();
-    ctx.moveTo(x, botY);
-    ctx.lineTo(x + w, botY);
-    ctx.lineTo(x + w + lean, height);
-    ctx.lineTo(x + lean, height);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-
-    // Opening edges stay straight/horizontal.
-    ctx.shadowBlur = 22;
-    ctx.lineWidth = 5;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.moveTo(x+6, topH);
-    ctx.lineTo(x+w-6, topH);
-    ctx.moveTo(x+6, botY);
-    ctx.lineTo(x+w-6, botY);
-    ctx.stroke();
-
-    ctx.shadowBlur = 0;
-    ctx.globalAlpha = .28;
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "#ffffff";
-    for(let i=1;i<3;i++){
-      const xx = x + (w/3)*i;
-      ctx.beginPath();
-      ctx.moveTo(xx - lean*.85, 8);
-      ctx.lineTo(xx, topH - 4);
-      ctx.moveTo(xx, botY + 4);
-      ctx.lineTo(xx + lean*.85, height - 8);
-      ctx.stroke();
+  for(let j=0;j<count;j++){
+    const x = ob.x + j*step;
+    let gapY = ob.gapY;
+    if(ob.gateKind === "stair"){
+      const localStep = Math.min(30, height*0.045);
+      gapY = clampSectionY(ob.gapY + (j - (count-1)/2) * localStep, ob.gap);
+    }else if(ob.gateKind === "slanted"){
+      const localStep = Math.min(24, height*0.035);
+      gapY = clampSectionY(ob.gapY + (j - (count-1)/2) * localStep * (ob.slant >= 0 ? -1 : 1), ob.gap);
     }
-  }else{
-    // Straight/normal/stair gates.
-    ctx.fillStyle = gradTop;
-    ctx.fillRect(x, 0, w, topH);
-    ctx.strokeRect(x, 0, w, topH);
 
-    ctx.fillStyle = gradBot;
-    ctx.fillRect(x, botY, w, height - botY);
-    ctx.strokeRect(x, botY, w, height - botY);
+    const topH = gapY - ob.gap/2;
+    const botY = gapY + ob.gap/2;
 
-    ctx.shadowBlur = 22;
+    const gradTop = ctx.createLinearGradient(x, 0, x+pipeW, Math.max(1, topH));
+    gradTop.addColorStop(0, "rgba(255,255,255,.22)");
+    gradTop.addColorStop(.45, color);
+    gradTop.addColorStop(1, "rgba(6,16,31,.96)");
+
+    const gradBot = ctx.createLinearGradient(x, botY, x+pipeW, height);
+    gradBot.addColorStop(0, "rgba(255,255,255,.18)");
+    gradBot.addColorStop(.45, color);
+    gradBot.addColorStop(1, "rgba(6,16,31,.98)");
+
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 16;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+
+    if(ob.gateKind === "slanted"){
+      const lean = ob.slant || 10;
+      ctx.fillStyle = gradTop;
+      ctx.beginPath();
+      ctx.moveTo(x - lean, 0);
+      ctx.lineTo(x + pipeW - lean, 0);
+      ctx.lineTo(x + pipeW, topH);
+      ctx.lineTo(x, topH);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = gradBot;
+      ctx.beginPath();
+      ctx.moveTo(x, botY);
+      ctx.lineTo(x + pipeW, botY);
+      ctx.lineTo(x + pipeW + lean, height);
+      ctx.lineTo(x + lean, height);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }else{
+      ctx.fillStyle = gradTop;
+      ctx.fillRect(x, 0, pipeW, topH);
+      ctx.strokeRect(x, 0, pipeW, topH);
+
+      ctx.fillStyle = gradBot;
+      ctx.fillRect(x, botY, pipeW, height - botY);
+      ctx.strokeRect(x, botY, pipeW, height - botY);
+    }
+
+    ctx.shadowBlur = 18;
     ctx.lineWidth = 5;
     ctx.lineCap = "round";
     ctx.beginPath();
     ctx.moveTo(x+6, topH);
-    ctx.lineTo(x+w-6, topH);
+    ctx.lineTo(x+pipeW-6, topH);
     ctx.moveTo(x+6, botY);
-    ctx.lineTo(x+w-6, botY);
+    ctx.lineTo(x+pipeW-6, botY);
     ctx.stroke();
 
     ctx.shadowBlur = 0;
-    ctx.globalAlpha = .26;
+    ctx.globalAlpha = .24;
     ctx.lineWidth = 3;
     ctx.strokeStyle = "#ffffff";
-    for(let i=1;i<3;i++){
-      const xx = x + (w/3)*i;
+    for(let k=1;k<3;k++){
+      const xx = x + (pipeW/3)*k;
       ctx.beginPath();
       ctx.moveTo(xx, 8);
       ctx.lineTo(xx, topH - 6);
@@ -3111,8 +3071,8 @@ function drawObstacle(ob){
       ctx.lineTo(xx, height - 8);
       ctx.stroke();
     }
+    ctx.globalAlpha = 1;
   }
-
   ctx.restore();
 }
 
