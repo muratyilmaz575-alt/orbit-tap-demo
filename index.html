@@ -4,7 +4,7 @@
   <!-- Orbit Tap V35 Presentation Build: stable local HTML test version -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Orbit Tap GitHub Stable</title>
+  <title>Orbit Tap Pattern Motion Build</title>
   <style>
     :root{
       --bg1:#07101f;
@@ -748,7 +748,7 @@
       .centerMsg .big{font-size:42px}
     }
   
-/* GitHub Stable Mobile Build */
+/* GitHub Pattern Motion Mobile Build */
 body{background:#050913!important;overscroll-behavior:none}
 .app{padding:0!important;align-items:stretch!important}
 .phone{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;gap:0!important;display:block!important}
@@ -771,9 +771,9 @@ body.cleanPlaying .runEndCard{display:none!important}
   <div class="phone" id="phone">
     <header class="top">
       <div class="brand">
-        <div class="label">GitHub Stable</div>
+        <div class="label">Pattern Motion</div>
         <h1>Orbit Tap</h1>
-        <p>GitHub stable build</p>
+        <p>Pattern & motion gates</p>
       </div>
       <div class="stat">
         <div class="label">Coins</div>
@@ -783,7 +783,7 @@ body.cleanPlaying .runEndCard{display:none!important}
 
     <section class="hint">
       <div class="hintMain">Ziel: <b>Ein Tap hebt dich hoch.</b> Flieg durch die <b>Energy Gates</b> und überlebe so lange wie möglich.</div>
-      <div class="hintSmall">GitHub stabile Spielversion.</div>
+      <div class="hintSmall">Pattern/Motion Testversion.</div>
     </section>
 
     <main class="gameWrap" id="touchArea">
@@ -876,6 +876,10 @@ let musicIntensity = 0;
 
 let player = null;
 let obstacles = [];
+let patternQueue = [];
+let lastGapY = 0;
+let obstacleCount = 0;
+let nextSpawnDelayOverride = null;
 let powerups = [];
 let powerupSpawnTimer = 0;
 let shieldActive = false;
@@ -1849,7 +1853,7 @@ function showMenu(){
   const next = getNextUnlock();
   modalBase(
     "Orbit Tap",
-    "GitHub Stable Build: Original-Spielkern, mobile Ansicht, Crash zurück ins Menü.",
+    "Pattern Motion Build: schräge Gate-Folgen, einzelne bewegliche Gates, Crash zurück ins Menü.",
     `
       <div class="heroCard">
         <div class="heroTop">
@@ -2063,6 +2067,10 @@ function startGame(){
   shockwaves = [];
   coinPopups = [];
   obstacles = [];
+  patternQueue = [];
+  lastGapY = height * 0.50;
+  obstacleCount = 0;
+  nextSpawnDelayOverride = null;
   powerups = [];
   shieldActive = false;
   shieldTimer = 0;
@@ -2122,10 +2130,10 @@ function getGapForScore(s){
 }
 
 function getSpawnDelayForScore(s){
-  if(s < 15) return 1.70;
-  if(s < 35) return clamp(1.70 - (s - 15) * 0.006, 1.58, 1.70);
-  if(s < 60) return clamp(1.58 - (s - 35) * 0.006, 1.43, 1.58);
-  return clamp(1.43 - (s - 60) * 0.004, 1.18, 1.43);
+  if(s < 15) return 1.58;
+  if(s < 35) return clamp(1.58 - (s - 15) * 0.004, 1.48, 1.58);
+  if(s < 60) return clamp(1.48 - (s - 35) * 0.004, 1.35, 1.48);
+  return clamp(1.35 - (s - 60) * 0.003, 1.16, 1.35);
 }
 
 
@@ -2141,28 +2149,9 @@ function spawnCoinPopup(x, y, amount){
   });
 }
 
-function updateCoinPopups(dt){
-  for(const c of coinPopups){
-    c.y += c.vy * dt;
-    c.life -= dt * 1.15;
-  }
-  coinPopups = coinPopups.filter(c => c.life > 0);
-}
+function updateCoinPopups(dt){}
 
-function drawCoinPopups(){
-  for(const c of coinPopups){
-    ctx.save();
-    ctx.globalAlpha = Math.max(0, c.life);
-    ctx.fillStyle = COLORS.gold;
-    ctx.shadowColor = COLORS.gold;
-    ctx.shadowBlur = 18;
-    ctx.font = "1000 18px system-ui";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("🪙 +" + c.amount, c.x, c.y);
-    ctx.restore();
-  }
-}
+function drawCoinPopups(){}
 
 function getGateCoinPosition(ob){
   const gapTop = ob.gapY - ob.gap / 2;
@@ -2370,33 +2359,110 @@ function drawPowerups(){
 }
 
 
+
+function clampGapYForGate(y, gap){
+  const margin = 82;
+  return clamp(y, margin + gap/2, height - margin - gap/2);
+}
+
+function buildGatePattern(gap){
+  const base = lastGapY || height * 0.50;
+  const maxStep = Math.min(74, height * 0.105);
+  const roll = gameRandom();
+  let pattern;
+
+  if(score < 5){
+    pattern = [
+      {offset:0, motion:false, tight:false},
+      {offset:rand(-maxStep*.45,maxStep*.45), motion:false, tight:false}
+    ];
+  }else if(roll < .26){
+    pattern = [
+      {offset:maxStep*.55, motion:false, tight:false},
+      {offset:maxStep*.20, motion:false, tight:true},
+      {offset:-maxStep*.18, motion:score>=10, tight:false},
+      {offset:-maxStep*.52, motion:false, tight:false}
+    ];
+  }else if(roll < .52){
+    pattern = [
+      {offset:-maxStep*.55, motion:false, tight:false},
+      {offset:-maxStep*.18, motion:false, tight:true},
+      {offset:maxStep*.18, motion:score>=10, tight:false},
+      {offset:maxStep*.55, motion:false, tight:false}
+    ];
+  }else if(roll < .76){
+    pattern = [
+      {offset:0, motion:false, tight:false},
+      {offset:-maxStep*.55, motion:score>=12, tight:true},
+      {offset:0, motion:false, tight:false},
+      {offset:maxStep*.55, motion:score>=12, tight:true},
+      {offset:0, motion:false, tight:false}
+    ];
+  }else{
+    pattern = [
+      {offset:rand(-maxStep*.45,maxStep*.45), motion:true, tight:false},
+      {offset:0, motion:false, tight:false},
+      {offset:rand(-maxStep*.35,maxStep*.35), motion:false, tight:false}
+    ];
+  }
+
+  const safeBase = clampGapYForGate(base + rand(-maxStep*.25, maxStep*.25), gap);
+  patternQueue = pattern.map(p => ({
+    gapY: clampGapYForGate(safeBase + p.offset, gap),
+    motion: !!p.motion,
+    tight: !!p.tight
+  }));
+}
+
+
 function spawnObstacle(){
   const gap = getGapForScore(score);
-  const margin = 90;
-  const gapY = rand(margin + gap/2, height - margin - gap/2);
   const w = score < 10 ? rand(64, 82) : score < 35 ? rand(68, 90) : rand(70, 96);
   const x = width + 90;
   const phase = rand(0, Math.PI*2);
   const color = gameRandom()<.5 ? COLORS.cyan : COLORS.pink;
 
+  if(patternQueue.length === 0){
+    buildGatePattern(gap);
+  }
+
+  const patternItem = patternQueue.shift() || {gapY:height*.5, motion:false, tight:false};
+  const gapY = clampGapYForGate(patternItem.gapY, gap);
+  lastGapY = gapY;
+  obstacleCount++;
+
   const typeRoll = gameRandom();
-  const type = score < 6 ? "normal" : typeRoll < .16 ? "thin" : typeRoll < .30 ? "pulse" : "normal";
+  const motionGate = patternItem.motion && score >= 7;
+  const type = motionGate ? "motion" : score < 6 ? "normal" : typeRoll < .14 ? "thin" : typeRoll < .26 ? "pulse" : "normal";
+
   const coinPlacementRoll = gameRandom();
   const coinPlacement = coinPlacementRoll < .34 ? "before" : coinPlacementRoll < .68 ? "inside" : "after";
-  const coinOffsetY = rand(-gap * 0.15, gap * 0.15);
+  const coinOffsetY = rand(-gap * 0.13, gap * 0.13);
+
+  if(patternItem.tight){
+    nextSpawnDelayOverride = clamp(getSpawnDelayForScore(score) * 0.72, 1.02, 1.22);
+  }else{
+    nextSpawnDelayOverride = null;
+  }
 
   obstacles.push({
-    x, w: type === "thin" ? w * .72 : w, gapY, gap: type === "pulse" ? gap + 16 : gap,
+    x,
+    w: type === "thin" ? w * .72 : w,
+    gapY,
+    baseGapY: gapY,
+    gap: type === "pulse" ? gap + 16 : gap,
     baseGap: type === "pulse" ? gap + 16 : gap,
     passed:false,
     phase,
     color,
     type,
+    motionAmp: motionGate ? rand(22, 42) : 0,
+    motionSpeed: motionGate ? rand(1.05, 1.45) : 0,
     coinPlacement,
     coinOffsetY,
     coinCollected:false,
-    bobAmp: type === "normal" ? rand(10, 22) : rand(6, 16),
-    bobSpeed: rand(.8, 1.4),
+    bobAmp: motionGate ? 0 : (type === "normal" ? rand(2, 8) : rand(2, 6)),
+    bobSpeed: rand(.65, 1.05),
     shardCount: Math.round(rand(4, 6))
   });
 }
@@ -2561,7 +2627,8 @@ function update(dt){
     spawnTimer -= dt;
     if(spawnTimer <= 0){
       spawnObstacle();
-      spawnTimer = getSpawnDelayForScore(score);
+      spawnTimer = nextSpawnDelayOverride || getSpawnDelayForScore(score);
+      nextSpawnDelayOverride = null;
     }
 
     powerupSpawnTimer -= dt;
@@ -2587,9 +2654,16 @@ function update(dt){
 
     for(const ob of obstacles){
       ob.x -= speedPx * dt;
-      ob.gapY += Math.sin(bgT*ob.bobSpeed + ob.phase) * ob.bobAmp * dt;
+
+      if(ob.type === "motion"){
+        const movingY = ob.baseGapY + Math.sin(bgT * ob.motionSpeed + ob.phase) * ob.motionAmp;
+        ob.gapY = clampGapYForGate(movingY, ob.gap);
+      }else{
+        ob.gapY = clampGapYForGate(ob.baseGapY + Math.sin(bgT*ob.bobSpeed + ob.phase) * ob.bobAmp, ob.gap);
+      }
+
       if(ob.type === "pulse"){
-        ob.gap = ob.baseGap + Math.sin(bgT*3.2 + ob.phase) * 14;
+        ob.gap = ob.baseGap + Math.sin(bgT*3.2 + ob.phase) * 10;
       }
 
       // Coin wird sofort beim echten Berühren eingesammelt.
