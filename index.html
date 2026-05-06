@@ -4,7 +4,7 @@
   <!-- Orbit Tap V35 Presentation Build: stable local HTML test version -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Orbit Tap Slanted Cluster Gates</title>
+  <title>Orbit Tap Alternating Gates</title>
   <style>
     :root{
       --bg1:#07101f;
@@ -748,22 +748,63 @@
       .centerMsg .big{font-size:42px}
     }
   
-/* SLANTED CLUSTER GATES BUILD */
+/* ALTERNATING GATES BUILD */
 body{background:#050913!important;overscroll-behavior:none}
 .app{padding:0!important;align-items:stretch!important}
 .phone{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;gap:0!important;display:block!important}
 .top,.hint,.controls{display:none!important}
 .gameWrap{position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;border-radius:0!important;border:none!important;padding:0!important;background:#050913!important;box-shadow:none!important}
 canvas{width:100%!important;height:100%!important;border-radius:0!important}
-.hud{top:calc(env(safe-area-inset-top,0px) + 12px)!important;left:10px!important;right:10px!important;gap:5px!important}
-.hudPill{padding:7px 8px!important;font-size:11px!important;background:rgba(8,15,29,.62)!important}
-.bigScore{top:18%!important;font-size:76px!important}
+.hud{top:calc(env(safe-area-inset-top,0px) + 12px)!important;left:10px!important;right:10px!important;gap:5px!important;opacity:.88}
+.hudPill{padding:7px 8px!important;font-size:11px!important;background:rgba(8,15,29,.45)!important}
+.bigScore{
+  top:calc(env(safe-area-inset-top,0px) + 60px)!important;
+  font-size:58px!important;
+  font-weight:1000!important;
+  color:#fff!important;
+  opacity:1!important;
+  text-shadow:
+    -4px -4px 0 #111,
+     4px -4px 0 #111,
+    -4px  4px 0 #111,
+     4px  4px 0 #111,
+     0 8px 0 rgba(0,0,0,.25)!important;
+  letter-spacing:-.08em!important;
+}
 .overlay{position:fixed!important;inset:0!important;padding:calc(env(safe-area-inset-top,0px) + 12px) 12px calc(env(safe-area-inset-bottom,0px) + 12px)!important;background:radial-gradient(circle at 50% 0%,rgba(53,231,255,.16),transparent 34%),radial-gradient(circle at 90% 15%,rgba(255,79,216,.12),transparent 28%),rgba(2,6,23,.88)!important}
 .modal{width:min(94vw,430px)!important;max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 28px)!important;border-radius:32px!important}
 body.cleanPlaying .centerMsg,
 body.cleanPlaying .bottomMsg,
 body.cleanPlaying .runEndCard{display:none!important}
 .buildMark{margin-top:10px;padding:10px 12px;border-radius:16px;border:1px solid rgba(255,209,102,.40);background:rgba(255,209,102,.16);color:#ffe7a3;font-size:13px;font-weight:1000;text-align:center}
+.lastScoreCard{
+  margin-top:10px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.lastScoreBox{
+  border:1px solid rgba(255,255,255,.13);
+  background:rgba(2,6,23,.30);
+  border-radius:18px;
+  padding:10px 8px;
+  text-align:center;
+}
+.lastScoreBox b{
+  display:block;
+  font-size:24px;
+  color:#fff;
+  line-height:1;
+}
+.lastScoreBox span{
+  display:block;
+  margin-top:5px;
+  color:var(--muted);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
 
 </style>
 </head>
@@ -772,9 +813,9 @@ body.cleanPlaying .runEndCard{display:none!important}
   <div class="phone" id="phone">
     <header class="top">
       <div class="brand">
-        <div class="label">SLANTED CLUSTER GATES</div>
+        <div class="label">ALTERNATING GATES</div>
         <h1>Orbit Tap</h1>
-        <p>SLANTED CLUSTER GATES</p>
+        <p>Alternating gates · score style</p>
       </div>
       <div class="stat">
         <div class="label">Coins</div>
@@ -784,7 +825,7 @@ body.cleanPlaying .runEndCard{display:none!important}
 
     <section class="hint">
       <div class="hintMain">Ziel: <b>Ein Tap hebt dich hoch.</b> Flieg durch die <b>Energy Gates</b> und überlebe so lange wie möglich.</div>
-      <div class="hintSmall">SLANTED CLUSTER GATES: schräge + zusammenhängende Gates.</div>
+      <div class="hintSmall">Alternating Gates Build.</div>
     </section>
 
     <main class="gameWrap" id="touchArea">
@@ -877,10 +918,11 @@ let musicIntensity = 0;
 
 let player = null;
 let obstacles = [];
+let formationQueue = [];
+let formationIndex = 0;
 let obstacleCount = 0;
 let gatesSinceShieldSpawn = 999;
-let clusterGateIndex = 0;
-let clusterRestCounter = 0;
+let lastRunScore = 0;
 let powerups = [];
 let powerupSpawnTimer = 0;
 let shieldActive = false;
@@ -1854,7 +1896,7 @@ function showMenu(){
   const next = getNextUnlock();
   modalBase(
     "Orbit Tap",
-    "SLANTED CLUSTER GATES: echte schräge Gates, nahe 4er-Cluster, danach wieder Luft, Shield mehrfach.",
+    "ALTERNATING GATES: Normal → gerade Cluster → Normal → schräge Cluster. Letzter Score wird im Menü angezeigt.",
     `
       <div class="heroCard">
         <div class="heroTop">
@@ -1884,7 +1926,7 @@ function showMenu(){
         </div>
       </div>
 
-      ${getUnlockProgressHtml()}<div class="buildMark">SLANTED CLUSTER GATES aktiv: schräge Gates + 4er-Cluster + Erholung + Shield mehrfach</div>
+      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">ALTERNATING GATES aktiv: Normal → gerade Cluster → Normal → schräge Cluster</div>
 
       <div class="demoNotice"><b>Hinweis:</b> Rankings, Freunde und Daily-Ranking sind in dieser HTML-Version Demo-Daten. Der Spielkern, Coins, Shop, Powerups und Daily-Seed laufen lokal.</div>
 
@@ -2001,6 +2043,7 @@ function showRunEnd(){
 
 function showGameOver(){
   document.body.classList.remove("cleanPlaying");
+  lastRunScore = score;
   showMenu();
 }
 function toggleSound(){
@@ -2068,10 +2111,10 @@ function startGame(){
   shockwaves = [];
   coinPopups = [];
   obstacles = [];
+  formationQueue = [];
+  formationIndex = 0;
   obstacleCount = 0;
   gatesSinceShieldSpawn = 999;
-  clusterGateIndex = 0;
-  clusterRestCounter = 0;
   powerups = [];
   shieldActive = false;
   shieldTimer = 0;
@@ -2129,22 +2172,10 @@ function getGapForScore(s){
 }
 
 function getSpawnDelayForScore(s){
-  // Wechsel: Cluster nah zusammen, danach Erholung.
-  if(clusterRestCounter > 0){
-    clusterRestCounter--;
-    return 1.45;
+  if(formationQueue.length > 0){
+    return formationQueue[0].cluster ? 0.62 : 1.42;
   }
-
-  // 4er-Cluster: sehr sichtbar nah beieinander
-  const idx = clusterGateIndex % 5;
-  clusterGateIndex++;
-  if(idx < 4){
-    return 0.64;
-  }
-
-  // Nach 4 nahen Gates kommt Luft
-  clusterRestCounter = 1;
-  return 1.55;
+  return 1.25;
 }
 
 
@@ -2359,55 +2390,85 @@ function drawPowerups(){
 
 
 
-function clusterLevelForGate(i){
-  // Sehr sichtbare Treppe/Tunnel: unten -> tiefer-mitte -> mitte -> hoch -> pause -> oben -> mitte -> unten
-  const levels = [0.72, 0.62, 0.52, 0.42, 0.30, 0.40, 0.52, 0.64, 0.74, 0.50, 0.34, 0.66];
-  return levels[i % levels.length];
-}
-
-function clampClusterY(y, gap){
+function clampFormationY(y, gap){
   const margin = 72;
   return clamp(y, margin + gap/2, height - margin - gap/2);
 }
 
+function enqueueFormation(gap){
+  // Exakter Wechsel: Normal -> gerade Cluster -> Normal -> schräger Cluster -> wieder von vorne
+  const mode = formationIndex % 4;
+  formationIndex++;
+
+  const mid = height * 0.50;
+  const step = Math.min(78, height * 0.105);
+
+  if(mode === 0){
+    // Normal-Gates mit Luft
+    formationQueue.push(
+      {kind:"normal", cluster:false, y:clampFormationY(mid + rand(-step*.45, step*.45), gap), slant:0, motion:false},
+      {kind:"normal", cluster:false, y:clampFormationY(mid + rand(-step*.45, step*.45), gap), slant:0, motion:false}
+    );
+  }else if(mode === 1){
+    // Gerade zusammenhängende Gates: Treppe nach oben
+    formationQueue.push(
+      {kind:"straightCluster", cluster:true, y:clampFormationY(mid + step*.75, gap), slant:0, motion:false},
+      {kind:"straightCluster", cluster:true, y:clampFormationY(mid + step*.38, gap), slant:0, motion:false},
+      {kind:"straightCluster", cluster:true, y:clampFormationY(mid, gap), slant:0, motion:false},
+      {kind:"straightCluster", cluster:true, y:clampFormationY(mid - step*.38, gap), slant:0, motion:false},
+      {kind:"straightCluster", cluster:false, y:clampFormationY(mid - step*.70, gap), slant:0, motion:false}
+    );
+  }else if(mode === 2){
+    // Erholung normal, weiter auseinander
+    formationQueue.push(
+      {kind:"normal", cluster:false, y:clampFormationY(mid - step*.30, gap), slant:0, motion:false},
+      {kind:"normal", cluster:false, y:clampFormationY(mid + step*.25, gap), slant:0, motion:false}
+    );
+  }else{
+    // Schräge 3er-Gates gegenüberstehend: Diagonal-Tunnel
+    const direction = formationIndex % 2 === 0 ? 1 : -1;
+    formationQueue.push(
+      {kind:"slantedCluster", cluster:true, y:clampFormationY(mid + step*.45*direction, gap), slant:48*direction, motion:false},
+      {kind:"slantedCluster", cluster:true, y:clampFormationY(mid, gap), slant:48*direction, motion:false},
+      {kind:"slantedCluster", cluster:true, y:clampFormationY(mid - step*.45*direction, gap), slant:48*direction, motion:false},
+      {kind:"slantedCluster", cluster:false, y:clampFormationY(mid, gap), slant:0, motion:false}
+    );
+  }
+}
+
 function spawnObstacle(){
   const gap = getGapForScore(score);
-  const x = width + 72;
-  const phase = rand(0, Math.PI*2);
 
+  if(formationQueue.length === 0){
+    enqueueFormation(gap);
+  }
+
+  const item = formationQueue.shift();
   const gateIndex = obstacleCount++;
-  const level = clusterLevelForGate(gateIndex);
-  const gapY = clampClusterY(height * level, gap);
-
-  // sichtbar zusammenhängende Gruppen: 4 nahe Gates, dann Luft
-  const groupPos = gateIndex % 5;
-  const isRestGate = groupPos === 4;
-
-  const slantDirection = Math.floor(gateIndex / 2) % 2 === 0 ? 1 : -1;
-  const isSlanted = groupPos !== 4; // Cluster-Gates sind schräg
-  const slant = isSlanted ? slantDirection * (score < 8 ? 32 : 44) : 0;
-  const motionGate = gateIndex >= 6 && gateIndex % 7 === 2;
-  const type = motionGate ? "motion" : (gateIndex % 9 === 5 ? "pulse" : "slanted");
-
   gatesSinceShieldSpawn++;
+
+  const type = item.kind === "slantedCluster" ? "slanted" : (gateIndex % 9 === 5 ? "pulse" : "normal");
+  const x = width + 76;
+  const phase = rand(0, Math.PI*2);
 
   const coinPlacement = gateIndex % 3 === 0 ? "before" : gateIndex % 3 === 1 ? "inside" : "after";
   const coinOffsetY = rand(-gap * 0.08, gap * 0.08);
 
   obstacles.push({
     x,
-    w: isRestGate ? 66 : 82,
-    gapY,
-    baseGapY: gapY,
+    w: item.cluster ? 86 : 68,
+    gapY: item.y,
+    baseGapY: item.y,
     gap: type === "pulse" ? gap + 10 : gap,
     baseGap: type === "pulse" ? gap + 10 : gap,
     passed:false,
     phase,
-    color: gateIndex % 2 === 0 ? COLORS.cyan : COLORS.pink,
+    color: item.kind === "slantedCluster" ? COLORS.gold : (gateIndex % 2 === 0 ? COLORS.cyan : COLORS.pink),
     type,
-    slant,
-    motionAmp: motionGate ? 38 : 0,
-    motionSpeed: motionGate ? 1.35 : 0,
+    gateKind: item.kind,
+    slant: item.slant || 0,
+    motionAmp: 0,
+    motionSpeed: 0,
     coinPlacement,
     coinOffsetY,
     coinCollected:false,
@@ -2425,7 +2486,6 @@ function obstacleCollide(ob){
   const topEdge = (ob.gapY - ob.gap/2) + (-s + 2*s*t);
   const bottomEdge = (ob.gapY + ob.gap/2) + (-s + 2*s*t);
 
-  // etwas tolerant, damit die schrägen Gates fair bleiben
   const forgive = 8;
   if(player.y - player.r < topEdge + forgive) return true;
   if(player.y + player.r > bottomEdge - forgive) return true;
@@ -2511,6 +2571,7 @@ function crash(reason="CRASH"){
   }
 
   document.body.classList.remove("cleanPlaying");
+  lastRunScore = score;
   status = "dead";
   player.dead = true;
   screenShake = .9;
@@ -2602,11 +2663,7 @@ function update(dt){
     for(const ob of obstacles){
       ob.x -= speedPx * dt;
 
-      if(ob.type === "motion"){
-        ob.gapY = clampClusterY(ob.baseGapY + Math.sin(bgT * ob.motionSpeed + ob.phase) * ob.motionAmp, ob.gap);
-      }else{
-        ob.gapY = ob.baseGapY;
-      }
+      ob.gapY = ob.baseGapY;
 
       if(ob.type === "pulse"){
         ob.gap = ob.baseGap + Math.sin(bgT*3.2 + ob.phase) * 8;
@@ -2989,7 +3046,7 @@ function drawObstacle(ob){
   gradBot.addColorStop(.45, color);
   gradBot.addColorStop(1, "rgba(6,16,31,.98)");
 
-  // Top slanted block
+  // Top piece
   ctx.fillStyle = gradTop;
   ctx.strokeStyle = color;
   ctx.lineWidth = 3;
@@ -3002,7 +3059,7 @@ function drawObstacle(ob){
   ctx.fill();
   ctx.stroke();
 
-  // Bottom slanted block
+  // Bottom piece
   ctx.fillStyle = gradBot;
   ctx.beginPath();
   ctx.moveTo(x, botY - s);
@@ -3013,7 +3070,7 @@ function drawObstacle(ob){
   ctx.fill();
   ctx.stroke();
 
-  // Clear gate-edge lines, so the slope is obvious
+  // Gate edge lines
   ctx.shadowBlur = 24;
   ctx.lineWidth = 6;
   ctx.lineCap = "round";
@@ -3036,7 +3093,7 @@ function drawObstacle(ob){
   ctx.lineTo(x+w-12, botY + s - 6);
   ctx.stroke();
 
-  // Segments: makes it feel like connected pipe/cluster pieces
+  // Vertical segment lines to make straight cluster feel like pipes
   ctx.globalAlpha = .30;
   ctx.lineWidth = 3;
   ctx.strokeStyle = "#ffffff";
@@ -3049,14 +3106,6 @@ function drawObstacle(ob){
     ctx.moveTo(xx, botY - s*(i/segs - .5));
     ctx.lineTo(xx + s*.18, Math.min(height-8, botY + Math.abs(s) + 90));
     ctx.stroke();
-  }
-
-  if(ob.type === "motion"){
-    ctx.globalAlpha = .30 + Math.sin(bgT*5 + ob.phase)*.08;
-    ctx.fillStyle = "#ffffff";
-    ctx.beginPath();
-    ctx.arc(x + w/2, ob.gapY, 9, 0, Math.PI*2);
-    ctx.fill();
   }
 
   ctx.restore();
