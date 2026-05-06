@@ -4,7 +4,7 @@
   <!-- Orbit Tap V35 Presentation Build: stable local HTML test version -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Orbit Tap Pattern Motion Shield Repeat</title>
+  <title>Orbit Tap Slanted Cluster Gates</title>
   <style>
     :root{
       --bg1:#07101f;
@@ -748,7 +748,7 @@
       .centerMsg .big{font-size:42px}
     }
   
-/* PATTERN MOTION + SHIELD REPEAT BUILD */
+/* SLANTED CLUSTER GATES BUILD */
 body{background:#050913!important;overscroll-behavior:none}
 .app{padding:0!important;align-items:stretch!important}
 .phone{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;gap:0!important;display:block!important}
@@ -763,7 +763,7 @@ canvas{width:100%!important;height:100%!important;border-radius:0!important}
 body.cleanPlaying .centerMsg,
 body.cleanPlaying .bottomMsg,
 body.cleanPlaying .runEndCard{display:none!important}
-.buildMark{margin-top:10px;padding:8px 10px;border-radius:16px;border:1px solid rgba(255,209,102,.28);background:rgba(255,209,102,.12);color:#ffe7a3;font-size:12px;font-weight:900}
+.buildMark{margin-top:10px;padding:10px 12px;border-radius:16px;border:1px solid rgba(255,209,102,.40);background:rgba(255,209,102,.16);color:#ffe7a3;font-size:13px;font-weight:1000;text-align:center}
 
 </style>
 </head>
@@ -772,9 +772,9 @@ body.cleanPlaying .runEndCard{display:none!important}
   <div class="phone" id="phone">
     <header class="top">
       <div class="brand">
-        <div class="label">Pattern Motion + Shield Repeat</div>
+        <div class="label">SLANTED CLUSTER GATES</div>
         <h1>Orbit Tap</h1>
-        <p>Pattern Motion + Shield Repeat</p>
+        <p>SLANTED CLUSTER GATES</p>
       </div>
       <div class="stat">
         <div class="label">Coins</div>
@@ -784,7 +784,7 @@ body.cleanPlaying .runEndCard{display:none!important}
 
     <section class="hint">
       <div class="hintMain">Ziel: <b>Ein Tap hebt dich hoch.</b> Flieg durch die <b>Energy Gates</b> und überlebe so lange wie möglich.</div>
-      <div class="hintSmall">Pattern Motion + Shield Repeat Build.</div>
+      <div class="hintSmall">SLANTED CLUSTER GATES: schräge + zusammenhängende Gates.</div>
     </section>
 
     <main class="gameWrap" id="touchArea">
@@ -877,11 +877,10 @@ let musicIntensity = 0;
 
 let player = null;
 let obstacles = [];
-let patternQueue = [];
-let lastGapY = 0;
 let obstacleCount = 0;
-let nextSpawnDelayOverride = null;
 let gatesSinceShieldSpawn = 999;
+let clusterGateIndex = 0;
+let clusterRestCounter = 0;
 let powerups = [];
 let powerupSpawnTimer = 0;
 let shieldActive = false;
@@ -1855,7 +1854,7 @@ function showMenu(){
   const next = getNextUnlock();
   modalBase(
     "Orbit Tap",
-    "Pattern Motion + Shield Repeat Build: schräge Gates, bewegliche Gates, Shield kommt mehrfach.",
+    "SLANTED CLUSTER GATES: echte schräge Gates, nahe 4er-Cluster, danach wieder Luft, Shield mehrfach.",
     `
       <div class="heroCard">
         <div class="heroTop">
@@ -1885,7 +1884,7 @@ function showMenu(){
         </div>
       </div>
 
-      ${getUnlockProgressHtml()}<div class="buildMark">NEUE VERSION: Pattern Motion + Shield Repeat aktiv</div>
+      ${getUnlockProgressHtml()}<div class="buildMark">SLANTED CLUSTER GATES aktiv: schräge Gates + 4er-Cluster + Erholung + Shield mehrfach</div>
 
       <div class="demoNotice"><b>Hinweis:</b> Rankings, Freunde und Daily-Ranking sind in dieser HTML-Version Demo-Daten. Der Spielkern, Coins, Shop, Powerups und Daily-Seed laufen lokal.</div>
 
@@ -2069,11 +2068,10 @@ function startGame(){
   shockwaves = [];
   coinPopups = [];
   obstacles = [];
-  patternQueue = [];
-  lastGapY = height * 0.50;
   obstacleCount = 0;
-  nextSpawnDelayOverride = null;
   gatesSinceShieldSpawn = 999;
+  clusterGateIndex = 0;
+  clusterRestCounter = 0;
   powerups = [];
   shieldActive = false;
   shieldTimer = 0;
@@ -2116,27 +2114,37 @@ function tapFly(){
 
 
 function getSpeedForScore(s){
-  if(s < 12) return 0.82 + s * 0.026;
-  if(s < 30) return 1.13 + (s - 12) * 0.018;
-  if(s < 55) return 1.45 + (s - 30) * 0.012;
-  return Math.min(2.18, 1.75 + (s - 55) * 0.005);
+  if(s < 20) return 0.72 + s * 0.018;
+  if(s < 55) return 1.08 + (s - 20) * 0.010;
+  return Math.min(1.82, 1.43 + (s - 55) * 0.004);
 }
 
 function getGapForScore(s){
-  const base = height * 0.37;
+  const base = height * 0.39;
   let shrink;
-  if(s < 12) shrink = s * 0.85;
-  else if(s < 30) shrink = 10 + (s - 12) * 1.0;
-  else if(s < 55) shrink = 28 + (s - 30) * 0.82;
-  else shrink = 49 + (s - 55) * 0.62;
-  return clamp(base - shrink, 150, 252);
+  if(s < 20) shrink = s * 0.55;
+  else if(s < 55) shrink = 11 + (s - 20) * 0.50;
+  else shrink = 29 + (s - 55) * 0.42;
+  return clamp(base - shrink, 164, 270);
 }
 
 function getSpawnDelayForScore(s){
-  if(s < 12) return 1.42;
-  if(s < 30) return clamp(1.42 - (s - 12) * 0.004, 1.32, 1.42);
-  if(s < 55) return clamp(1.32 - (s - 30) * 0.004, 1.18, 1.32);
-  return clamp(1.18 - (s - 55) * 0.003, 1.04, 1.18);
+  // Wechsel: Cluster nah zusammen, danach Erholung.
+  if(clusterRestCounter > 0){
+    clusterRestCounter--;
+    return 1.45;
+  }
+
+  // 4er-Cluster: sehr sichtbar nah beieinander
+  const idx = clusterGateIndex % 5;
+  clusterGateIndex++;
+  if(idx < 4){
+    return 0.64;
+  }
+
+  // Nach 4 nahen Gates kommt Luft
+  clusterRestCounter = 1;
+  return 1.55;
 }
 
 
@@ -2246,16 +2254,15 @@ function spawnPowerup(){
   let type;
   const roll = gameRandom();
 
-  // Shield kommt mehrfach: nach ungefähr 12 Gates wieder.
-  if(gatesSinceShieldSpawn >= 12){
+  if(gatesSinceShieldSpawn >= 10){
     type = "shield";
     gatesSinceShieldSpawn = 0;
   }else{
-    type = roll < .58 ? "coin" : "slow";
+    type = roll < .55 ? "coin" : "slow";
   }
 
   const upcoming = obstacles
-    .filter(ob => ob.x > player.x + 150 && !ob.powerupReserved)
+    .filter(ob => ob.x > player.x + 120 && !ob.powerupReserved)
     .sort((a,b) => a.x - b.x);
 
   if(!upcoming.length) return;
@@ -2352,128 +2359,77 @@ function drawPowerups(){
 
 
 
-function clampGapYForGate(y, gap){
-  const margin = 76;
-  return clamp(y, margin + gap/2, height - margin - gap/2);
+function clusterLevelForGate(i){
+  // Sehr sichtbare Treppe/Tunnel: unten -> tiefer-mitte -> mitte -> hoch -> pause -> oben -> mitte -> unten
+  const levels = [0.72, 0.62, 0.52, 0.42, 0.30, 0.40, 0.52, 0.64, 0.74, 0.50, 0.34, 0.66];
+  return levels[i % levels.length];
 }
 
-function buildGatePattern(gap){
-  const base = lastGapY || height * 0.50;
-  const maxStep = Math.min(90, height * 0.13);
-  const roll = gameRandom();
-  let pattern;
-
-  if(score < 4){
-    pattern = [
-      {offset:0, motion:false, tight:false},
-      {offset:rand(-maxStep*.35,maxStep*.35), motion:false, tight:false},
-      {offset:rand(-maxStep*.45,maxStep*.45), motion:false, tight:true}
-    ];
-  }else if(roll < .28){
-    pattern = [
-      {offset:maxStep*.72, motion:false, tight:false},
-      {offset:maxStep*.36, motion:false, tight:true},
-      {offset:0, motion:true, tight:true},
-      {offset:-maxStep*.36, motion:false, tight:false},
-      {offset:-maxStep*.72, motion:false, tight:true}
-    ];
-  }else if(roll < .56){
-    pattern = [
-      {offset:-maxStep*.72, motion:false, tight:false},
-      {offset:-maxStep*.36, motion:false, tight:true},
-      {offset:0, motion:true, tight:true},
-      {offset:maxStep*.36, motion:false, tight:false},
-      {offset:maxStep*.72, motion:false, tight:true}
-    ];
-  }else if(roll < .82){
-    pattern = [
-      {offset:0, motion:false, tight:false},
-      {offset:-maxStep*.72, motion:true, tight:true},
-      {offset:0, motion:false, tight:false},
-      {offset:maxStep*.72, motion:true, tight:true},
-      {offset:0, motion:false, tight:false}
-    ];
-  }else{
-    pattern = [
-      {offset:rand(-maxStep*.55,maxStep*.55), motion:true, tight:true},
-      {offset:0, motion:false, tight:false},
-      {offset:rand(-maxStep*.45,maxStep*.45), motion:false, tight:true},
-      {offset:0, motion:false, tight:false}
-    ];
-  }
-
-  const safeBase = clampGapYForGate(base + rand(-maxStep*.20, maxStep*.20), gap);
-  patternQueue = pattern.map(p => ({
-    gapY: clampGapYForGate(safeBase + p.offset, gap),
-    motion: !!p.motion,
-    tight: !!p.tight
-  }));
+function clampClusterY(y, gap){
+  const margin = 72;
+  return clamp(y, margin + gap/2, height - margin - gap/2);
 }
 
 function spawnObstacle(){
   const gap = getGapForScore(score);
-  const w = score < 10 ? rand(64, 82) : score < 35 ? rand(68, 90) : rand(70, 96);
-  const x = width + 90;
+  const x = width + 72;
   const phase = rand(0, Math.PI*2);
-  const color = gameRandom()<.5 ? COLORS.cyan : COLORS.pink;
 
-  if(patternQueue.length === 0){
-    buildGatePattern(gap);
-  }
+  const gateIndex = obstacleCount++;
+  const level = clusterLevelForGate(gateIndex);
+  const gapY = clampClusterY(height * level, gap);
 
-  const patternItem = patternQueue.shift() || {gapY:height*.5, motion:false, tight:false};
-  const gapY = clampGapYForGate(patternItem.gapY, gap);
-  lastGapY = gapY;
-  obstacleCount++;
+  // sichtbar zusammenhängende Gruppen: 4 nahe Gates, dann Luft
+  const groupPos = gateIndex % 5;
+  const isRestGate = groupPos === 4;
+
+  const slantDirection = Math.floor(gateIndex / 2) % 2 === 0 ? 1 : -1;
+  const isSlanted = groupPos !== 4; // Cluster-Gates sind schräg
+  const slant = isSlanted ? slantDirection * (score < 8 ? 32 : 44) : 0;
+  const motionGate = gateIndex >= 6 && gateIndex % 7 === 2;
+  const type = motionGate ? "motion" : (gateIndex % 9 === 5 ? "pulse" : "slanted");
+
   gatesSinceShieldSpawn++;
 
-  const typeRoll = gameRandom();
-  const motionGate = patternItem.motion && score >= 4;
-  const type = motionGate ? "motion" : score < 5 ? "normal" : typeRoll < .12 ? "thin" : typeRoll < .22 ? "pulse" : "normal";
-
-  const coinPlacementRoll = gameRandom();
-  const coinPlacement = coinPlacementRoll < .34 ? "before" : coinPlacementRoll < .68 ? "inside" : "after";
-  const coinOffsetY = rand(-gap * 0.13, gap * 0.13);
-
-  nextSpawnDelayOverride = patternItem.tight ? clamp(getSpawnDelayForScore(score) * 0.66, 0.92, 1.08) : null;
+  const coinPlacement = gateIndex % 3 === 0 ? "before" : gateIndex % 3 === 1 ? "inside" : "after";
+  const coinOffsetY = rand(-gap * 0.08, gap * 0.08);
 
   obstacles.push({
     x,
-    w: type === "thin" ? w * .72 : w,
+    w: isRestGate ? 66 : 82,
     gapY,
     baseGapY: gapY,
-    gap: type === "pulse" ? gap + 16 : gap,
-    baseGap: type === "pulse" ? gap + 16 : gap,
+    gap: type === "pulse" ? gap + 10 : gap,
+    baseGap: type === "pulse" ? gap + 10 : gap,
     passed:false,
     phase,
-    color,
+    color: gateIndex % 2 === 0 ? COLORS.cyan : COLORS.pink,
     type,
-    motionAmp: motionGate ? rand(34, 62) : 0,
-    motionSpeed: motionGate ? rand(1.15, 1.75) : 0,
+    slant,
+    motionAmp: motionGate ? 38 : 0,
+    motionSpeed: motionGate ? 1.35 : 0,
     coinPlacement,
     coinOffsetY,
     coinCollected:false,
-    bobAmp: motionGate ? 0 : (type === "normal" ? rand(2, 8) : rand(2, 6)),
-    bobSpeed: rand(.65, 1.05),
+    bobAmp: 0,
+    bobSpeed: 0,
     shardCount: Math.round(rand(4, 6))
   });
 }
 
 function obstacleCollide(ob){
-  const topH = ob.gapY - ob.gap/2;
-  const botY = ob.gapY + ob.gap/2;
-
   if(player.x + player.r < ob.x || player.x - player.r > ob.x + ob.w) return false;
-  if(player.y - player.r < topH || player.y + player.r > botY) return true;
 
-  // hit the glowing center frame a bit
-  const frameThickness = 8;
-  if(player.x + player.r > ob.x && player.x - player.r < ob.x + frameThickness){
-    if(player.y < ob.gapY - ob.gap/2 + 16 || player.y > ob.gapY + ob.gap/2 - 16) return true;
-  }
-  if(player.x + player.r > ob.x + ob.w - frameThickness && player.x - player.r < ob.x + ob.w){
-    if(player.y < ob.gapY - ob.gap/2 + 16 || player.y > ob.gapY + ob.gap/2 - 16) return true;
-  }
+  const t = clamp((player.x - ob.x) / Math.max(1, ob.w), 0, 1);
+  const s = ob.slant || 0;
+  const topEdge = (ob.gapY - ob.gap/2) + (-s + 2*s*t);
+  const bottomEdge = (ob.gapY + ob.gap/2) + (-s + 2*s*t);
+
+  // etwas tolerant, damit die schrägen Gates fair bleiben
+  const forgive = 8;
+  if(player.y - player.r < topEdge + forgive) return true;
+  if(player.y + player.r > bottomEdge - forgive) return true;
+
   return false;
 }
 
@@ -2619,8 +2575,7 @@ function update(dt){
     spawnTimer -= dt;
     if(spawnTimer <= 0){
       spawnObstacle();
-      spawnTimer = nextSpawnDelayOverride || getSpawnDelayForScore(score);
-      nextSpawnDelayOverride = null;
+      spawnTimer = getSpawnDelayForScore(score);
     }
 
     powerupSpawnTimer -= dt;
@@ -2648,14 +2603,13 @@ function update(dt){
       ob.x -= speedPx * dt;
 
       if(ob.type === "motion"){
-        const movingY = ob.baseGapY + Math.sin(bgT * ob.motionSpeed + ob.phase) * ob.motionAmp;
-        ob.gapY = clampGapYForGate(movingY, ob.gap);
+        ob.gapY = clampClusterY(ob.baseGapY + Math.sin(bgT * ob.motionSpeed + ob.phase) * ob.motionAmp, ob.gap);
       }else{
-        ob.gapY = clampGapYForGate(ob.baseGapY + Math.sin(bgT*ob.bobSpeed + ob.phase) * ob.bobAmp, ob.gap);
+        ob.gapY = ob.baseGapY;
       }
 
       if(ob.type === "pulse"){
-        ob.gap = ob.baseGap + Math.sin(bgT*3.2 + ob.phase) * 10;
+        ob.gap = ob.baseGap + Math.sin(bgT*3.2 + ob.phase) * 8;
       }
 
       // Coin wird sofort beim echten Berühren eingesammelt.
@@ -3016,40 +2970,96 @@ function drawBackground(){
 function drawObstacle(ob){
   const topH = ob.gapY - ob.gap/2;
   const botY = ob.gapY + ob.gap/2;
-  const theme = save.theme || 'neon';
+  const s = ob.slant || 0;
+  const x = ob.x;
+  const w = ob.w;
+  const color = ob.type === "pulse" ? "#ffd166" : (ob.color || COLORS.cyan);
 
-  if(theme === 'nature'){
-    drawNatureObstacle(ob.x, 0, ob.w, topH, true);
-    drawNatureObstacle(ob.x, botY, ob.w, height-botY, false);
-    drawGateBridge(ob, "#8b5a2b", "#d4a373", "#ffffff");
-    return;
+  ctx.save();
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 18;
+
+  const gradTop = ctx.createLinearGradient(x, 0, x+w, Math.max(1, topH));
+  gradTop.addColorStop(0, "rgba(255,255,255,.20)");
+  gradTop.addColorStop(.45, color);
+  gradTop.addColorStop(1, "rgba(6,16,31,.96)");
+
+  const gradBot = ctx.createLinearGradient(x, botY, x+w, height);
+  gradBot.addColorStop(0, "rgba(255,255,255,.18)");
+  gradBot.addColorStop(.45, color);
+  gradBot.addColorStop(1, "rgba(6,16,31,.98)");
+
+  // Top slanted block
+  ctx.fillStyle = gradTop;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(x, 0);
+  ctx.lineTo(x+w, 0);
+  ctx.lineTo(x+w, topH + s);
+  ctx.lineTo(x, topH - s);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Bottom slanted block
+  ctx.fillStyle = gradBot;
+  ctx.beginPath();
+  ctx.moveTo(x, botY - s);
+  ctx.lineTo(x+w, botY + s);
+  ctx.lineTo(x+w, height);
+  ctx.lineTo(x, height);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // Clear gate-edge lines, so the slope is obvious
+  ctx.shadowBlur = 24;
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x+7, topH - s);
+  ctx.lineTo(x+w-7, topH + s);
+  ctx.moveTo(x+7, botY - s);
+  ctx.lineTo(x+w-7, botY + s);
+  ctx.stroke();
+
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = .72;
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.moveTo(x+12, topH - s + 6);
+  ctx.lineTo(x+w-12, topH + s + 6);
+  ctx.moveTo(x+12, botY - s - 6);
+  ctx.lineTo(x+w-12, botY + s - 6);
+  ctx.stroke();
+
+  // Segments: makes it feel like connected pipe/cluster pieces
+  ctx.globalAlpha = .30;
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "#ffffff";
+  const segs = 3;
+  for(let i=1;i<segs;i++){
+    const xx = x + (w/segs)*i;
+    ctx.beginPath();
+    ctx.moveTo(xx, Math.max(8, topH - Math.abs(s) - 90));
+    ctx.lineTo(xx + s*.18, topH + s*(i/segs - .5));
+    ctx.moveTo(xx, botY - s*(i/segs - .5));
+    ctx.lineTo(xx + s*.18, Math.min(height-8, botY + Math.abs(s) + 90));
+    ctx.stroke();
   }
 
-  if(theme === 'lava'){
-    drawLavaObstacle(ob.x, 0, ob.w, topH, true);
-    drawLavaObstacle(ob.x, botY, ob.w, height-botY, false);
-    drawGateBridge(ob, "#ff6b00", "#ffd166", "#ffffff");
-    return;
+  if(ob.type === "motion"){
+    ctx.globalAlpha = .30 + Math.sin(bgT*5 + ob.phase)*.08;
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath();
+    ctx.arc(x + w/2, ob.gapY, 9, 0, Math.PI*2);
+    ctx.fill();
   }
 
-  if(theme === 'ice'){
-    drawIceObstacle(ob.x, 0, ob.w, topH, true);
-    drawIceObstacle(ob.x, botY, ob.w, height-botY, false);
-    drawGateBridge(ob, "#8fe9ff", "#ffffff", "#dff8ff");
-    return;
-  }
-
-  if(theme === 'sunset'){
-    drawSunsetObstacle(ob.x, 0, ob.w, topH, true);
-    drawSunsetObstacle(ob.x, botY, ob.w, height-botY, false);
-    drawGateBridge(ob, "#ffb067", "#ffd166", "#fff2e0");
-    return;
-  }
-
-  // default neon
-  drawNeonObstacle(ob.x, 0, ob.w, topH, ob, true);
-  drawNeonObstacle(ob.x, botY, ob.w, height-botY, ob, false);
-  drawGateBridge(ob, ob.type === "pulse" ? "#ffd166" : "#35e7ff", "#ffffff", "#ffffff");
+  ctx.restore();
 }
 
 function drawGateBridge(ob, color, innerColor, edgeColor){
