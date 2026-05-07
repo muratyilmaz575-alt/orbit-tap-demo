@@ -1194,6 +1194,7 @@ function beep(type){
       fail:[120,.32,"sawtooth",.070],
       start:[620,.14,"triangle",.050],
       combo:[980,.14,"triangle",.070],
+      coin:[1320,.08,"triangle",.060],
       coin:[1320,.08,"triangle",.060]
     };
     const [freq,dur,wave,vol] = map[type] || map.flap;
@@ -1902,7 +1903,7 @@ function showMenu(){
         </div>
       </div>
 
-      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">ORBIT DASH aktiv: klares Flappy-Gefühl · seltene 3er-Gates · faire Schwierigkeit · 1 Abschnitt = 1 Punkt</div>
+      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">ORBIT DASH V3 aktiv: engere Abstände · 3er selten · Shield 1x selten · fairer Highscore-Druck</div>
 
       <div class="demoNotice"><b>Hinweis:</b> Rankings, Freunde und Daily-Ranking sind in dieser HTML-Version Demo-Daten. Der Spielkern, Coins, Shop, Powerups und Daily-Seed laufen lokal.</div>
 
@@ -2099,6 +2100,7 @@ function startGame(){
   powerupSpawnTimer = 3.8;
   spawnTimer = 0.95;
   specialGateCooldown = 0;
+  specialGateCooldown = 0;
   screenShake = 0;
   highscoreWarned = false;
   newBestShown = false;
@@ -2138,19 +2140,23 @@ function getSpeedForScore(s){
 }
 
 function getGapForScore(s){
-  // Etwas enger als zuvor: wieder fair, aber spürbar anspruchsvoller.
-  const base = height * 0.258;
+  // V3: enger als vorher, damit es wieder mehr Druck macht.
+  // Nicht unfair, aber nicht mehr so bequem bis 50+ Punkte.
+  const base = height * 0.238;
   let shrink;
-  if(s < 20) shrink = s * 0.28;
-  else if(s < 55) shrink = 5.6 + (s - 20) * 0.18;
-  else shrink = 11.9 + (s - 55) * 0.10;
-  return clamp(base - shrink, 122, 176);
+  if(s < 8) shrink = s * 0.20;
+  else if(s < 20) shrink = 1.6 + (s - 8) * 0.30;
+  else if(s < 55) shrink = 5.2 + (s - 20) * 0.16;
+  else shrink = 10.8 + (s - 55) * 0.08;
+  return clamp(base - shrink, 112, 162);
 }
 
 function getSpawnDelayForScore(s){
-  if(s < 20) return 1.28;
-  if(s < 55) return 1.20;
-  return 1.14;
+  // V3: ca. 6-8% kürzere horizontale Abstände.
+  if(s < 8) return 1.22;
+  if(s < 20) return 1.16;
+  if(s < 55) return 1.10;
+  return 1.06;
 }
 
 
@@ -2237,7 +2243,7 @@ function tryCollectGateCoin(ob){
   if(ob.coinCollected || !player || status !== "playing") return;
 
   const pos = getGateCoinPosition(ob);
-  const pickupRadius = Math.max(8, player.r + pos.r - 6);
+  const pickupRadius = Math.max(8, player.r + pos.r - 8);
   if(dist(player.x, player.y, pos.x, pos.y) <= pickupRadius){
     ob.coinCollected = true;
 
@@ -2256,16 +2262,17 @@ function tryCollectGateCoin(ob){
 
 
 function spawnPowerup(){
-  if(score < 2) return;
+  if(score < 4) return;
 
   let type;
   const roll = gameRandom();
 
-  if(gatesSinceShieldSpawn >= 10){
+  // V3: Shield ist selten und kommt nicht, wenn man bereits eins hat.
+  if(!shieldActive && gatesSinceShieldSpawn >= 22 && roll < 0.33){
     type = "shield";
     gatesSinceShieldSpawn = 0;
   }else{
-    type = roll < .55 ? "coin" : "slow";
+    type = roll < .72 ? "coin" : "slow";
   }
 
   const upcoming = obstacles
@@ -2281,7 +2288,7 @@ function spawnPowerup(){
     type,
     x: ob.x + ob.w / 2,
     y: ob.gapY,
-    r: 17,
+    r: type === "shield" ? 16 : 15,
     pulse: rand(0, Math.PI*2),
     taken:false,
     attachedObstacle: ob
@@ -2372,34 +2379,39 @@ function clampSectionY(y, gap){
 }
 
 function getSectionKind(i){
-  if(i < 3) return "normal";
+  // V3: 3er-Gates sind seltene Spezialmomente.
+  if(score < 10 || i < 7) return "normal";
+
   if(specialGateCooldown > 0){
     specialGateCooldown--;
     return "normal";
   }
 
   const theme = save.theme || 'neon';
-  const baseChance = theme === 'lava' ? 0.13
-                    : theme === 'ice' ? 0.11
-                    : theme === 'nature' ? 0.09
-                    : theme === 'sunset' ? 0.08
-                    : 0.11;
+  const baseChance = theme === 'lava' ? 0.075
+                    : theme === 'ice' ? 0.065
+                    : theme === 'nature' ? 0.055
+                    : theme === 'sunset' ? 0.055
+                    : 0.065;
 
   if(gameRandom() < baseChance){
-    specialGateCooldown = 3 + Math.floor(gameRandom() * 3);
+    specialGateCooldown = 8 + Math.floor(gameRandom() * 5); // 8-12 normale Gates Abstand
     return "stair";
   }
+
   return "normal";
 }
 
 function sectionGapY(kind, gap, i){
   const mid = height * 0.50;
-  const amp = Math.min(72, height * 0.13);
+  const amp = Math.min(80, height * 0.145);
+
   if(kind === "stair"){
-    const bias = (gameRandom() < 0.5 ? -1 : 1) * amp * rand(0.12, 0.28);
-    return clampSectionY(mid + bias + rand(-amp * 0.15, amp * 0.15), gap);
+    const bias = (gameRandom() < 0.5 ? -1 : 1) * amp * rand(0.10, 0.24);
+    return clampSectionY(mid + bias + rand(-amp * 0.12, amp * 0.12), gap);
   }
-  return clampSectionY(mid + rand(-amp * 0.72, amp * 0.72), gap);
+
+  return clampSectionY(mid + rand(-amp * 0.82, amp * 0.82), gap);
 }
 
 function spawnObstacle(){
@@ -2620,7 +2632,7 @@ function update(dt){
         p.x -= speedPx * dt;
       }
 
-      if(!p.taken && dist(player.x, player.y, p.x, p.y) < player.r + p.r){
+      if(!p.taken && dist(player.x, player.y, p.x, p.y) <= Math.max(8, player.r + p.r - 7)){
         collectPowerup(p);
       }
     }
