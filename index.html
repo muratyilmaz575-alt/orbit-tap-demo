@@ -4,7 +4,7 @@
   <!-- Orbit Tap V35 Presentation Build: stable local HTML test version -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Orbit Tap Flappy Clean Balance</title>
+  <title>Orbit Tap Good Basis Fixes</title>
   <style>
     :root{
       --bg1:#07101f;
@@ -895,6 +895,7 @@ let musicIntensity = 0;
 let player = null;
 let obstacles = [];
 let obstacleCount = 0;
+let lastSpecialGateIndex = -99;
 let gatesSinceShieldSpawn = 999;
 let lastRunScore = 0;
 let powerups = [];
@@ -940,7 +941,7 @@ function updateHud(){
   if(els.bigScore) els.bigScore.textContent = score;
   if(els.powerHud){
     const active = [];
-    if(shieldActive || shieldTimer > 0 || shieldGraceTimer > 0) active.push(shieldTimer > 0 ? "🛡️"+Math.ceil(shieldTimer) : "🛡️");
+    if(shieldActive || shieldGraceTimer > 0) active.push("🛡️");
     if(slowTimer > 0) active.push("⏱️");
     if(coinBoostTimer > 0) active.push("🪙x2");
     els.powerHud.textContent = active.length ? active.join(" ") : "–";
@@ -1900,7 +1901,7 @@ function showMenu(){
         </div>
       </div>
 
-      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">FLAPPY CLEAN BALANCE aktiv: Spaßgefühl zurück · 3 Typen dezent · keine Wände · 1 Abschnitt = 1 Punkt</div>
+      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">GOOD BASIS FIXES aktiv: 3er selten · Schild 1x · Coin-Sound exakt · Welt-Gates</div>
 
       <div class="demoNotice"><b>Hinweis:</b> Rankings, Freunde und Daily-Ranking sind in dieser HTML-Version Demo-Daten. Der Spielkern, Coins, Shop, Powerups und Daily-Seed laufen lokal.</div>
 
@@ -2235,7 +2236,10 @@ function tryCollectGateCoin(ob){
   if(ob.coinCollected || !player || status !== "playing") return;
 
   const pos = getGateCoinPosition(ob);
-  if(dist(player.x, player.y, pos.x, pos.y) <= player.r + pos.r){
+
+  // Exakter als vorher: Sound/Collect erst bei sichtbarer Berührung.
+  const touchRadius = player.r * 0.68 + pos.r * 0.68;
+  if(dist(player.x, player.y, pos.x, pos.y) <= touchRadius){
     ob.coinCollected = true;
 
     const coinGain = (score % 5 === 0 ? 2 : 1) * (coinBoostTimer > 0 ? 2 : 1);
@@ -2243,7 +2247,7 @@ function tryCollectGateCoin(ob){
     save.coins += coinGain;
 
     spawnCoinPopup(pos.x, pos.y - 18, coinGain);
-    spawnParticles(pos.x, pos.y, COLORS.gold, coinGain >= 2 ? 18 : 12, 120);
+    spawnParticles(pos.x, pos.y, COLORS.gold, coinGain >= 2 ? 12 : 8, 95);
     shock(pos.x, pos.y, COLORS.gold, false);
     beep("pass");
     updateHud();
@@ -2302,13 +2306,15 @@ function getPowerupIcon(type){
 function collectPowerup(p){
   p.taken = true;
   const color = getPowerupColor(p.type);
-  spawnParticles(p.x, p.y, color, 22, 135);
+  spawnParticles(p.x, p.y, color, 16, 115);
   shock(p.x, p.y, color, true);
-  screenShake = .25;
+  screenShake = .22;
 
   if(p.type === "shield"){
+    // Schild schützt genau 1 Treffer, keine 10-Sekunden-Zeit mehr.
     shieldActive = true;
-    shieldTimer = 10.0;
+    shieldTimer = 0;
+    shieldGraceTimer = 0;
   }else if(p.type === "slow"){
     slowTimer = 4.4;
   }else if(p.type === "coin"){
@@ -2369,24 +2375,35 @@ function clampSectionY(y, gap){
 }
 
 function getSectionKind(i){
-  // Dezent: Typ 3 Normal ist Basis, Typ 1/2 kommen selten.
-  // Ablauf: Normal, Normal, Treppe, Normal, Normal, Schräg
-  const cycle = ["normal","normal","stair","normal","normal","slanted"];
-  return cycle[i % cycle.length];
+  // Kein festes Muster mehr.
+  // Einzel-Gates sind Standard. 3er-Gates kommen selten als besonderer Moment.
+  if(i < 5) return "normal";
+  if(i - lastSpecialGateIndex < 8) return "normal";
+
+  const chance = gameRandom();
+  if(chance < 0.08){
+    lastSpecialGateIndex = i;
+    return gameRandom() < 0.65 ? "stair" : "slanted";
+  }
+
+  return "normal";
 }
 
 function sectionGapY(kind, gap, i){
   const mid = height * 0.50;
-  const amp = Math.min(78, height * 0.14);
+  const amp = Math.min(72, height * 0.125);
+
   if(kind === "normal"){
-    const wave = Math.sin(i * 1.35) * amp * 0.70;
-    return clampSectionY(mid + wave + rand(-amp*.18, amp*.18), gap);
+    const wave = Math.sin(i * 1.17) * amp * 0.68;
+    return clampSectionY(mid + wave + rand(-amp*.22, amp*.22), gap);
   }
+
   if(kind === "stair"){
-    const stair = [-0.55, -0.18, 0.18, 0.55][Math.floor(i/6)%4] || 0;
+    const stair = gameRandom() < 0.5 ? -0.34 : 0.34;
     return clampSectionY(mid + stair * amp, gap);
   }
-  const diag = [-0.42, 0, 0.42][Math.floor(i/6)%3] || 0;
+
+  const diag = gameRandom() < 0.5 ? -0.26 : 0.26;
   return clampSectionY(mid + diag * amp, gap);
 }
 
@@ -2395,15 +2412,15 @@ function spawnObstacle(){
   const kind = getSectionKind(i);
   const gap = getGapForScore(score);
 
-  const w = Math.max(58, Math.min(84, width * 0.115));
+  const w = Math.max(56, Math.min(78, width * 0.105));
   const x = width + 88;
   const y = sectionGapY(kind, gap, i);
 
-  // Wichtig: jeder Abschnitt ist ein Hindernis und zählt nur 1 Punkt.
-  const visualCount = kind === "stair" ? 3 : kind === "slanted" ? 3 : 1;
-  const visualStep = w * 0.62; // optisch nah, aber kein echter Mehrfach-Punkte-Cluster
+  // Einzel-Gate ist Standard. 3er-Gate ist selten.
+  const visualCount = kind === "normal" ? 1 : 3;
+  const visualStep = w * 0.60;
   const sectionW = kind === "normal" ? w : w + visualStep * (visualCount - 1);
-  const lean = kind === "slanted" ? (i % 2 === 0 ? 1 : -1) * Math.min(14, width * 0.018) : 0;
+  const lean = kind === "slanted" ? (i % 2 === 0 ? 1 : -1) * Math.min(12, width * 0.015) : 0;
 
   gatesSinceShieldSpawn++;
 
@@ -2502,25 +2519,24 @@ function passObstacle(){
 function crash(reason="CRASH"){
   if(status === "dead") return;
 
-  // Während der 10-Sekunden-Shield-Zeit stirbt man nicht.
-  // Kurze Grace verhindert Mehrfach-Kollision im selben Gate.
   if(shieldGraceTimer > 0 && status === "playing"){
     return;
   }
 
-  if(shieldActive && shieldTimer > 0 && status === "playing"){
-    shieldGraceTimer = 0.55;
-    screenShake = .45;
-    spawnParticles(player.x, player.y, COLORS.green, 26, 150);
+  if(shieldActive && status === "playing"){
+    // Einmaliger Schutz: Treffer blocken, Schild sofort verbrauchen.
+    shieldActive = false;
+    shieldTimer = 0;
+    shieldGraceTimer = 0.48;
+    screenShake = .55;
+    spawnParticles(player.x, player.y, COLORS.green, 22, 145);
     shock(player.x, player.y, COLORS.green, true);
-    showCenter("SHIELD", Math.ceil(shieldTimer)+"s", COLORS.green, 420);
+    showCenter("SHIELD", "geblockt", COLORS.green, 420);
     beep("combo");
 
-    // Aus der Kollisionszone rausdrücken, Shield bleibt aber aktiv.
     player.vy = -Math.min(height*0.42, 285);
     player.y = clamp(player.y, 50 + player.r, height - 50 - player.r);
 
-    // Aktuelles Hindernis als passiert markieren, damit es nicht sofort erneut blockt.
     for(const ob of obstacles){
       if(player.x + player.r > ob.x && player.x - player.r < ob.x + ob.w){
         ob.passed = true;
@@ -2578,10 +2594,8 @@ function update(dt){
 
   if(status === "playing"){
     slowTimer = Math.max(0, slowTimer - dt);
-    shieldTimer = Math.max(0, shieldTimer - dt);
-    if(shieldTimer <= 0 && shieldActive){
-      shieldActive = false;
-    }
+    shieldTimer = 0;
+    // Schild bleibt aktiv, bis es genau 1 Treffer blockt.
     shieldGraceTimer = Math.max(0, shieldGraceTimer - dt);
     coinBoostTimer = Math.max(0, coinBoostTimer - dt);
 
@@ -2615,7 +2629,7 @@ function update(dt){
         p.x -= speedPx * dt;
       }
 
-      if(!p.taken && dist(player.x, player.y, p.x, p.y) < player.r + p.r){
+      if(!p.taken && dist(player.x, player.y, p.x, p.y) <= player.r * 0.68 + p.r * 0.68){
         collectPowerup(p);
       }
     }
@@ -2985,94 +2999,133 @@ function drawObstacle(ob){
   const count = ob.visualCount || 1;
   const pipeW = ob.pipeW || ob.w;
   const step = ob.visualStep || pipeW;
-  const color = ob.gateKind === "slanted" ? "#ffd166" : (ob.color || COLORS.cyan);
+  const theme = save.theme || "neon";
 
   ctx.save();
+
   for(let j=0;j<count;j++){
     const x = ob.x + j*step;
     let gapY = ob.gapY;
+
     if(ob.gateKind === "stair"){
-      const localStep = Math.min(30, height*0.045);
+      const localStep = Math.min(24, height*0.035);
       gapY = clampSectionY(ob.gapY + (j - (count-1)/2) * localStep, ob.gap);
     }else if(ob.gateKind === "slanted"){
-      const localStep = Math.min(24, height*0.035);
+      const localStep = Math.min(18, height*0.028);
       gapY = clampSectionY(ob.gapY + (j - (count-1)/2) * localStep * (ob.slant >= 0 ? -1 : 1), ob.gap);
     }
 
     const topH = gapY - ob.gap/2;
     const botY = gapY + ob.gap/2;
 
-    const gradTop = ctx.createLinearGradient(x, 0, x+pipeW, Math.max(1, topH));
-    gradTop.addColorStop(0, "rgba(255,255,255,.22)");
-    gradTop.addColorStop(.45, color);
-    gradTop.addColorStop(1, "rgba(6,16,31,.96)");
+    ctx.save();
 
-    const gradBot = ctx.createLinearGradient(x, botY, x+pipeW, height);
-    gradBot.addColorStop(0, "rgba(255,255,255,.18)");
-    gradBot.addColorStop(.45, color);
-    gradBot.addColorStop(1, "rgba(6,16,31,.98)");
-
-    ctx.shadowColor = color;
-    ctx.shadowBlur = 16;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 3;
-
-    if(ob.gateKind === "slanted"){
-      const lean = ob.slant || 10;
-      ctx.fillStyle = gradTop;
-      ctx.beginPath();
-      ctx.moveTo(x - lean, 0);
-      ctx.lineTo(x + pipeW - lean, 0);
-      ctx.lineTo(x + pipeW, topH);
-      ctx.lineTo(x, topH);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = gradBot;
-      ctx.beginPath();
-      ctx.moveTo(x, botY);
-      ctx.lineTo(x + pipeW, botY);
-      ctx.lineTo(x + pipeW + lean, height);
-      ctx.lineTo(x + lean, height);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-    }else{
-      ctx.fillStyle = gradTop;
+    if(theme === "nature"){
+      // Landschaft: Baum/Stamm statt Neon-Gate
+      ctx.fillStyle = "#6b3f22";
       ctx.fillRect(x, 0, pipeW, topH);
-      ctx.strokeRect(x, 0, pipeW, topH);
-
-      ctx.fillStyle = gradBot;
       ctx.fillRect(x, botY, pipeW, height - botY);
-      ctx.strokeRect(x, botY, pipeW, height - botY);
+
+      ctx.fillStyle = "#2fc56f";
+      ctx.beginPath(); ctx.ellipse(x+pipeW/2, Math.max(14, topH-9), pipeW*.68, 15, 0, 0, Math.PI*2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x+pipeW/2, Math.min(height-14, botY+9), pipeW*.68, 15, 0, 0, Math.PI*2); ctx.fill();
+
+      ctx.strokeStyle = "rgba(255,255,255,.22)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x+pipeW*.30, 8); ctx.lineTo(x+pipeW*.30, Math.max(8, topH-16));
+      ctx.moveTo(x+pipeW*.30, botY+16); ctx.lineTo(x+pipeW*.30, height-8);
+      ctx.stroke();
+
+    }else if(theme === "ice"){
+      // Winter: Eis-Gates
+      const gradTop = ctx.createLinearGradient(x,0,x+pipeW,Math.max(1,topH));
+      gradTop.addColorStop(0,"#eaffff");
+      gradTop.addColorStop(.45,"#8dddf5");
+      gradTop.addColorStop(1,"#0b2f43");
+      const gradBot = ctx.createLinearGradient(x,botY,x+pipeW,height);
+      gradBot.addColorStop(0,"#eaffff");
+      gradBot.addColorStop(.45,"#8dddf5");
+      gradBot.addColorStop(1,"#0b2f43");
+      ctx.fillStyle = gradTop; ctx.fillRect(x,0,pipeW,topH);
+      ctx.fillStyle = gradBot; ctx.fillRect(x,botY,pipeW,height-botY);
+      ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2;
+      ctx.strokeRect(x,0,pipeW,topH); ctx.strokeRect(x,botY,pipeW,height-botY);
+
+      ctx.fillStyle = "rgba(255,255,255,.62)";
+      for(let k=0;k<4;k++){
+        const sx = x + (k+.5)*pipeW/4;
+        ctx.beginPath();
+        ctx.moveTo(sx-pipeW*.055, topH);
+        ctx.lineTo(sx+pipeW*.055, topH);
+        ctx.lineTo(sx, Math.min(topH+16, gapY-ob.gap*.34));
+        ctx.closePath(); ctx.fill();
+      }
+
+    }else if(theme === "lava"){
+      // Lava: dunkler Stein mit Lava-Kante
+      ctx.fillStyle = "#1d1010";
+      ctx.fillRect(x,0,pipeW,topH);
+      ctx.fillRect(x,botY,pipeW,height-botY);
+      ctx.strokeStyle = "#ff6b00";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(x,0,pipeW,topH);
+      ctx.strokeRect(x,botY,pipeW,height-botY);
+      ctx.strokeStyle = "rgba(255,209,102,.55)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x+pipeW*.25,8); ctx.lineTo(x+pipeW*.25,Math.max(8,topH-8));
+      ctx.moveTo(x+pipeW*.25,botY+8); ctx.lineTo(x+pipeW*.25,height-8);
+      ctx.stroke();
+
+    }else if(theme === "sunset"){
+      // Sunset: dunkle Palmen/Silhouetten
+      ctx.fillStyle = "#111322";
+      ctx.fillRect(x,0,pipeW,topH);
+      ctx.fillRect(x,botY,pipeW,height-botY);
+      ctx.fillStyle = "#070912";
+      ctx.fillRect(x+pipeW*.35,0,pipeW*.30,topH);
+      ctx.fillRect(x+pipeW*.35,botY,pipeW*.30,height-botY);
+      ctx.strokeStyle = "#ffd166";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x,topH); ctx.lineTo(x+pipeW,topH);
+      ctx.moveTo(x,botY); ctx.lineTo(x+pipeW,botY);
+      ctx.stroke();
+
+    }else{
+      // Neon/Galaxy: bestehender Orbit-Look
+      const color = ob.gateKind === "slanted" ? "#ffd166" : (ob.color || COLORS.cyan);
+      const gradTop = ctx.createLinearGradient(x, 0, x+pipeW, Math.max(1, topH));
+      gradTop.addColorStop(0, "rgba(255,255,255,.18)");
+      gradTop.addColorStop(.45, color);
+      gradTop.addColorStop(1, "rgba(6,16,31,.96)");
+      const gradBot = ctx.createLinearGradient(x, botY, x+pipeW, height);
+      gradBot.addColorStop(0, "rgba(255,255,255,.14)");
+      gradBot.addColorStop(.45, color);
+      gradBot.addColorStop(1, "rgba(6,16,31,.98)");
+
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 12;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 3;
+      ctx.fillStyle = gradTop; ctx.fillRect(x,0,pipeW,topH); ctx.strokeRect(x,0,pipeW,topH);
+      ctx.fillStyle = gradBot; ctx.fillRect(x,botY,pipeW,height-botY); ctx.strokeRect(x,botY,pipeW,height-botY);
     }
 
-    ctx.shadowBlur = 18;
-    ctx.lineWidth = 5;
+    // Klare Durchgangskanten bei allen Welten
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = "rgba(255,255,255,.58)";
+    ctx.lineWidth = 3;
     ctx.lineCap = "round";
     ctx.beginPath();
-    ctx.moveTo(x+6, topH);
-    ctx.lineTo(x+pipeW-6, topH);
-    ctx.moveTo(x+6, botY);
-    ctx.lineTo(x+pipeW-6, botY);
+    ctx.moveTo(x+5, topH); ctx.lineTo(x+pipeW-5, topH);
+    ctx.moveTo(x+5, botY); ctx.lineTo(x+pipeW-5, botY);
     ctx.stroke();
 
-    ctx.shadowBlur = 0;
-    ctx.globalAlpha = .24;
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = "#ffffff";
-    for(let k=1;k<3;k++){
-      const xx = x + (pipeW/3)*k;
-      ctx.beginPath();
-      ctx.moveTo(xx, 8);
-      ctx.lineTo(xx, topH - 6);
-      ctx.moveTo(xx, botY + 6);
-      ctx.lineTo(xx, height - 8);
-      ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
+    ctx.restore();
   }
+
   ctx.restore();
 }
 
@@ -3326,16 +3379,36 @@ function drawPlayer(){
   ctx.translate(player.x, player.y);
   ctx.rotate(player.rot);
 
-  // shield ring
+  // shield aura: deutlich sichtbar, knallig, nur solange Schild aktiv ist
   if(shieldActive || shieldGraceTimer > 0){
     ctx.save();
-    ctx.globalAlpha = shieldGraceTimer > 0 ? .72 : .48;
-    ctx.strokeStyle = COLORS.green;
-    ctx.shadowColor = COLORS.green;
-    ctx.shadowBlur = 22;
-    ctx.lineWidth = 4;
+    const auraPulse = Math.sin(bgT*12)*3;
+    const auraR = r + 16 + auraPulse;
+
+    const gradAura = ctx.createRadialGradient(0,0,r*.6,0,0,auraR+15);
+    gradAura.addColorStop(0, 'rgba(255,255,255,.55)');
+    gradAura.addColorStop(.35, 'rgba(115,255,155,.42)');
+    gradAura.addColorStop(.72, 'rgba(53,231,255,.24)');
+    gradAura.addColorStop(1, 'rgba(53,231,255,0)');
+
+    ctx.fillStyle = gradAura;
     ctx.beginPath();
-    ctx.arc(0, 0, r + 12 + Math.sin(bgT*10)*2, 0, Math.PI*2);
+    ctx.arc(0, 0, auraR+15, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.globalAlpha = shieldActive ? .96 : .68;
+    ctx.strokeStyle = '#ffffff';
+    ctx.shadowColor = COLORS.green;
+    ctx.shadowBlur = 30;
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.arc(0, 0, auraR, 0, Math.PI*2);
+    ctx.stroke();
+
+    ctx.strokeStyle = COLORS.green;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(0, 0, auraR + 7, 0, Math.PI*2);
     ctx.stroke();
     ctx.restore();
   }
