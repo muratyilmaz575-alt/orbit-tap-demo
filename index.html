@@ -4,7 +4,7 @@
   <!-- Orbit Tap V35 Presentation Build: stable local HTML test version -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Orbit Tap Full Demo Classic Geometry</title>
+  <title>Orbit Tap Flappy Clean Balance</title>
   <style>
     :root{
       --bg1:#07101f;
@@ -748,7 +748,7 @@
       .centerMsg .big{font-size:42px}
     }
   
-/* FULL DEMO CLASSIC GEOMETRY PATCH */
+/* FLAPPY CLEAN BALANCE */
 body{background:#050913!important;overscroll-behavior:none}
 .app{padding:0!important;align-items:stretch!important}
 .phone{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;gap:0!important;display:block!important}
@@ -757,14 +757,18 @@ body{background:#050913!important;overscroll-behavior:none}
 canvas{width:100%!important;height:100%!important;border-radius:0!important}
 .hud{top:calc(env(safe-area-inset-top,0px) + 12px)!important;left:10px!important;right:10px!important;gap:5px!important;opacity:.90}
 .hudPill{padding:7px 8px!important;font-size:11px!important;background:rgba(8,15,29,.45)!important}
-.hudPill:nth-child(4){display:none!important}
 .bigScore{
   top:calc(env(safe-area-inset-top,0px) + 62px)!important;
   font-size:58px!important;
   font-weight:1000!important;
   color:#fff!important;
   opacity:1!important;
-  text-shadow:-4px -4px 0 #111,4px -4px 0 #111,-4px 4px 0 #111,4px 4px 0 #111,0 8px 0 rgba(0,0,0,.25)!important;
+  text-shadow:
+    -4px -4px 0 #111,
+     4px -4px 0 #111,
+    -4px  4px 0 #111,
+     4px  4px 0 #111,
+     0 8px 0 rgba(0,0,0,.25)!important;
   letter-spacing:-.08em!important;
 }
 .overlay{position:fixed!important;inset:0!important;padding:calc(env(safe-area-inset-top,0px) + 12px) 12px calc(env(safe-area-inset-bottom,0px) + 12px)!important;background:radial-gradient(circle at 50% 0%,rgba(53,231,255,.16),transparent 34%),radial-gradient(circle at 90% 15%,rgba(255,79,216,.12),transparent 28%),rgba(2,6,23,.88)!important}
@@ -785,9 +789,9 @@ body.cleanPlaying .runEndCard{display:none!important}
   <div class="phone" id="phone">
     <header class="top">
       <div class="brand">
-        <div class="label">Full Demo · Classic Geometry</div>
+        <div class="label">FLAPPY CLEAN BALANCE</div>
         <h1>Orbit Tap</h1>
-        <p>Full Demo · Classic Geometry</p>
+        <p>Flappy clean balance</p>
       </div>
       <div class="stat">
         <div class="label">Coins</div>
@@ -797,7 +801,7 @@ body.cleanPlaying .runEndCard{display:none!important}
 
     <section class="hint">
       <div class="hintMain">Ziel: <b>Ein Tap hebt dich hoch.</b> Flieg durch die <b>Energy Gates</b> und überlebe so lange wie möglich.</div>
-      <div class="hintSmall">Full Demo mit Classic-Flappy-Spielkern. Menü, Rankings, Freunde und Shop bleiben erhalten.</div>
+      <div class="hintSmall">Flappy Clean Balance Build.</div>
     </section>
 
     <main class="gameWrap" id="touchArea">
@@ -1866,7 +1870,7 @@ function showMenu(){
   const next = getNextUnlock();
   modalBase(
     "Orbit Tap",
-    "Stabile Testversion mit Shop, Daily Challenge, Rankings-Demo und sichtbarem Coin-System.",
+    "FLAPPY CLEAN BALANCE: altes Spielgefühl zurück, 3 Typen dezent, 1 Abschnitt = 1 Punkt.",
     `
       <div class="heroCard">
         <div class="heroTop">
@@ -1896,7 +1900,7 @@ function showMenu(){
         </div>
       </div>
 
-      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">FULL DEMO CLASSIC GEOMETRY aktiv: Menü/Freunde/Rankings bleiben · Spielkern optimiert</div>
+      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">FLAPPY CLEAN BALANCE aktiv: Spaßgefühl zurück · 3 Typen dezent · keine Wände · 1 Abschnitt = 1 Punkt</div>
 
       <div class="demoNotice"><b>Hinweis:</b> Rankings, Freunde und Daily-Ranking sind in dieser HTML-Version Demo-Daten. Der Spielkern, Coins, Shop, Powerups und Daily-Seed laufen lokal.</div>
 
@@ -2116,7 +2120,7 @@ function tapFly(){
   if(status === "dead"){ startGame(); return; }
   if(status !== "playing" || !player) return;
 
-  player.vy = -Math.min(height*0.52, 310);
+  player.vy = -Math.min(height*0.55, (score < 10 ? 300 : score < 35 ? 312 : 320) + score*1.25);
   player.rot = -0.42;
   screenShake = .07;
   spawnParticles(player.x-8, player.y+6, COLORS.cyan, 7, 70);
@@ -2125,15 +2129,26 @@ function tapFly(){
 
 
 function getSpeedForScore(s){
-  return 1.0;
+  if(s < 20) return 0.78 + s * 0.019;
+  if(s < 55) return 1.16 + (s - 20) * 0.011;
+  return Math.min(1.92, 1.55 + (s - 55) * 0.004);
 }
 
 function getGapForScore(s){
-  return clamp(height * 0.205, 118, 156);
+  // Zurück zu sauberem Spielgefühl: nicht riesig, nicht unfair.
+  const base = height * 0.285;
+  let shrink;
+  if(s < 20) shrink = s * 0.35;
+  else if(s < 55) shrink = 7 + (s - 20) * 0.24;
+  else shrink = 16 + (s - 55) * 0.14;
+  return clamp(base - shrink, 132, 188);
 }
 
 function getSpawnDelayForScore(s){
-  return 1.69;
+  // Normale Flappy-Distanz, keine Wand-Cluster.
+  if(s < 20) return 1.32;
+  if(s < 55) return 1.24;
+  return 1.16;
 }
 
 
@@ -2241,11 +2256,13 @@ function spawnPowerup(){
   if(score < 2) return;
 
   let type;
-  if(gatesSinceShieldSpawn >= 12){
+  const roll = gameRandom();
+
+  if(gatesSinceShieldSpawn >= 10){
     type = "shield";
     gatesSinceShieldSpawn = 0;
   }else{
-    type = "coin";
+    type = roll < .55 ? "coin" : "slow";
   }
 
   const upcoming = obstacles
@@ -2285,13 +2302,15 @@ function getPowerupIcon(type){
 function collectPowerup(p){
   p.taken = true;
   const color = getPowerupColor(p.type);
-  spawnParticles(p.x, p.y, color, 10, 90);
+  spawnParticles(p.x, p.y, color, 22, 135);
   shock(p.x, p.y, color, true);
-  screenShake = .18;
+  screenShake = .25;
 
   if(p.type === "shield"){
     shieldActive = true;
     shieldTimer = 10.0;
+  }else if(p.type === "slow"){
+    slowTimer = 4.4;
   }else if(p.type === "coin"){
     coinBoostTimer = 7.0;
   }
@@ -2344,47 +2363,70 @@ function drawPowerups(){
 
 
 
-function classicGateGapY(gap){
-  const margin = height * 0.10;
-  return rand(margin + gap/2, height - margin - gap/2);
+function clampSectionY(y, gap){
+  const margin = 62;
+  return clamp(y, margin + gap/2, height - margin - gap/2);
 }
 
-function classicGateStyle(){
-  const theme = save.theme || "neon";
-  if(theme === "nature") return {kind:"sunny"};
-  if(theme === "lava") return {kind:"sunset"};
-  if(theme === "ice") return {kind:"winter"};
-  if(theme === "sunset") return {kind:"sunset"};
-  if(theme === "galaxy") return {kind:"galaxy"};
-  return {kind:"galaxy"};
+function getSectionKind(i){
+  // Dezent: Typ 3 Normal ist Basis, Typ 1/2 kommen selten.
+  // Ablauf: Normal, Normal, Treppe, Normal, Normal, Schräg
+  const cycle = ["normal","normal","stair","normal","normal","slanted"];
+  return cycle[i % cycle.length];
+}
+
+function sectionGapY(kind, gap, i){
+  const mid = height * 0.50;
+  const amp = Math.min(78, height * 0.14);
+  if(kind === "normal"){
+    const wave = Math.sin(i * 1.35) * amp * 0.70;
+    return clampSectionY(mid + wave + rand(-amp*.18, amp*.18), gap);
+  }
+  if(kind === "stair"){
+    const stair = [-0.55, -0.18, 0.18, 0.55][Math.floor(i/6)%4] || 0;
+    return clampSectionY(mid + stair * amp, gap);
+  }
+  const diag = [-0.42, 0, 0.42][Math.floor(i/6)%3] || 0;
+  return clampSectionY(mid + diag * amp, gap);
 }
 
 function spawnObstacle(){
+  const i = obstacleCount++;
+  const kind = getSectionKind(i);
   const gap = getGapForScore(score);
-  const w = Math.max(52, width * 0.18);
-  const x = width + w;
-  const gapY = classicGateGapY(gap);
-  const i = obstacleCount || 0;
-  obstacleCount = i + 1;
+
+  const w = Math.max(58, Math.min(84, width * 0.115));
+  const x = width + 88;
+  const y = sectionGapY(kind, gap, i);
+
+  // Wichtig: jeder Abschnitt ist ein Hindernis und zählt nur 1 Punkt.
+  const visualCount = kind === "stair" ? 3 : kind === "slanted" ? 3 : 1;
+  const visualStep = w * 0.62; // optisch nah, aber kein echter Mehrfach-Punkte-Cluster
+  const sectionW = kind === "normal" ? w : w + visualStep * (visualCount - 1);
+  const lean = kind === "slanted" ? (i % 2 === 0 ? 1 : -1) * Math.min(14, width * 0.018) : 0;
+
   gatesSinceShieldSpawn++;
 
   obstacles.push({
     x,
-    w,
-    gapY,
-    baseGapY: gapY,
+    w: sectionW,
+    pipeW: w,
+    visualCount,
+    visualStep,
+    gapY: y,
+    baseGapY: y,
     gap,
     baseGap: gap,
     passed:false,
     phase: rand(0, Math.PI*2),
-    color: i % 2 === 0 ? COLORS.cyan : COLORS.pink,
-    type: "classic",
-    gateKind: "classic",
-    slant: 0,
+    color: kind === "slanted" ? "#ffd166" : (i % 2 === 0 ? COLORS.cyan : COLORS.pink),
+    type: kind,
+    gateKind: kind,
+    slant: lean,
     motionAmp: 0,
     motionSpeed: 0,
     coinPlacement: i % 3 === 0 ? "before" : i % 3 === 1 ? "inside" : "after",
-    coinOffsetY: rand(-gap * 0.03, gap * 0.03),
+    coinOffsetY: rand(-gap * 0.05, gap * 0.05),
     coinCollected:false,
     bobAmp: 0,
     bobSpeed: 0,
@@ -2393,12 +2435,22 @@ function spawnObstacle(){
 }
 
 function obstacleCollide(ob){
-  const hitR = player.r * 0.92;
-  if(player.x + hitR < ob.x || player.x - hitR > ob.x + ob.w) return false;
-  const topEdge = ob.gapY - ob.gap/2;
-  const bottomEdge = ob.gapY + ob.gap/2;
-  if(player.y - hitR < topEdge) return true;
-  if(player.y + hitR > bottomEdge) return true;
+  if(player.x + player.r < ob.x || player.x - player.r > ob.x + ob.w) return false;
+
+  let gapY = ob.gapY;
+  if(ob.gateKind === "stair" || ob.gateKind === "slanted"){
+    const t = clamp((player.x - ob.x) / Math.max(1, ob.w), 0, 1);
+    const count = ob.visualCount || 1;
+    const localStep = ob.gateKind === "stair" ? Math.min(30, height*0.045) : Math.min(24, height*0.035) * (ob.slant >= 0 ? -1 : 1);
+    gapY = clampSectionY(ob.gapY + (t * (count-1) - (count-1)/2) * localStep, ob.gap);
+  }
+
+  const topEdge = gapY - ob.gap/2;
+  const bottomEdge = gapY + ob.gap/2;
+  const forgive = 6;
+
+  if(player.y - player.r < topEdge + forgive) return true;
+  if(player.y + player.r > bottomEdge - forgive) return true;
   return false;
 }
 
@@ -2525,7 +2577,7 @@ function update(dt){
   player.trail.forEach(t => t.life *= .92);
 
   if(status === "playing"){
-    slowTimer = 0;
+    slowTimer = Math.max(0, slowTimer - dt);
     shieldTimer = Math.max(0, shieldTimer - dt);
     if(shieldTimer <= 0 && shieldActive){
       shieldActive = false;
@@ -2535,14 +2587,13 @@ function update(dt){
 
     // Slow Motion soll helfen, nicht stören:
     // Nur Gates/Welt werden langsamer. Die Figur bleibt normal steuerbar.
-    const gravity = height * 1.12;
+    const gravity = height * (score < 10 ? 1.08 : score < 25 ? 1.13 : score < 40 ? 1.16 : 1.20);
     player.vy += gravity * dt;
-    player.vy = Math.min(player.vy, height * 0.95);
     player.y += player.vy * dt;
     player.rot = clamp(player.rot + dt*2.2, -0.55, 0.95);
     if(player.vy < 0) player.rot = -0.42;
 
-    const speedPx = width * 0.36;
+    const speedPx = (width*0.49 + score*2.8) * gameSpeed * (slowTimer > 0 ? 0.50 : 1);
     spawnTimer -= dt;
     if(spawnTimer <= 0){
       spawnObstacle();
@@ -2931,89 +2982,97 @@ function drawBackground(){
 
 
 function drawObstacle(ob){
-  const style = classicGateStyle();
-  const topH = ob.gapY - ob.gap/2;
-  const botY = ob.gapY + ob.gap/2;
-  const x = ob.x;
-  const w = ob.w;
+  const count = ob.visualCount || 1;
+  const pipeW = ob.pipeW || ob.w;
+  const step = ob.visualStep || pipeW;
+  const color = ob.gateKind === "slanted" ? "#ffd166" : (ob.color || COLORS.cyan);
 
   ctx.save();
-
-  if(style.kind === "sunny"){
-    // Landschaft: Baum-/Stamm-Gates
-    ctx.fillStyle = "#6b3f22";
-    ctx.fillRect(x, 0, w, topH);
-    ctx.fillRect(x, botY, w, height - botY);
-
-    ctx.fillStyle = "#2fc56f";
-    ctx.beginPath(); ctx.ellipse(x+w/2, Math.max(18, topH-10), w*.72, 18, 0, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(x+w/2, Math.min(height-18, botY+10), w*.72, 18, 0, 0, Math.PI*2); ctx.fill();
-
-    ctx.strokeStyle = "rgba(255,255,255,.22)";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(x+w*.28, 8); ctx.lineTo(x+w*.28, Math.max(8, topH-18));
-    ctx.moveTo(x+w*.28, botY+18); ctx.lineTo(x+w*.28, height-8);
-    ctx.stroke();
-
-  }else if(style.kind === "winter"){
-    ctx.fillStyle = "#8dddf5";
-    ctx.fillRect(x, 0, w, topH);
-    ctx.fillRect(x, botY, w, height - botY);
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x, 0, w, topH);
-    ctx.strokeRect(x, botY, w, height - botY);
-
-    ctx.fillStyle = "rgba(255,255,255,.65)";
-    for(let i=0;i<4;i++){
-      const sx = x + (i+.5)*w/4;
-      ctx.beginPath();
-      ctx.moveTo(sx-w*.07, topH);
-      ctx.lineTo(sx+w*.07, topH);
-      ctx.lineTo(sx, Math.min(topH+18, ob.gapY-ob.gap*.33));
-      ctx.closePath(); ctx.fill();
+  for(let j=0;j<count;j++){
+    const x = ob.x + j*step;
+    let gapY = ob.gapY;
+    if(ob.gateKind === "stair"){
+      const localStep = Math.min(30, height*0.045);
+      gapY = clampSectionY(ob.gapY + (j - (count-1)/2) * localStep, ob.gap);
+    }else if(ob.gateKind === "slanted"){
+      const localStep = Math.min(24, height*0.035);
+      gapY = clampSectionY(ob.gapY + (j - (count-1)/2) * localStep * (ob.slant >= 0 ? -1 : 1), ob.gap);
     }
 
-  }else if(style.kind === "sunset"){
-    ctx.fillStyle = "#121424";
-    ctx.fillRect(x, 0, w, topH);
-    ctx.fillRect(x, botY, w, height - botY);
-    ctx.fillStyle = "#0a0a12";
-    ctx.fillRect(x+w*.36, 0, w*.28, topH);
-    ctx.fillRect(x+w*.36, botY, w*.28, height-botY);
-    ctx.strokeStyle = "#ffd166";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(x, topH); ctx.lineTo(x+w, topH);
-    ctx.moveTo(x, botY); ctx.lineTo(x+w, botY);
-    ctx.stroke();
+    const topH = gapY - ob.gap/2;
+    const botY = gapY + ob.gap/2;
 
-  }else{
-    // Galaxy: Energie-/Asteroiden-Gates
-    ctx.fillStyle = "#15254f";
-    ctx.fillRect(x, 0, w, topH);
-    ctx.fillRect(x, botY, w, height - botY);
-    ctx.strokeStyle = "#35e7ff";
+    const gradTop = ctx.createLinearGradient(x, 0, x+pipeW, Math.max(1, topH));
+    gradTop.addColorStop(0, "rgba(255,255,255,.22)");
+    gradTop.addColorStop(.45, color);
+    gradTop.addColorStop(1, "rgba(6,16,31,.96)");
+
+    const gradBot = ctx.createLinearGradient(x, botY, x+pipeW, height);
+    gradBot.addColorStop(0, "rgba(255,255,255,.18)");
+    gradBot.addColorStop(.45, color);
+    gradBot.addColorStop(1, "rgba(6,16,31,.98)");
+
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 16;
+    ctx.strokeStyle = color;
     ctx.lineWidth = 3;
-    ctx.strokeRect(x, 0, w, topH);
-    ctx.strokeRect(x, botY, w, height - botY);
-    ctx.fillStyle = "rgba(53,231,255,.55)";
-    for(let i=0;i<3;i++){
-      const cx = x + w*(.25+i*.25);
-      ctx.beginPath(); ctx.arc(cx, Math.max(14, topH-10), 4, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.arc(cx, Math.min(height-14, botY+10), 4, 0, Math.PI*2); ctx.fill();
+
+    if(ob.gateKind === "slanted"){
+      const lean = ob.slant || 10;
+      ctx.fillStyle = gradTop;
+      ctx.beginPath();
+      ctx.moveTo(x - lean, 0);
+      ctx.lineTo(x + pipeW - lean, 0);
+      ctx.lineTo(x + pipeW, topH);
+      ctx.lineTo(x, topH);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = gradBot;
+      ctx.beginPath();
+      ctx.moveTo(x, botY);
+      ctx.lineTo(x + pipeW, botY);
+      ctx.lineTo(x + pipeW + lean, height);
+      ctx.lineTo(x + lean, height);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }else{
+      ctx.fillStyle = gradTop;
+      ctx.fillRect(x, 0, pipeW, topH);
+      ctx.strokeRect(x, 0, pipeW, topH);
+
+      ctx.fillStyle = gradBot;
+      ctx.fillRect(x, botY, pipeW, height - botY);
+      ctx.strokeRect(x, botY, pipeW, height - botY);
     }
+
+    ctx.shadowBlur = 18;
+    ctx.lineWidth = 5;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(x+6, topH);
+    ctx.lineTo(x+pipeW-6, topH);
+    ctx.moveTo(x+6, botY);
+    ctx.lineTo(x+pipeW-6, botY);
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = .24;
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "#ffffff";
+    for(let k=1;k<3;k++){
+      const xx = x + (pipeW/3)*k;
+      ctx.beginPath();
+      ctx.moveTo(xx, 8);
+      ctx.lineTo(xx, topH - 6);
+      ctx.moveTo(xx, botY + 6);
+      ctx.lineTo(xx, height - 8);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
   }
-
-  // Clear gate opening edge, lightweight.
-  ctx.strokeStyle = "rgba(255,255,255,.65)";
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(x+4, topH); ctx.lineTo(x+w-4, topH);
-  ctx.moveTo(x+4, botY); ctx.lineTo(x+w-4, botY);
-  ctx.stroke();
-
   ctx.restore();
 }
 
