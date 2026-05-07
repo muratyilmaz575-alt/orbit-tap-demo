@@ -1903,7 +1903,7 @@ function showMenu(){
         </div>
       </div>
 
-      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">ORBIT DASH V3 aktiv: engere Abstände · 3er selten · Shield 1x selten · fairer Highscore-Druck</div>
+      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">ORBIT DASH V4 aktiv: schwerer · Shield seltener · Coins riskanter · 3er-Gates selten</div>
 
       <div class="demoNotice"><b>Hinweis:</b> Rankings, Freunde und Daily-Ranking sind in dieser HTML-Version Demo-Daten. Der Spielkern, Coins, Shop, Powerups und Daily-Seed laufen lokal.</div>
 
@@ -2140,23 +2140,25 @@ function getSpeedForScore(s){
 }
 
 function getGapForScore(s){
-  // V3: enger als vorher, damit es wieder mehr Druck macht.
-  // Nicht unfair, aber nicht mehr so bequem bis 50+ Punkte.
-  const base = height * 0.238;
+  // V4: etwas schwerer als V3, aber nicht unfair.
+  // Start bleibt spielbar, ab Score 8 kommt mehr Druck.
+  const base = height * 0.226;
   let shrink;
-  if(s < 8) shrink = s * 0.20;
-  else if(s < 20) shrink = 1.6 + (s - 8) * 0.30;
-  else if(s < 55) shrink = 5.2 + (s - 20) * 0.16;
-  else shrink = 10.8 + (s - 55) * 0.08;
-  return clamp(base - shrink, 112, 162);
+  if(s < 6) shrink = s * 0.10;
+  else if(s < 15) shrink = 0.6 + (s - 6) * 0.34;
+  else if(s < 30) shrink = 3.7 + (s - 15) * 0.24;
+  else if(s < 55) shrink = 7.3 + (s - 30) * 0.13;
+  else shrink = 10.6 + (s - 55) * 0.07;
+  return clamp(base - shrink, 106, 154);
 }
 
 function getSpawnDelayForScore(s){
-  // V3: ca. 6-8% kürzere horizontale Abstände.
-  if(s < 8) return 1.22;
-  if(s < 20) return 1.16;
-  if(s < 55) return 1.10;
-  return 1.06;
+  // V4: nochmal 3-5% kürzer als V3.
+  if(s < 6) return 1.18;
+  if(s < 15) return 1.12;
+  if(s < 30) return 1.07;
+  if(s < 55) return 1.04;
+  return 1.00;
 }
 
 
@@ -2243,7 +2245,7 @@ function tryCollectGateCoin(ob){
   if(ob.coinCollected || !player || status !== "playing") return;
 
   const pos = getGateCoinPosition(ob);
-  const pickupRadius = Math.max(8, player.r + pos.r - 8);
+  const pickupRadius = Math.max(7, player.r + pos.r - 9);
   if(dist(player.x, player.y, pos.x, pos.y) <= pickupRadius){
     ob.coinCollected = true;
 
@@ -2262,17 +2264,19 @@ function tryCollectGateCoin(ob){
 
 
 function spawnPowerup(){
-  if(score < 4) return;
+  if(score < 5) return;
 
   let type;
   const roll = gameRandom();
 
-  // V3: Shield ist selten und kommt nicht, wenn man bereits eins hat.
-  if(!shieldActive && gatesSinceShieldSpawn >= 22 && roll < 0.33){
+  // V4: Shield ist ein seltener Rettungsmoment, nicht Dauerzustand.
+  // Erst ab Score 18 und nur, wenn genug Gates seit dem letzten Shield vergangen sind.
+  if(score >= 18 && !shieldActive && gatesSinceShieldSpawn >= 36 && roll < 0.18){
     type = "shield";
     gatesSinceShieldSpawn = 0;
   }else{
-    type = roll < .72 ? "coin" : "slow";
+    // Coins häufiger, Slow selten.
+    type = roll < .78 ? "coin" : "slow";
   }
 
   const upcoming = obstacles
@@ -2379,8 +2383,8 @@ function clampSectionY(y, gap){
 }
 
 function getSectionKind(i){
-  // V3: 3er-Gates sind seltene Spezialmomente.
-  if(score < 10 || i < 7) return "normal";
+  // V4: 3er-Gates bleiben selten, aber kommen als echter Konzentrationsmoment.
+  if(score < 14 || i < 9) return "normal";
 
   if(specialGateCooldown > 0){
     specialGateCooldown--;
@@ -2388,14 +2392,14 @@ function getSectionKind(i){
   }
 
   const theme = save.theme || 'neon';
-  const baseChance = theme === 'lava' ? 0.075
-                    : theme === 'ice' ? 0.065
-                    : theme === 'nature' ? 0.055
-                    : theme === 'sunset' ? 0.055
-                    : 0.065;
+  const baseChance = theme === 'lava' ? 0.070
+                    : theme === 'ice' ? 0.060
+                    : theme === 'nature' ? 0.052
+                    : theme === 'sunset' ? 0.052
+                    : 0.060;
 
   if(gameRandom() < baseChance){
-    specialGateCooldown = 8 + Math.floor(gameRandom() * 5); // 8-12 normale Gates Abstand
+    specialGateCooldown = 10 + Math.floor(gameRandom() * 6); // 10-15 normale Gates Abstand
     return "stair";
   }
 
@@ -2404,14 +2408,14 @@ function getSectionKind(i){
 
 function sectionGapY(kind, gap, i){
   const mid = height * 0.50;
-  const amp = Math.min(80, height * 0.145);
+  const amp = Math.min(88, height * 0.155);
 
   if(kind === "stair"){
-    const bias = (gameRandom() < 0.5 ? -1 : 1) * amp * rand(0.10, 0.24);
-    return clampSectionY(mid + bias + rand(-amp * 0.12, amp * 0.12), gap);
+    const bias = (gameRandom() < 0.5 ? -1 : 1) * amp * rand(0.14, 0.30);
+    return clampSectionY(mid + bias + rand(-amp * 0.10, amp * 0.10), gap);
   }
 
-  return clampSectionY(mid + rand(-amp * 0.82, amp * 0.82), gap);
+  return clampSectionY(mid + rand(-amp * 0.88, amp * 0.88), gap);
 }
 
 function spawnObstacle(){
@@ -2425,9 +2429,16 @@ function spawnObstacle(){
   const visualCount = kind === "stair" ? 3 : 1;
   const visualStep = w * 0.56;
   const sectionW = kind === "normal" ? w : w + visualStep * (visualCount - 1);
-  const placements = ["before", "inside", "after"];
+  const placements = gameRandom() < 0.62 ? ["inside"] : ["before", "after"];
 
   gatesSinceShieldSpawn++;
+
+  // Coin ist nicht mehr immer bequem in der Mitte.
+  // Manche Coins liegen näher am oberen/unteren Rand der Öffnung = Risiko/Belohnung.
+  const riskyCoin = score >= 8 && gameRandom() < 0.46;
+  const coinOffset = riskyCoin
+    ? (gameRandom() < 0.5 ? -1 : 1) * rand(gap * 0.22, gap * 0.34)
+    : rand(-gap * 0.12, gap * 0.12);
 
   obstacles.push({
     x,
@@ -2448,12 +2459,13 @@ function spawnObstacle(){
     motionAmp: 0,
     motionSpeed: 0,
     coinPlacement: placements[Math.floor(gameRandom() * placements.length)],
-    coinOffsetY: rand(-gap * 0.05, gap * 0.05),
+    coinOffsetY: coinOffset,
     coinCollected:false,
     bobAmp: 0,
     bobSpeed: 0,
     shardCount: Math.round(rand(4, 6)),
-    styleTheme: save.theme || 'neon'
+    styleTheme: save.theme || 'neon',
+    visualVariant: Math.floor(gameRandom() * 4)
   });
 }
 
@@ -2464,13 +2476,13 @@ function obstacleCollide(ob){
   if(ob.gateKind === "stair"){
     const t = clamp((player.x - ob.x) / Math.max(1, ob.w), 0, 1);
     const count = ob.visualCount || 1;
-    const localStep = Math.min(22, height * 0.032) * (ob.stairDir || 1);
+    const localStep = Math.min(28, height * 0.040) * (ob.stairDir || 1);
     gapY = clampSectionY(ob.gapY + (t * (count - 1) - (count - 1) / 2) * localStep, ob.gap);
   }
 
   const topEdge = gapY - ob.gap / 2;
   const bottomEdge = gapY + ob.gap / 2;
-  const forgive = 3;
+  const forgive = 2;
 
   if(player.y - player.r < topEdge + forgive) return true;
   if(player.y + player.r > bottomEdge - forgive) return true;
@@ -2632,7 +2644,7 @@ function update(dt){
         p.x -= speedPx * dt;
       }
 
-      if(!p.taken && dist(player.x, player.y, p.x, p.y) <= Math.max(8, player.r + p.r - 7)){
+      if(!p.taken && dist(player.x, player.y, p.x, p.y) <= Math.max(7, player.r + p.r - 8)){
         collectPowerup(p);
       }
     }
@@ -3009,7 +3021,7 @@ function drawObstacle(ob){
     const x = ob.x + j*step;
     let gapY = ob.gapY;
     if(ob.gateKind === "stair"){
-      const localStep = Math.min(22, height*0.032) * (ob.stairDir || 1);
+      const localStep = Math.min(28, height*0.040) * (ob.stairDir || 1);
       gapY = clampSectionY(ob.gapY + (j - (count-1)/2) * localStep, ob.gap);
     }
 
@@ -3138,30 +3150,46 @@ function drawNeonObstacle(x,y,w,h,ob,top=true){
 
 function drawNatureObstacle(x,y,w,h,top=true){
   if(h <= 0) return;
-  drawRoundedPillarBody(x,y,w,h,"#9b6b3d","#5c3b1e","#d4a373","#8b5a2b");
 
-  // leaves
+  const v = Math.abs(Math.floor(x / 37)) % 4;
+  const woodTop = v === 0 ? "#9b6b3d" : v === 1 ? "#80512e" : v === 2 ? "#a87542" : "#714421";
+  const woodBot = v === 0 ? "#5c3b1e" : v === 1 ? "#4b2f19" : v === 2 ? "#6b421f" : "#3f2716";
+  const leafColor = v === 0 ? "#54c76c" : v === 1 ? "#42b95f" : v === 2 ? "#66d47a" : "#2f9f52";
+
+  drawRoundedPillarBody(x,y,w,h,woodTop,woodBot,"#d4a373","#8b5a2b");
+
+  // leaves / kleine Variation, gleiche Hitbox
   ctx.save();
-  const leafColor = "#54c76c";
   ctx.fillStyle = leafColor;
   ctx.shadowColor = leafColor;
   ctx.shadowBlur = 10;
   const count = Math.max(3, Math.floor(h/55));
   for(let i=0;i<count;i++){
     const yy = y + 14 + i*((h-24)/count);
-    const side = i % 2 === 0 ? -1 : 1;
+    const side = (i + v) % 2 === 0 ? -1 : 1;
     const lx = side < 0 ? x+8 : x+w-8;
     ctx.beginPath();
-    ctx.ellipse(lx, yy, 8, 14, side<0 ? -.7 : .7, 0, Math.PI*2);
+    ctx.ellipse(lx, yy, 7 + v, 13 + (v%2)*3, side<0 ? -.7 : .7, 0, Math.PI*2);
     ctx.fill();
   }
-  // vines
-  ctx.strokeStyle = "#2e8b57";
-  ctx.lineWidth = 3;
+
+  // vines / Aststruktur
+  ctx.strokeStyle = v % 2 === 0 ? "#2e8b57" : "#246b42";
+  ctx.lineWidth = 2.5;
   ctx.beginPath();
-  ctx.moveTo(x+w*.25, y);
-  ctx.bezierCurveTo(x+w*.05, y+h*.25, x+w*.45, y+h*.55, x+w*.20, y+h);
+  ctx.moveTo(x+w*(.22+.06*v), y);
+  ctx.bezierCurveTo(x+w*.05, y+h*.25, x+w*.50, y+h*.55, x+w*.22, y+h);
   ctx.stroke();
+
+  if(v === 2 || v === 3){
+    ctx.globalAlpha = .45;
+    ctx.strokeStyle = "#d4a373";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x+w*.68, y+h*.18);
+    ctx.lineTo(x+w*.42, y+h*.28);
+    ctx.stroke();
+  }
   ctx.restore();
 }
 
