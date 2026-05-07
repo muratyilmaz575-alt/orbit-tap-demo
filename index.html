@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- Orbit Tap V35 Presentation Build: stable local HTML test version -->
+  <!-- Orbit Dash V35 Presentation Build: stable local HTML test version -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Orbit Tap Good Basis Fixes</title>
+  <title>Orbit Dash</title>
   <style>
     :root{
       --bg1:#07101f;
@@ -790,7 +790,7 @@ body.cleanPlaying .runEndCard{display:none!important}
     <header class="top">
       <div class="brand">
         <div class="label">FLAPPY CLEAN BALANCE</div>
-        <h1>Orbit Tap</h1>
+        <h1>Orbit Dash</h1>
         <p>Flappy clean balance</p>
       </div>
       <div class="stat">
@@ -895,7 +895,6 @@ let musicIntensity = 0;
 let player = null;
 let obstacles = [];
 let obstacleCount = 0;
-let lastSpecialGateIndex = -99;
 let gatesSinceShieldSpawn = 999;
 let lastRunScore = 0;
 let powerups = [];
@@ -909,6 +908,7 @@ let coinBoostTimer = 0;
 let highscoreWarned = false;
 let newBestShown = false;
 let spawnTimer = 0;
+let specialGateCooldown = 0;
 
 function defaultSave(){
   return {coins:0,best:0,sound:true,music:true,theme:'neon',skin:'orb',unlockedThemes:['neon'],unlockedSkins:['orb'],dailyBest:{}};
@@ -941,7 +941,7 @@ function updateHud(){
   if(els.bigScore) els.bigScore.textContent = score;
   if(els.powerHud){
     const active = [];
-    if(shieldActive || shieldGraceTimer > 0) active.push("🛡️");
+    if(shieldActive || shieldGraceTimer > 0) active.push(shieldActive ? "🛡️1" : "🛡️");
     if(slowTimer > 0) active.push("⏱️");
     if(coinBoostTimer > 0) active.push("🪙x2");
     els.powerHud.textContent = active.length ? active.join(" ") : "–";
@@ -1193,7 +1193,8 @@ function beep(type){
       pass:[820,.12,"sine",.065],
       fail:[120,.32,"sawtooth",.070],
       start:[620,.14,"triangle",.050],
-      combo:[980,.14,"triangle",.070]
+      combo:[980,.14,"triangle",.070],
+      coin:[1320,.08,"triangle",.060]
     };
     const [freq,dur,wave,vol] = map[type] || map.flap;
     o.type = wave;
@@ -1708,7 +1709,7 @@ function startNormalGame(){
 
 function startDailyChallenge(){
   dailyDateKey = getTodayKey();
-  dailySeed = seedFromString("OrbitTapDaily-" + dailyDateKey);
+  dailySeed = seedFromString("OrbitDashDaily-" + dailyDateKey);
   dailyMode = true;
   startGame();
 }
@@ -1858,7 +1859,7 @@ function showAddFriend(){
 function modalBase(title,text,extra){
   els.overlay.classList.remove("hide");
   els.modal.innerHTML = `
-    <div class="label">Orbit Tap</div>
+    <div class="label">Orbit Dash</div>
     <h2>${title}</h2>
     <p>${text}</p>
     <div class="coinBadge">🪙 <span>${save.coins}</span> Coins</div>
@@ -1870,15 +1871,15 @@ function showMenu(){
   status = "menu";
   const next = getNextUnlock();
   modalBase(
-    "Orbit Tap",
-    "FLAPPY CLEAN BALANCE: altes Spielgefühl zurück, 3 Typen dezent, 1 Abschnitt = 1 Punkt.",
+    "Orbit Dash",
+    "Orbit Dash: sauberes Flappy-Gefühl, klare Welten, seltene 3er-Gates und fairer Flow.",
     `
       <div class="heroCard">
         <div class="heroTop">
           <div class="heroLogo">
             <div class="heroIcon"></div>
             <div>
-              <div class="heroName">Orbit Tap</div>
+              <div class="heroName">Orbit Dash</div>
               <div class="heroTag">One tap · Highscore · Again</div>
             </div>
           </div>
@@ -1901,7 +1902,7 @@ function showMenu(){
         </div>
       </div>
 
-      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">GOOD BASIS FIXES aktiv: 3er selten · Schild 1x · Coin-Sound exakt · Welt-Gates</div>
+      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">ORBIT DASH aktiv: klares Flappy-Gefühl · seltene 3er-Gates · faire Schwierigkeit · 1 Abschnitt = 1 Punkt</div>
 
       <div class="demoNotice"><b>Hinweis:</b> Rankings, Freunde und Daily-Ranking sind in dieser HTML-Version Demo-Daten. Der Spielkern, Coins, Shop, Powerups und Daily-Seed laufen lokal.</div>
 
@@ -2072,7 +2073,7 @@ function startGame(){
   startAmbientMusic();
   if(dailyMode){
     dailyDateKey = dailyDateKey || getTodayKey();
-    dailySeed = dailySeed || seedFromString("OrbitTapDaily-" + dailyDateKey);
+    dailySeed = dailySeed || seedFromString("OrbitDashDaily-" + dailyDateKey);
     rngState = dailySeed;
   }
   els.overlay.classList.add("hide");
@@ -2097,6 +2098,7 @@ function startGame(){
   coinBoostTimer = 0;
   powerupSpawnTimer = 3.8;
   spawnTimer = 0.95;
+  specialGateCooldown = 0;
   screenShake = 0;
   highscoreWarned = false;
   newBestShown = false;
@@ -2110,7 +2112,7 @@ function startGame(){
     trail: [],
     dead:false
   };
-  showCenter("GO", "Tap to fly", COLORS.green, 600);
+  showCenter("GO", "Tap to dash", COLORS.green, 600);
   els.bottomMsg.textContent = "Tap für Auftrieb";
   beep("start");
   updateHud();
@@ -2136,20 +2138,19 @@ function getSpeedForScore(s){
 }
 
 function getGapForScore(s){
-  // Zurück zu sauberem Spielgefühl: nicht riesig, nicht unfair.
-  const base = height * 0.285;
+  // Etwas enger als zuvor: wieder fair, aber spürbar anspruchsvoller.
+  const base = height * 0.258;
   let shrink;
-  if(s < 20) shrink = s * 0.35;
-  else if(s < 55) shrink = 7 + (s - 20) * 0.24;
-  else shrink = 16 + (s - 55) * 0.14;
-  return clamp(base - shrink, 132, 188);
+  if(s < 20) shrink = s * 0.28;
+  else if(s < 55) shrink = 5.6 + (s - 20) * 0.18;
+  else shrink = 11.9 + (s - 55) * 0.10;
+  return clamp(base - shrink, 122, 176);
 }
 
 function getSpawnDelayForScore(s){
-  // Normale Flappy-Distanz, keine Wand-Cluster.
-  if(s < 20) return 1.32;
-  if(s < 55) return 1.24;
-  return 1.16;
+  if(s < 20) return 1.28;
+  if(s < 55) return 1.20;
+  return 1.14;
 }
 
 
@@ -2178,7 +2179,7 @@ function getGateCoinPosition(ob){
   if(ob.coinPlacement === "after") cx = ob.x + ob.w + 34;
 
   const cy = clamp(ob.gapY + (ob.coinOffsetY || 0), gapTop + 18, gapBottom - 18);
-  return {x:cx, y:cy, r:12};
+  return {x:cx, y:cy, r:10};
 }
 
 function drawGateCoins(ob){
@@ -2236,10 +2237,8 @@ function tryCollectGateCoin(ob){
   if(ob.coinCollected || !player || status !== "playing") return;
 
   const pos = getGateCoinPosition(ob);
-
-  // Exakter als vorher: Sound/Collect erst bei sichtbarer Berührung.
-  const touchRadius = player.r * 0.68 + pos.r * 0.68;
-  if(dist(player.x, player.y, pos.x, pos.y) <= touchRadius){
+  const pickupRadius = Math.max(8, player.r + pos.r - 6);
+  if(dist(player.x, player.y, pos.x, pos.y) <= pickupRadius){
     ob.coinCollected = true;
 
     const coinGain = (score % 5 === 0 ? 2 : 1) * (coinBoostTimer > 0 ? 2 : 1);
@@ -2247,9 +2246,9 @@ function tryCollectGateCoin(ob){
     save.coins += coinGain;
 
     spawnCoinPopup(pos.x, pos.y - 18, coinGain);
-    spawnParticles(pos.x, pos.y, COLORS.gold, coinGain >= 2 ? 12 : 8, 95);
+    spawnParticles(pos.x, pos.y, COLORS.gold, coinGain >= 2 ? 18 : 12, 120);
     shock(pos.x, pos.y, COLORS.gold, false);
-    beep("pass");
+    beep("coin");
     updateHud();
     saveGame();
   }
@@ -2306,15 +2305,13 @@ function getPowerupIcon(type){
 function collectPowerup(p){
   p.taken = true;
   const color = getPowerupColor(p.type);
-  spawnParticles(p.x, p.y, color, 16, 115);
+  spawnParticles(p.x, p.y, color, 22, 135);
   shock(p.x, p.y, color, true);
-  screenShake = .22;
+  screenShake = .25;
 
   if(p.type === "shield"){
-    // Schild schützt genau 1 Treffer, keine 10-Sekunden-Zeit mehr.
     shieldActive = true;
-    shieldTimer = 0;
-    shieldGraceTimer = 0;
+    shieldTimer = 1;
   }else if(p.type === "slow"){
     slowTimer = 4.4;
   }else if(p.type === "coin"){
@@ -2375,36 +2372,34 @@ function clampSectionY(y, gap){
 }
 
 function getSectionKind(i){
-  // Kein festes Muster mehr.
-  // Einzel-Gates sind Standard. 3er-Gates kommen selten als besonderer Moment.
-  if(i < 5) return "normal";
-  if(i - lastSpecialGateIndex < 8) return "normal";
-
-  const chance = gameRandom();
-  if(chance < 0.08){
-    lastSpecialGateIndex = i;
-    return gameRandom() < 0.65 ? "stair" : "slanted";
+  if(i < 3) return "normal";
+  if(specialGateCooldown > 0){
+    specialGateCooldown--;
+    return "normal";
   }
 
+  const theme = save.theme || 'neon';
+  const baseChance = theme === 'lava' ? 0.13
+                    : theme === 'ice' ? 0.11
+                    : theme === 'nature' ? 0.09
+                    : theme === 'sunset' ? 0.08
+                    : 0.11;
+
+  if(gameRandom() < baseChance){
+    specialGateCooldown = 3 + Math.floor(gameRandom() * 3);
+    return "stair";
+  }
   return "normal";
 }
 
 function sectionGapY(kind, gap, i){
   const mid = height * 0.50;
-  const amp = Math.min(72, height * 0.125);
-
-  if(kind === "normal"){
-    const wave = Math.sin(i * 1.17) * amp * 0.68;
-    return clampSectionY(mid + wave + rand(-amp*.22, amp*.22), gap);
-  }
-
+  const amp = Math.min(72, height * 0.13);
   if(kind === "stair"){
-    const stair = gameRandom() < 0.5 ? -0.34 : 0.34;
-    return clampSectionY(mid + stair * amp, gap);
+    const bias = (gameRandom() < 0.5 ? -1 : 1) * amp * rand(0.12, 0.28);
+    return clampSectionY(mid + bias + rand(-amp * 0.15, amp * 0.15), gap);
   }
-
-  const diag = gameRandom() < 0.5 ? -0.26 : 0.26;
-  return clampSectionY(mid + diag * amp, gap);
+  return clampSectionY(mid + rand(-amp * 0.72, amp * 0.72), gap);
 }
 
 function spawnObstacle(){
@@ -2412,15 +2407,13 @@ function spawnObstacle(){
   const kind = getSectionKind(i);
   const gap = getGapForScore(score);
 
-  const w = Math.max(56, Math.min(78, width * 0.105));
+  const w = Math.max(58, Math.min(84, width * 0.115));
   const x = width + 88;
   const y = sectionGapY(kind, gap, i);
-
-  // Einzel-Gate ist Standard. 3er-Gate ist selten.
-  const visualCount = kind === "normal" ? 1 : 3;
-  const visualStep = w * 0.60;
+  const visualCount = kind === "stair" ? 3 : 1;
+  const visualStep = w * 0.56;
   const sectionW = kind === "normal" ? w : w + visualStep * (visualCount - 1);
-  const lean = kind === "slanted" ? (i % 2 === 0 ? 1 : -1) * Math.min(12, width * 0.015) : 0;
+  const placements = ["before", "inside", "after"];
 
   gatesSinceShieldSpawn++;
 
@@ -2436,18 +2429,19 @@ function spawnObstacle(){
     baseGap: gap,
     passed:false,
     phase: rand(0, Math.PI*2),
-    color: kind === "slanted" ? "#ffd166" : (i % 2 === 0 ? COLORS.cyan : COLORS.pink),
+    color: i % 2 === 0 ? COLORS.cyan : COLORS.pink,
     type: kind,
     gateKind: kind,
-    slant: lean,
+    stairDir: gameRandom() < 0.5 ? -1 : 1,
     motionAmp: 0,
     motionSpeed: 0,
-    coinPlacement: i % 3 === 0 ? "before" : i % 3 === 1 ? "inside" : "after",
+    coinPlacement: placements[Math.floor(gameRandom() * placements.length)],
     coinOffsetY: rand(-gap * 0.05, gap * 0.05),
     coinCollected:false,
     bobAmp: 0,
     bobSpeed: 0,
-    shardCount: Math.round(rand(4, 6))
+    shardCount: Math.round(rand(4, 6)),
+    styleTheme: save.theme || 'neon'
   });
 }
 
@@ -2455,16 +2449,16 @@ function obstacleCollide(ob){
   if(player.x + player.r < ob.x || player.x - player.r > ob.x + ob.w) return false;
 
   let gapY = ob.gapY;
-  if(ob.gateKind === "stair" || ob.gateKind === "slanted"){
+  if(ob.gateKind === "stair"){
     const t = clamp((player.x - ob.x) / Math.max(1, ob.w), 0, 1);
     const count = ob.visualCount || 1;
-    const localStep = ob.gateKind === "stair" ? Math.min(30, height*0.045) : Math.min(24, height*0.035) * (ob.slant >= 0 ? -1 : 1);
-    gapY = clampSectionY(ob.gapY + (t * (count-1) - (count-1)/2) * localStep, ob.gap);
+    const localStep = Math.min(22, height * 0.032) * (ob.stairDir || 1);
+    gapY = clampSectionY(ob.gapY + (t * (count - 1) - (count - 1) / 2) * localStep, ob.gap);
   }
 
-  const topEdge = gapY - ob.gap/2;
-  const bottomEdge = gapY + ob.gap/2;
-  const forgive = 6;
+  const topEdge = gapY - ob.gap / 2;
+  const bottomEdge = gapY + ob.gap / 2;
+  const forgive = 3;
 
   if(player.y - player.r < topEdge + forgive) return true;
   if(player.y + player.r > bottomEdge - forgive) return true;
@@ -2524,17 +2518,16 @@ function crash(reason="CRASH"){
   }
 
   if(shieldActive && status === "playing"){
-    // Einmaliger Schutz: Treffer blocken, Schild sofort verbrauchen.
     shieldActive = false;
     shieldTimer = 0;
-    shieldGraceTimer = 0.48;
-    screenShake = .55;
-    spawnParticles(player.x, player.y, COLORS.green, 22, 145);
+    shieldGraceTimer = 0.35;
+    screenShake = .42;
+    spawnParticles(player.x, player.y, COLORS.green, 28, 155);
     shock(player.x, player.y, COLORS.green, true);
-    showCenter("SHIELD", "geblockt", COLORS.green, 420);
+    showCenter("SHIELD", "1 Treffer geblockt", COLORS.green, 460);
     beep("combo");
 
-    player.vy = -Math.min(height*0.42, 285);
+    player.vy = -Math.min(height*0.40, 280);
     player.y = clamp(player.y, 50 + player.r, height - 50 - player.r);
 
     for(const ob of obstacles){
@@ -2594,8 +2587,6 @@ function update(dt){
 
   if(status === "playing"){
     slowTimer = Math.max(0, slowTimer - dt);
-    shieldTimer = 0;
-    // Schild bleibt aktiv, bis es genau 1 Treffer blockt.
     shieldGraceTimer = Math.max(0, shieldGraceTimer - dt);
     coinBoostTimer = Math.max(0, coinBoostTimer - dt);
 
@@ -2629,7 +2620,7 @@ function update(dt){
         p.x -= speedPx * dt;
       }
 
-      if(!p.taken && dist(player.x, player.y, p.x, p.y) <= player.r * 0.68 + p.r * 0.68){
+      if(!p.taken && dist(player.x, player.y, p.x, p.y) < player.r + p.r){
         collectPowerup(p);
       }
     }
@@ -2999,133 +2990,38 @@ function drawObstacle(ob){
   const count = ob.visualCount || 1;
   const pipeW = ob.pipeW || ob.w;
   const step = ob.visualStep || pipeW;
-  const theme = save.theme || "neon";
+  const theme = ob.styleTheme || save.theme || 'neon';
 
   ctx.save();
-
   for(let j=0;j<count;j++){
     const x = ob.x + j*step;
     let gapY = ob.gapY;
-
     if(ob.gateKind === "stair"){
-      const localStep = Math.min(24, height*0.035);
+      const localStep = Math.min(22, height*0.032) * (ob.stairDir || 1);
       gapY = clampSectionY(ob.gapY + (j - (count-1)/2) * localStep, ob.gap);
-    }else if(ob.gateKind === "slanted"){
-      const localStep = Math.min(18, height*0.028);
-      gapY = clampSectionY(ob.gapY + (j - (count-1)/2) * localStep * (ob.slant >= 0 ? -1 : 1), ob.gap);
     }
 
     const topH = gapY - ob.gap/2;
     const botY = gapY + ob.gap/2;
+    const botH = height - botY;
 
-    ctx.save();
-
-    if(theme === "nature"){
-      // Landschaft: Baum/Stamm statt Neon-Gate
-      ctx.fillStyle = "#6b3f22";
-      ctx.fillRect(x, 0, pipeW, topH);
-      ctx.fillRect(x, botY, pipeW, height - botY);
-
-      ctx.fillStyle = "#2fc56f";
-      ctx.beginPath(); ctx.ellipse(x+pipeW/2, Math.max(14, topH-9), pipeW*.68, 15, 0, 0, Math.PI*2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(x+pipeW/2, Math.min(height-14, botY+9), pipeW*.68, 15, 0, 0, Math.PI*2); ctx.fill();
-
-      ctx.strokeStyle = "rgba(255,255,255,.22)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x+pipeW*.30, 8); ctx.lineTo(x+pipeW*.30, Math.max(8, topH-16));
-      ctx.moveTo(x+pipeW*.30, botY+16); ctx.lineTo(x+pipeW*.30, height-8);
-      ctx.stroke();
-
-    }else if(theme === "ice"){
-      // Winter: Eis-Gates
-      const gradTop = ctx.createLinearGradient(x,0,x+pipeW,Math.max(1,topH));
-      gradTop.addColorStop(0,"#eaffff");
-      gradTop.addColorStop(.45,"#8dddf5");
-      gradTop.addColorStop(1,"#0b2f43");
-      const gradBot = ctx.createLinearGradient(x,botY,x+pipeW,height);
-      gradBot.addColorStop(0,"#eaffff");
-      gradBot.addColorStop(.45,"#8dddf5");
-      gradBot.addColorStop(1,"#0b2f43");
-      ctx.fillStyle = gradTop; ctx.fillRect(x,0,pipeW,topH);
-      ctx.fillStyle = gradBot; ctx.fillRect(x,botY,pipeW,height-botY);
-      ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2;
-      ctx.strokeRect(x,0,pipeW,topH); ctx.strokeRect(x,botY,pipeW,height-botY);
-
-      ctx.fillStyle = "rgba(255,255,255,.62)";
-      for(let k=0;k<4;k++){
-        const sx = x + (k+.5)*pipeW/4;
-        ctx.beginPath();
-        ctx.moveTo(sx-pipeW*.055, topH);
-        ctx.lineTo(sx+pipeW*.055, topH);
-        ctx.lineTo(sx, Math.min(topH+16, gapY-ob.gap*.34));
-        ctx.closePath(); ctx.fill();
-      }
-
-    }else if(theme === "lava"){
-      // Lava: dunkler Stein mit Lava-Kante
-      ctx.fillStyle = "#1d1010";
-      ctx.fillRect(x,0,pipeW,topH);
-      ctx.fillRect(x,botY,pipeW,height-botY);
-      ctx.strokeStyle = "#ff6b00";
-      ctx.lineWidth = 3;
-      ctx.strokeRect(x,0,pipeW,topH);
-      ctx.strokeRect(x,botY,pipeW,height-botY);
-      ctx.strokeStyle = "rgba(255,209,102,.55)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x+pipeW*.25,8); ctx.lineTo(x+pipeW*.25,Math.max(8,topH-8));
-      ctx.moveTo(x+pipeW*.25,botY+8); ctx.lineTo(x+pipeW*.25,height-8);
-      ctx.stroke();
-
-    }else if(theme === "sunset"){
-      // Sunset: dunkle Palmen/Silhouetten
-      ctx.fillStyle = "#111322";
-      ctx.fillRect(x,0,pipeW,topH);
-      ctx.fillRect(x,botY,pipeW,height-botY);
-      ctx.fillStyle = "#070912";
-      ctx.fillRect(x+pipeW*.35,0,pipeW*.30,topH);
-      ctx.fillRect(x+pipeW*.35,botY,pipeW*.30,height-botY);
-      ctx.strokeStyle = "#ffd166";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x,topH); ctx.lineTo(x+pipeW,topH);
-      ctx.moveTo(x,botY); ctx.lineTo(x+pipeW,botY);
-      ctx.stroke();
-
+    if(theme === 'nature'){
+      drawNatureObstacle(x, 0, pipeW, topH, true);
+      drawNatureObstacle(x, botY, pipeW, botH, false);
+    }else if(theme === 'lava'){
+      drawLavaObstacle(x, 0, pipeW, topH, true);
+      drawLavaObstacle(x, botY, pipeW, botH, false);
+    }else if(theme === 'ice'){
+      drawIceObstacle(x, 0, pipeW, topH, true);
+      drawIceObstacle(x, botY, pipeW, botH, false);
+    }else if(theme === 'sunset'){
+      drawSunsetObstacle(x, 0, pipeW, topH, true);
+      drawSunsetObstacle(x, botY, pipeW, botH, false);
     }else{
-      // Neon/Galaxy: bestehender Orbit-Look
-      const color = ob.gateKind === "slanted" ? "#ffd166" : (ob.color || COLORS.cyan);
-      const gradTop = ctx.createLinearGradient(x, 0, x+pipeW, Math.max(1, topH));
-      gradTop.addColorStop(0, "rgba(255,255,255,.18)");
-      gradTop.addColorStop(.45, color);
-      gradTop.addColorStop(1, "rgba(6,16,31,.96)");
-      const gradBot = ctx.createLinearGradient(x, botY, x+pipeW, height);
-      gradBot.addColorStop(0, "rgba(255,255,255,.14)");
-      gradBot.addColorStop(.45, color);
-      gradBot.addColorStop(1, "rgba(6,16,31,.98)");
-
-      ctx.shadowColor = color;
-      ctx.shadowBlur = 12;
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 3;
-      ctx.fillStyle = gradTop; ctx.fillRect(x,0,pipeW,topH); ctx.strokeRect(x,0,pipeW,topH);
-      ctx.fillStyle = gradBot; ctx.fillRect(x,botY,pipeW,height-botY); ctx.strokeRect(x,botY,pipeW,height-botY);
+      drawNeonObstacle(x, 0, pipeW, topH, ob, true);
+      drawNeonObstacle(x, botY, pipeW, botH, ob, false);
     }
-
-    // Klare Durchgangskanten bei allen Welten
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = "rgba(255,255,255,.58)";
-    ctx.lineWidth = 3;
-    ctx.lineCap = "round";
-    ctx.beginPath();
-    ctx.moveTo(x+5, topH); ctx.lineTo(x+pipeW-5, topH);
-    ctx.moveTo(x+5, botY); ctx.lineTo(x+pipeW-5, botY);
-    ctx.stroke();
-
-    ctx.restore();
   }
-
   ctx.restore();
 }
 
@@ -3379,37 +3275,38 @@ function drawPlayer(){
   ctx.translate(player.x, player.y);
   ctx.rotate(player.rot);
 
-  // shield aura: deutlich sichtbar, knallig, nur solange Schild aktiv ist
+  // shield aura
   if(shieldActive || shieldGraceTimer > 0){
     ctx.save();
-    const auraPulse = Math.sin(bgT*12)*3;
-    const auraR = r + 16 + auraPulse;
-
-    const gradAura = ctx.createRadialGradient(0,0,r*.6,0,0,auraR+15);
-    gradAura.addColorStop(0, 'rgba(255,255,255,.55)');
-    gradAura.addColorStop(.35, 'rgba(115,255,155,.42)');
-    gradAura.addColorStop(.72, 'rgba(53,231,255,.24)');
-    gradAura.addColorStop(1, 'rgba(53,231,255,0)');
-
-    ctx.fillStyle = gradAura;
-    ctx.beginPath();
-    ctx.arc(0, 0, auraR+15, 0, Math.PI*2);
-    ctx.fill();
-
-    ctx.globalAlpha = shieldActive ? .96 : .68;
-    ctx.strokeStyle = '#ffffff';
-    ctx.shadowColor = COLORS.green;
-    ctx.shadowBlur = 30;
-    ctx.lineWidth = 5;
+    const auraColor = shieldGraceTimer > 0 ? "#c9ff7d" : "#8dff3a";
+    const auraR = r + 14 + Math.sin(bgT*8)*2.2;
+    ctx.globalAlpha = shieldGraceTimer > 0 ? .72 : .60;
+    ctx.fillStyle = auraColor;
+    ctx.shadowColor = auraColor;
+    ctx.shadowBlur = 32;
     ctx.beginPath();
     ctx.arc(0, 0, auraR, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.globalAlpha = .95;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, auraR + 2, 0, Math.PI*2);
     ctx.stroke();
 
-    ctx.strokeStyle = COLORS.green;
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.arc(0, 0, auraR + 7, 0, Math.PI*2);
-    ctx.stroke();
+    ctx.lineWidth = 2.2;
+    for(let i=0;i<6;i++){
+      const ang = bgT*2 + i*(Math.PI*2/6);
+      const x1 = Math.cos(ang) * (auraR + 2);
+      const y1 = Math.sin(ang) * (auraR + 2);
+      const x2 = Math.cos(ang) * (auraR + 10);
+      const y2 = Math.sin(ang) * (auraR + 10);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+    }
     ctx.restore();
   }
 
