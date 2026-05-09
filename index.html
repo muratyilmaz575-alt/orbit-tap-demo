@@ -782,6 +782,10 @@ body.cleanPlaying .runEndCard{display:none!important}
 .lastScoreBox b{display:block;font-size:24px;color:#fff;line-height:1}
 .lastScoreBox span{display:block;margin-top:5px;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
 
+
+/* V6 App-Feeling */
+.modal{scroll-behavior:auto!important}
+.shopCard{scroll-margin-top:12px}
 </style>
 </head>
 <body>
@@ -1417,6 +1421,8 @@ function showShop(tab='skins'){
       </div>
     `
   );
+
+  scrollModalTop();
 }
 
 
@@ -1613,6 +1619,8 @@ function showShop(tab='skins'){
       </div>
     `
   );
+
+  scrollModalTop();
 }
 
 
@@ -1857,6 +1865,17 @@ function showAddFriend(){
 }
 
 
+function scrollModalTop(){
+  requestAnimationFrame(()=>{
+    try{
+      if(els.modal) els.modal.scrollTop = 0;
+      if(els.overlay) els.overlay.scrollTop = 0;
+      const modal = document.querySelector(".modal");
+      if(modal) modal.scrollTop = 0;
+    }catch(e){}
+  });
+}
+
 function modalBase(title,text,extra){
   els.overlay.classList.remove("hide");
   els.modal.innerHTML = `
@@ -1866,6 +1885,7 @@ function modalBase(title,text,extra){
     <div class="coinBadge">🪙 <span>${save.coins}</span> Coins</div>
     ${extra || ""}
   `;
+  scrollModalTop();
 }
 function showMenu(){
   document.body.classList.remove("cleanPlaying");
@@ -1873,7 +1893,7 @@ function showMenu(){
   const next = getNextUnlock();
   modalBase(
     "Orbit Dash",
-    "Orbit Dash: sauberes Flappy-Gefühl, klare Welten, seltene 3er-Gates und fairer Flow.",
+    "Orbit Dash: sauberes Flappy-Gefühl, klare Welten, seltene Einzel-Gates und fairer Flow.",
     `
       <div class="heroCard">
         <div class="heroTop">
@@ -1903,7 +1923,7 @@ function showMenu(){
         </div>
       </div>
 
-      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">ORBIT DASH V4 aktiv: schwerer · Shield seltener · Coins riskanter · 3er-Gates selten</div>
+      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">ORBIT DASH V6 aktiv: mehr Kick · Natur ruhiger · Shop startet oben · faire Einzel-Gates</div>
 
       <div class="demoNotice"><b>Hinweis:</b> Rankings, Freunde und Daily-Ranking sind in dieser HTML-Version Demo-Daten. Der Spielkern, Coins, Shop, Powerups und Daily-Seed laufen lokal.</div>
 
@@ -2134,31 +2154,32 @@ function tapFly(){
 
 
 function getSpeedForScore(s){
-  if(s < 20) return 0.78 + s * 0.019;
-  if(s < 55) return 1.16 + (s - 20) * 0.011;
-  return Math.min(1.92, 1.55 + (s - 55) * 0.004);
+  // V6: minimal mehr Tempo.
+  if(s < 15) return 0.84 + s * 0.021;
+  if(s < 40) return 1.155 + (s - 15) * 0.012;
+  if(s < 75) return 1.455 + (s - 40) * 0.006;
+  return Math.min(1.95, 1.665 + (s - 75) * 0.003);
 }
 
 function getGapForScore(s){
-  // V4: etwas schwerer als V3, aber nicht unfair.
-  // Start bleibt spielbar, ab Score 8 kommt mehr Druck.
-  const base = height * 0.226;
+  // V6: Mehr Kick, aber weiterhin fair.
+  const base = height * 0.214;
   let shrink;
-  if(s < 6) shrink = s * 0.10;
-  else if(s < 15) shrink = 0.6 + (s - 6) * 0.34;
-  else if(s < 30) shrink = 3.7 + (s - 15) * 0.24;
-  else if(s < 55) shrink = 7.3 + (s - 30) * 0.13;
-  else shrink = 10.6 + (s - 55) * 0.07;
-  return clamp(base - shrink, 106, 154);
+  if(s < 5) shrink = s * 0.08;
+  else if(s < 12) shrink = 0.4 + (s - 5) * 0.30;
+  else if(s < 25) shrink = 2.5 + (s - 12) * 0.23;
+  else if(s < 50) shrink = 5.5 + (s - 25) * 0.12;
+  else shrink = 8.5 + (s - 50) * 0.06;
+  return clamp(base - shrink, 100, 146);
 }
 
 function getSpawnDelayForScore(s){
-  // V4: nochmal 3-5% kürzer als V3.
-  if(s < 6) return 1.18;
-  if(s < 15) return 1.12;
-  if(s < 30) return 1.07;
-  if(s < 55) return 1.04;
-  return 1.00;
+  // V6: dichterer Rhythmus, weniger Erholungszeit.
+  if(s < 5) return 1.14;
+  if(s < 12) return 1.08;
+  if(s < 25) return 1.03;
+  if(s < 50) return 0.99;
+  return 0.96;
 }
 
 
@@ -2383,69 +2404,40 @@ function clampSectionY(y, gap){
 }
 
 function getSectionKind(i){
-  // V4: 3er-Gates bleiben selten, aber kommen als echter Konzentrationsmoment.
-  if(score < 14 || i < 9) return "normal";
-
-  if(specialGateCooldown > 0){
-    specialGateCooldown--;
-    return "normal";
-  }
-
-  const theme = save.theme || 'neon';
-  const baseChance = theme === 'lava' ? 0.070
-                    : theme === 'ice' ? 0.060
-                    : theme === 'nature' ? 0.052
-                    : theme === 'sunset' ? 0.052
-                    : 0.060;
-
-  if(gameRandom() < baseChance){
-    specialGateCooldown = 10 + Math.floor(gameRandom() * 6); // 10-15 normale Gates Abstand
-    return "stair";
-  }
-
+  // V5: Keine Einzel-Gates mehr.
+  // Mehrfach-Baum-Gates konnten unmögliche Situationen erzeugen.
   return "normal";
 }
 
 function sectionGapY(kind, gap, i){
   const mid = height * 0.50;
   const amp = Math.min(88, height * 0.155);
-
-  if(kind === "stair"){
-    const bias = (gameRandom() < 0.5 ? -1 : 1) * amp * rand(0.14, 0.30);
-    return clampSectionY(mid + bias + rand(-amp * 0.10, amp * 0.10), gap);
-  }
-
   return clampSectionY(mid + rand(-amp * 0.88, amp * 0.88), gap);
 }
 
 function spawnObstacle(){
   const i = obstacleCount++;
-  const kind = getSectionKind(i);
+  const kind = "normal";
   const gap = getGapForScore(score);
 
   const w = Math.max(58, Math.min(84, width * 0.115));
   const x = width + 88;
   const y = sectionGapY(kind, gap, i);
-  const visualCount = kind === "stair" ? 3 : 1;
-  const visualStep = w * 0.56;
-  const sectionW = kind === "normal" ? w : w + visualStep * (visualCount - 1);
   const placements = gameRandom() < 0.62 ? ["inside"] : ["before", "after"];
 
   gatesSinceShieldSpawn++;
 
-  // Coin ist nicht mehr immer bequem in der Mitte.
-  // Manche Coins liegen näher am oberen/unteren Rand der Öffnung = Risiko/Belohnung.
-  const riskyCoin = score >= 8 && gameRandom() < 0.46;
+  const riskyCoin = score >= 8 && gameRandom() < 0.42;
   const coinOffset = riskyCoin
-    ? (gameRandom() < 0.5 ? -1 : 1) * rand(gap * 0.22, gap * 0.34)
-    : rand(-gap * 0.12, gap * 0.12);
+    ? (gameRandom() < 0.5 ? -1 : 1) * rand(gap * 0.20, gap * 0.30)
+    : rand(-gap * 0.10, gap * 0.10);
 
   obstacles.push({
     x,
-    w: sectionW,
+    w,
     pipeW: w,
-    visualCount,
-    visualStep,
+    visualCount: 1,
+    visualStep: w,
     gapY: y,
     baseGapY: y,
     gap,
@@ -2455,7 +2447,7 @@ function spawnObstacle(){
     color: i % 2 === 0 ? COLORS.cyan : COLORS.pink,
     type: kind,
     gateKind: kind,
-    stairDir: gameRandom() < 0.5 ? -1 : 1,
+    stairDir: 0,
     motionAmp: 0,
     motionSpeed: 0,
     coinPlacement: placements[Math.floor(gameRandom() * placements.length)],
@@ -2472,14 +2464,7 @@ function spawnObstacle(){
 function obstacleCollide(ob){
   if(player.x + player.r < ob.x || player.x - player.r > ob.x + ob.w) return false;
 
-  let gapY = ob.gapY;
-  if(ob.gateKind === "stair"){
-    const t = clamp((player.x - ob.x) / Math.max(1, ob.w), 0, 1);
-    const count = ob.visualCount || 1;
-    const localStep = Math.min(28, height * 0.040) * (ob.stairDir || 1);
-    gapY = clampSectionY(ob.gapY + (t * (count - 1) - (count - 1) / 2) * localStep, ob.gap);
-  }
-
+  const gapY = ob.gapY;
   const topEdge = gapY - ob.gap / 2;
   const bottomEdge = gapY + ob.gap / 2;
   const forgive = 2;
@@ -3011,40 +2996,31 @@ function drawBackground(){
 
 
 function drawObstacle(ob){
-  const count = ob.visualCount || 1;
   const pipeW = ob.pipeW || ob.w;
-  const step = ob.visualStep || pipeW;
   const theme = ob.styleTheme || save.theme || 'neon';
 
+  const x = ob.x;
+  const gapY = ob.gapY;
+  const topH = gapY - ob.gap/2;
+  const botY = gapY + ob.gap/2;
+  const botH = height - botY;
+
   ctx.save();
-  for(let j=0;j<count;j++){
-    const x = ob.x + j*step;
-    let gapY = ob.gapY;
-    if(ob.gateKind === "stair"){
-      const localStep = Math.min(28, height*0.040) * (ob.stairDir || 1);
-      gapY = clampSectionY(ob.gapY + (j - (count-1)/2) * localStep, ob.gap);
-    }
-
-    const topH = gapY - ob.gap/2;
-    const botY = gapY + ob.gap/2;
-    const botH = height - botY;
-
-    if(theme === 'nature'){
-      drawNatureObstacle(x, 0, pipeW, topH, true);
-      drawNatureObstacle(x, botY, pipeW, botH, false);
-    }else if(theme === 'lava'){
-      drawLavaObstacle(x, 0, pipeW, topH, true);
-      drawLavaObstacle(x, botY, pipeW, botH, false);
-    }else if(theme === 'ice'){
-      drawIceObstacle(x, 0, pipeW, topH, true);
-      drawIceObstacle(x, botY, pipeW, botH, false);
-    }else if(theme === 'sunset'){
-      drawSunsetObstacle(x, 0, pipeW, topH, true);
-      drawSunsetObstacle(x, botY, pipeW, botH, false);
-    }else{
-      drawNeonObstacle(x, 0, pipeW, topH, ob, true);
-      drawNeonObstacle(x, botY, pipeW, botH, ob, false);
-    }
+  if(theme === 'nature'){
+    drawNatureObstacle(x, 0, pipeW, topH, true);
+    drawNatureObstacle(x, botY, pipeW, botH, false);
+  }else if(theme === 'lava'){
+    drawLavaObstacle(x, 0, pipeW, topH, true);
+    drawLavaObstacle(x, botY, pipeW, botH, false);
+  }else if(theme === 'ice'){
+    drawIceObstacle(x, 0, pipeW, topH, true);
+    drawIceObstacle(x, botY, pipeW, botH, false);
+  }else if(theme === 'sunset'){
+    drawSunsetObstacle(x, 0, pipeW, topH, true);
+    drawSunsetObstacle(x, botY, pipeW, botH, false);
+  }else{
+    drawNeonObstacle(x, 0, pipeW, topH, ob, true);
+    drawNeonObstacle(x, botY, pipeW, botH, ob, false);
   }
   ctx.restore();
 }
@@ -3152,44 +3128,47 @@ function drawNatureObstacle(x,y,w,h,top=true){
   if(h <= 0) return;
 
   const v = Math.abs(Math.floor(x / 37)) % 4;
-  const woodTop = v === 0 ? "#9b6b3d" : v === 1 ? "#80512e" : v === 2 ? "#a87542" : "#714421";
-  const woodBot = v === 0 ? "#5c3b1e" : v === 1 ? "#4b2f19" : v === 2 ? "#6b421f" : "#3f2716";
-  const leafColor = v === 0 ? "#54c76c" : v === 1 ? "#42b95f" : v === 2 ? "#66d47a" : "#2f9f52";
+  const woodTop = v === 0 ? "#8a552f" : v === 1 ? "#744625" : v === 2 ? "#936037" : "#633a1f";
+  const woodBot = v === 0 ? "#4c2f18" : v === 1 ? "#3f2715" : v === 2 ? "#5a371c" : "#321f12";
+  const leafColor = v === 0 ? "#2f9b50" : v === 1 ? "#278844" : v === 2 ? "#3daa5b" : "#22743d";
 
-  drawRoundedPillarBody(x,y,w,h,woodTop,woodBot,"#d4a373","#8b5a2b");
+  drawRoundedPillarBody(x,y,w,h,woodTop,woodBot,"#b98455","rgba(0,0,0,.28)");
 
-  // leaves / kleine Variation, gleiche Hitbox
+  // V6: Blätter ohne Glow, damit sie nicht irritieren.
   ctx.save();
+  ctx.shadowBlur = 0;
+  ctx.globalAlpha = 0.82;
   ctx.fillStyle = leafColor;
-  ctx.shadowColor = leafColor;
-  ctx.shadowBlur = 10;
-  const count = Math.max(3, Math.floor(h/55));
+
+  const count = Math.max(3, Math.floor(h/68));
   for(let i=0;i<count;i++){
-    const yy = y + 14 + i*((h-24)/count);
+    const yy = y + 18 + i*((h-36)/count);
     const side = (i + v) % 2 === 0 ? -1 : 1;
-    const lx = side < 0 ? x+8 : x+w-8;
+    const lx = side < 0 ? x+9 : x+w-9;
     ctx.beginPath();
-    ctx.ellipse(lx, yy, 7 + v, 13 + (v%2)*3, side<0 ? -.7 : .7, 0, Math.PI*2);
+    ctx.ellipse(lx, yy, 7 + (v%2), 12 + (v%2)*2, side<0 ? -.72 : .72, 0, Math.PI*2);
     ctx.fill();
   }
 
-  // vines / Aststruktur
-  ctx.strokeStyle = v % 2 === 0 ? "#2e8b57" : "#246b42";
-  ctx.lineWidth = 2.5;
+  // dunklere Ranke statt leuchtender Linie
+  ctx.globalAlpha = 0.58;
+  ctx.strokeStyle = v % 2 === 0 ? "#1f6d3e" : "#195834";
+  ctx.lineWidth = 2.2;
   ctx.beginPath();
-  ctx.moveTo(x+w*(.22+.06*v), y);
-  ctx.bezierCurveTo(x+w*.05, y+h*.25, x+w*.50, y+h*.55, x+w*.22, y+h);
+  ctx.moveTo(x+w*(.22+.05*v), y+4);
+  ctx.bezierCurveTo(x+w*.08, y+h*.25, x+w*.48, y+h*.55, x+w*.25, y+h-4);
   ctx.stroke();
 
   if(v === 2 || v === 3){
-    ctx.globalAlpha = .45;
-    ctx.strokeStyle = "#d4a373";
+    ctx.globalAlpha = .32;
+    ctx.strokeStyle = "#9d6b43";
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(x+w*.68, y+h*.18);
     ctx.lineTo(x+w*.42, y+h*.28);
     ctx.stroke();
   }
+
   ctx.restore();
 }
 
