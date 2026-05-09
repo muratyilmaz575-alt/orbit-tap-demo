@@ -3050,8 +3050,9 @@ function drawObstacle(ob){
     const botH = height - botY;
 
     if(theme === 'nature'){
-      drawNatureObstacle(x, 0, pipeW, topH, true);
-      drawNatureObstacle(x, botY, pipeW, botH, false);
+      const natureVariant = ((ob.visualVariant || 0) + j) % 4;
+      drawNatureObstacle(x, 0, pipeW, topH, true, natureVariant);
+      drawNatureObstacle(x, botY, pipeW, botH, false, natureVariant);
     }else if(theme === 'lava'){
       drawLavaObstacle(x, 0, pipeW, topH, true);
       drawLavaObstacle(x, botY, pipeW, botH, false);
@@ -3168,10 +3169,10 @@ function drawNeonObstacle(x,y,w,h,ob,top=true){
   ctx.restore();
 }
 
-function drawNatureObstacle(x,y,w,h,top=true){
+function drawNatureObstacle(x,y,w,h,top=true,variant=0){
   if(h <= 0) return;
 
-  const v = Math.abs(Math.floor(x / 37)) % 4;
+  const v = ((variant % 4) + 4) % 4;
   const woodTop = v === 0 ? "#8a5b33" : v === 1 ? "#744826" : v === 2 ? "#96633a" : "#693d20";
   const woodBot = v === 0 ? "#55331a" : v === 1 ? "#462815" : v === 2 ? "#60381c" : "#3a2313";
   const barkStroke = v === 0 ? "#b17a4a" : v === 1 ? "#9a663c" : v === 2 ? "#b98753" : "#8c5a32";
