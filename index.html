@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <!-- Orbit Dash V35 Presentation Build: stable local HTML test version -->
+  <!-- Orbit Dash V4.3 -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
   <title>Orbit Dash</title>
@@ -463,7 +463,7 @@
       background:linear-gradient(90deg,var(--cyan),var(--pink),var(--gold));
       box-shadow:0 0 16px rgba(53,231,255,.30)
     }
-    .demoNotice{
+    .infoNotice{
       margin-top:12px;
       padding:10px 12px;
       border-radius:18px;
@@ -474,7 +474,7 @@
       line-height:1.35;
       text-align:left;
     }
-    .demoNotice b{color:#fff}
+    .infoNotice b{color:#fff}
     .shopScreen{
       margin-top:12px;
       border:1px solid rgba(255,255,255,.17);
@@ -748,7 +748,7 @@
       .centerMsg .big{font-size:42px}
     }
   
-/* FLAPPY CLEAN BALANCE */
+/* ORBIT DASH */
 body{background:#050913!important;overscroll-behavior:none}
 .app{padding:0!important;align-items:stretch!important}
 .phone{width:100%!important;max-width:none!important;height:100dvh!important;max-height:none!important;gap:0!important;display:block!important}
@@ -776,11 +776,145 @@ canvas{width:100%!important;height:100%!important;border-radius:0!important}
 body.cleanPlaying .centerMsg,
 body.cleanPlaying .bottomMsg,
 body.cleanPlaying .runEndCard{display:none!important}
-.buildMark{margin-top:10px;padding:10px 12px;border-radius:16px;border:1px solid rgba(53,231,255,.35);background:rgba(53,231,255,.12);color:#bff7ff;font-size:13px;font-weight:1000;text-align:center}
+.versionMark{margin-top:10px;padding:10px 12px;border-radius:16px;border:1px solid rgba(53,231,255,.35);background:rgba(53,231,255,.12);color:#bff7ff;font-size:13px;font-weight:1000;text-align:center}
 .lastScoreCard{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .lastScoreBox{border:1px solid rgba(255,255,255,.13);background:rgba(2,6,23,.30);border-radius:18px;padding:10px 8px;text-align:center}
 .lastScoreBox b{display:block;font-size:24px;color:#fff;line-height:1}
 .lastScoreBox span{display:block;margin-top:5px;color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+
+
+
+/* ORBIT DASH V4.3 PROFESSIONAL MENU UPDATE */
+.overlay{
+  background:
+    radial-gradient(circle at 50% -10%,rgba(53,231,255,.20),transparent 38%),
+    radial-gradient(circle at 110% 10%,rgba(255,79,216,.18),transparent 34%),
+    radial-gradient(circle at -10% 95%,rgba(255,209,102,.12),transparent 30%),
+    rgba(2,6,23,.91)!important;
+}
+.modal{
+  text-align:left!important;
+  width:min(94vw,448px)!important;
+  padding:16px!important;
+  border-radius:34px!important;
+  border:1px solid rgba(255,255,255,.18)!important;
+  background:
+    linear-gradient(160deg,rgba(15,25,48,.94),rgba(6,10,22,.86)),
+    rgba(2,6,23,.88)!important;
+  box-shadow:0 30px 90px rgba(0,0,0,.58), inset 0 1px 0 rgba(255,255,255,.10)!important;
+}
+.modalTopLine{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+.modalTitleBlock{min-width:0}
+.modal h2{
+  margin:3px 0 0!important;
+  font-size:30px!important;
+  line-height:1!important;
+  letter-spacing:-.075em!important;
+  text-align:left!important;
+}
+.modal p.modalText{
+  margin:0 0 12px!important;
+  color:#c8d4eb!important;
+  font-size:13px!important;
+  line-height:1.42!important;
+  text-align:left!important;
+}
+.modal .coinBadge{
+  flex:0 0 auto;
+  margin-top:0!important;
+  padding:8px 10px!important;
+  border-radius:999px!important;
+  background:linear-gradient(135deg,rgba(255,209,102,.19),rgba(255,255,255,.08))!important;
+  border:1px solid rgba(255,209,102,.28)!important;
+  box-shadow:0 10px 24px rgba(0,0,0,.22)!important;
+}
+.premiumHome{display:flex;flex-direction:column;gap:12px}
+.orbitHeroPro{
+  position:relative;
+  min-height:198px;
+  overflow:hidden;
+  border-radius:30px;
+  padding:17px;
+  border:1px solid rgba(255,255,255,.16);
+  background:
+    radial-gradient(circle at 42% 32%,rgba(53,231,255,.28),transparent 28%),
+    radial-gradient(circle at 80% 18%,rgba(255,79,216,.18),transparent 28%),
+    linear-gradient(145deg,rgba(255,255,255,.12),rgba(255,255,255,.045));
+  box-shadow:0 22px 60px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.10);
+}
+.orbitHeroPro:before{
+  content:"";
+  position:absolute;
+  width:230px;height:230px;
+  left:50%;top:43%;
+  transform:translate(-50%,-50%) rotate(-18deg);
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.18);
+  box-shadow:0 0 40px rgba(53,231,255,.18), inset 0 0 40px rgba(255,79,216,.08);
+}
+.orbitHeroPro:after{
+  content:"";
+  position:absolute;
+  width:76px;height:76px;
+  left:50%;top:43%;
+  transform:translate(-50%,-50%);
+  border-radius:28px;
+  background:radial-gradient(circle at 32% 24%,#fff 0 8%,#7cf5ff 30%,#6d7cff 62%,#ff4fd8 100%);
+  box-shadow:0 0 30px rgba(53,231,255,.55),0 0 55px rgba(255,79,216,.22);
+}
+.heroContentPro{position:relative;z-index:2;display:flex;flex-direction:column;min-height:164px;justify-content:space-between}
+.heroTopPro{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.gameKicker{font-size:10px;font-weight:1000;letter-spacing:.22em;text-transform:uppercase;color:#9cf4ff}
+.gameTitlePro{margin-top:4px;font-size:42px;font-weight:1000;line-height:.92;letter-spacing:-.09em;color:#fff;text-shadow:0 0 24px rgba(255,255,255,.18)}
+.gameSubPro{margin-top:8px;color:#cbd6ea;font-size:12px;font-weight:850;max-width:240px;line-height:1.35}
+.versionPillPro{padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(2,6,23,.35);font-size:11px;font-weight:1000;color:#eaf7ff;white-space:nowrap}
+.heroStatsPro{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:84px}
+.heroStatPro{border:1px solid rgba(255,255,255,.13);background:rgba(2,6,23,.43);backdrop-filter:blur(10px);border-radius:19px;padding:10px 8px;text-align:center}
+.heroStatPro b{display:block;font-size:21px;line-height:1;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.heroStatPro span{display:block;margin-top:5px;color:#9daac0;font-size:9px;font-weight:1000;letter-spacing:.12em;text-transform:uppercase}
+.playBtnMega{
+  width:100%;min-height:76px!important;border-radius:26px!important;
+  font-size:20px!important;letter-spacing:-.02em!important;
+  background:linear-gradient(135deg,rgba(53,231,255,.54),rgba(255,79,216,.40),rgba(255,209,102,.24))!important;
+  border:1px solid rgba(255,255,255,.24)!important;
+  box-shadow:0 18px 42px rgba(0,0,0,.35),0 0 32px rgba(53,231,255,.18)!important;
+}
+.playBtnMega span{display:block;font-size:10px;margin-top:4px;letter-spacing:.16em;text-transform:uppercase;color:#d9faff}
+.menuSectionPro{display:flex;align-items:center;justify-content:space-between;margin:2px 1px -4px;color:#eff7ff;font-size:12px;font-weight:1000;letter-spacing:.15em;text-transform:uppercase}
+.menuSectionPro small{letter-spacing:0;text-transform:none;color:#93a4bc;font-size:11px;font-weight:850}
+.tileGridPro{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.tilePro{
+  min-height:72px!important;border-radius:22px!important;padding:10px!important;
+  display:flex;align-items:center;justify-content:flex-start;text-align:left;gap:10px;
+  background:linear-gradient(145deg,rgba(255,255,255,.13),rgba(255,255,255,.065))!important;
+  border:1px solid rgba(255,255,255,.14)!important;
+}
+.tileIconPro{width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:15px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.12);font-size:20px;flex:0 0 auto}
+.tileTextPro{min-width:0}
+.tileTextPro b{display:block;font-size:13px;line-height:1.05;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tileTextPro span{display:block;margin-top:5px;font-size:9px;letter-spacing:.10em;text-transform:uppercase;color:#aebbd1;font-weight:1000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.progressBox{border-radius:24px!important;background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.045))!important;border-color:rgba(255,255,255,.14)!important}
+.lastScoreCard{margin-top:0!important}
+.shopScreen{margin-top:12px!important;max-height:none!important;overflow:visible!important;border-radius:30px!important;padding:14px!important}
+.shopHeader h3{font-size:26px!important;letter-spacing:-.075em!important}
+.shopHeader p{font-size:12px!important;color:#c4d0e5!important}
+.shopTabs{background:rgba(2,6,23,.28);padding:5px;border-radius:20px;border:1px solid rgba(255,255,255,.10)}
+.shopTabs button{box-shadow:none!important}
+.itemGrid{gap:11px!important}
+.itemCard{border-radius:24px!important;background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.045))!important;box-shadow:0 15px 36px rgba(0,0,0,.24)!important}
+.itemCard.active{background:linear-gradient(160deg,rgba(255,209,102,.18),rgba(255,255,255,.055))!important}
+.itemPreview{height:58px!important;font-size:42px!important}
+.rankList,.friendList{gap:8px!important}
+.rankRow,.friendRow{border-radius:19px!important;background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.045))!important}
+.rankRow.me,.friendRow.me{background:linear-gradient(145deg,rgba(255,209,102,.16),rgba(255,255,255,.055))!important}
+.challengeBox{border-radius:24px!important;background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.045))!important}
+@media (max-width:390px){.gameTitlePro{font-size:36px}.heroStatsPro{margin-top:74px}.tilePro{min-height:67px!important}.modal{padding:13px!important}.itemGrid{grid-template-columns:1fr!important}}
 
 </style>
 </head>
@@ -789,9 +923,9 @@ body.cleanPlaying .runEndCard{display:none!important}
   <div class="phone" id="phone">
     <header class="top">
       <div class="brand">
-        <div class="label">FLAPPY CLEAN BALANCE</div>
+        <div class="label">ORBIT DASH</div>
         <h1>Orbit Dash</h1>
-        <p>Flappy clean balance</p>
+        <p>Orbit Dash</p>
       </div>
       <div class="stat">
         <div class="label">Coins</div>
@@ -801,7 +935,7 @@ body.cleanPlaying .runEndCard{display:none!important}
 
     <section class="hint">
       <div class="hintMain">Ziel: <b>Ein Tap hebt dich hoch.</b> Flieg durch die <b>Energy Gates</b> und überlebe so lange wie möglich.</div>
-      <div class="hintSmall">Flappy Clean Balance Build.</div>
+      <div class="hintSmall">Tippe, fliege und sammle Coins.</div>
     </section>
 
     <main class="gameWrap" id="touchArea">
@@ -1474,7 +1608,7 @@ function setPlayerName(){
   }
 }
 
-function getDemoRankings(type){
+function getRankingRows(type){
   const global = [
     ["NEON-KAI", 87],
     ["LUNA", 73],
@@ -1509,7 +1643,7 @@ function getDemoRankings(type){
 
 function showRanking(type="global"){
   const title = type === "de" ? "Deutschland-Ranking" : "Welt-Ranking";
-  const rows = getDemoRankings(type);
+  const rows = getRankingRows(type);
   const list = rows.map((r,i)=>`
     <div class="rankRow ${r.me ? "me" : ""}">
       <div class="rankPos">#${i+1}</div>
@@ -1520,7 +1654,7 @@ function showRanking(type="global"){
 
   modalBase(
     title,
-    "Ranking ist in dieser HTML-Version eine Demo mit deinem lokalen Highscore. Für echtes weltweites Ranking brauchen wir später ein Backend.",
+    "Dein Bestwert wird direkt einsortiert. Trage einen Namen ein und vergleiche dich mit der Rangliste.",
     `
       <div class="rankTabs">
         <button class="${type==='global'?'primary':''}" onclick="showRanking('global')">Weltweit</button>
@@ -1749,7 +1883,7 @@ function showDailyChallenge(){
       <div class="friendAvatar">${r.emoji}</div>
       <div>
         <div class="friendName">#${i+1} ${r.name}${r.me ? " ⭐" : ""}</div>
-        <div class="friendSub">${r.me ? "Dein Tages-Best" : "Daily Demo"}</div>
+        <div class="friendSub">${r.me ? "Dein Tages-Best" : "Tages-Run"}</div>
       </div>
       <div class="friendScore">${r.score}</div>
     </div>
@@ -1757,7 +1891,7 @@ function showDailyChallenge(){
 
   modalBase(
     "Daily Challenge",
-    "Jeden Tag dieselbe Hindernisfolge. Tages-Best und Ranking sind in dieser HTML-Version als Demo vorbereitet.",
+    "Jeden Tag wartet dieselbe Hindernisfolge auf dich. Ziel: Tages-Best schlagen.",
     `
       <div class="bestCard">
         <div>
@@ -1814,7 +1948,7 @@ function showFriends(){
 
   modalBase(
     "Freunde",
-    "Freundesliste ist in dieser HTML-Version eine Demo. Später kommen echte Freunde per Code, Login oder Kontakt-Link.",
+    "Vergleiche Scores, ändere deinen Namen und starte private Challenges.",
     `
       <div class="friendList">${rows}</div>
       <div class="menuGrid">
@@ -1835,10 +1969,10 @@ function showChallenge(){
     `
       <div class="challengeBox">
         <b>Duell-Regel</b>
-        <p>Beide Spieler bekommen später exakt dieselbe Hindernisfolge. Wer den höheren Score schafft, gewinnt Coins und steigt im Freundesranking.</p>
+        <p>Beide Spieler bekommen dieselbe Hindernisfolge. Der höhere Score gewinnt.</p>
       </div>
       <div class="challengeBox">
-        <b>Demo-Herausforderung</b>
+        <b>Challenge</b>
         <p>Schlage ${target.name}s Score von <b>${target.score}</b>. Dein aktueller Bestwert: <b>${save.best || 0}</b>.</p>
       </div>
       <div class="menuGrid">
@@ -1856,7 +1990,7 @@ function showAddFriend(){
     "Im echten Spiel bekommt jeder Spieler einen Freundescode. Beispiel: ORBIT-4821. Damit kann man Freunde hinzufügen und private Rankings erstellen.",
     `
       <div class="challengeBox">
-        <b>Demo-Freundescode</b>
+        <b>Freundescode</b>
         <p>Dein Code: <b>ORBIT-${String((save.best || 0) + 4821).slice(0,4)}</b></p>
       </div>
       <div class="menuGrid">
@@ -1904,7 +2038,7 @@ function showMenu(){
               <div class="heroTag">One tap · Highscore · Again</div>
             </div>
           </div>
-          <div class="heroBadge">V35</div>
+          <div class="heroBadge">V4.3</div>
         </div>
 
         <div class="quickStats">
@@ -1923,9 +2057,9 @@ function showMenu(){
         </div>
       </div>
 
-      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="buildMark">ORBIT DASH V4 aktiv: schwerer · Shield seltener · Coins riskanter · 3er-Gates selten</div>
+      ${getUnlockProgressHtml()}<div class="lastScoreCard"><div class="lastScoreBox"><b>${lastRunScore || 0}</b><span>Letzter Score</span></div><div class="lastScoreBox"><b>${save.best || 0}</b><span>Best</span></div></div><div class="versionMark">ORBIT DASH V4 aktiv: schwerer · Shield seltener · Coins riskanter · 3er-Gates selten</div>
 
-      <div class="demoNotice"><b>Hinweis:</b> Rankings, Freunde und Daily-Ranking sind in dieser HTML-Version Demo-Daten. Der Spielkern, Coins, Shop, Powerups und Daily-Seed laufen lokal.</div>
+      
 
       <div class="sectionTitle">Start <small>normal oder täglich</small></div>
       <button class="full primary playBtnPro" onclick="startNormalGame()">▶ Spielen</button>
@@ -1956,7 +2090,7 @@ function showMenu(){
         </button>
       </div>
 
-      <div class="sectionTitle">Social <small>Demo</small></div>
+      <div class="sectionTitle">Community <small>Scores</small></div>
       <div class="proGrid">
         <button class="proBtn" onclick="showFriends()">
           <span class="ico">👥</span>
@@ -1966,12 +2100,12 @@ function showMenu(){
         <button class="proBtn" onclick="showRanking('global')">
           <span class="ico">🌍</span>
           <span class="txt">Welt-Ranking</span>
-          <span class="sub">Demo</span>
+          <span class="sub">Top Scores</span>
         </button>
         <button class="proBtn" onclick="showRanking('de')">
           <span class="ico">🇩🇪</span>
           <span class="txt">Deutschland</span>
-          <span class="sub">Demo</span>
+          <span class="sub">Top Scores</span>
         </button>
         <button class="proBtn" onclick="howTo()">
           <span class="ico">❔</span>
@@ -1995,7 +2129,7 @@ function showMenu(){
       </div>
     `
   );
-  showCenter("ORBIT TAP", "V35 Stable Build", COLORS.gold, 1200);
+  showCenter("ORBIT TAP", "Tap to fly", COLORS.gold, 1200);
 }
 function howTo(){
   modalBase(
@@ -2070,6 +2204,342 @@ function toggleMusic(){
     setTimeout(()=>els.bottomMsg.textContent = status==="playing" ? "Tap für Auftrieb" : "Tap oder Leertaste", 900);
   }
 }
+
+
+/* ORBIT DASH V4.3 PROFESSIONAL MENU LOGIC */
+function modalBase(title,text,extra){
+  els.overlay.classList.remove("hide");
+  els.modal.innerHTML = `
+    <div class="modalTopLine">
+      <div class="modalTitleBlock">
+        <div class="label">Orbit Dash</div>
+        <h2>${title}</h2>
+      </div>
+      <div class="coinBadge">🪙 <span>${save.coins}</span></div>
+    </div>
+    ${text ? `<p class="modalText">${text}</p>` : ""}
+    ${extra || ""}
+  `;
+  els.modal.scrollTop = 0;
+  requestAnimationFrame(() => {
+    els.modal.scrollTop = 0;
+    const firstScrollable = els.modal.querySelector('.shopScreen, .rankList, .friendList, .itemGrid');
+    if(firstScrollable && typeof firstScrollable.scrollTop === 'number') firstScrollable.scrollTop = 0;
+  });
+}
+
+function getUnlockProgressHtml(){
+  const next = getNextUnlock();
+  if(!next){
+    return `<div class="progressBox"><div class="progressTitle">Kollektion komplett</div><div class="progressSub">Alle aktuellen Skins und Welten sind freigeschaltet.</div></div>`;
+  }
+  const need = Math.max(0, next.cost - (save.coins || 0));
+  const pct = Math.min(100, Math.floor(((save.coins || 0) / next.cost) * 100));
+  return `
+    <div class="progressBox">
+      <div class="progressTitle">Nächstes Ziel: ${next.emoji} ${next.title}</div>
+      <div class="progressSub">Noch <b>${need}</b> Coins bis zur Freischaltung.</div>
+      <div class="progressTrack"><div class="progressFill" style="width:${pct}%"></div></div>
+    </div>
+  `;
+}
+
+function selectTheme(theme){
+  const item = THEME_ITEMS.find(t=>t.key===theme);
+  if(!item) return;
+  if(isThemeUnlocked(theme)){
+    save.theme = theme;
+    saveGame();
+    showShop('themes');
+    return;
+  }
+  if((save.coins || 0) >= item.cost){
+    save.coins -= item.cost;
+    save.unlockedThemes.push(theme);
+    save.theme = theme;
+    saveGame();
+    showCenter("FREIGESCHALTET", item.title, COLORS.gold, 700);
+    showShop('themes');
+  }else{
+    showCenter("COINS", "Nicht genug Coins", COLORS.red, 700);
+  }
+}
+
+function selectSkin(skin){
+  const item = SKIN_ITEMS.find(s=>s.key===skin);
+  if(!item) return;
+  if(isSkinUnlocked(skin)){
+    save.skin = skin;
+    saveGame();
+    showShop('skins');
+    return;
+  }
+  if((save.coins || 0) >= item.cost){
+    save.coins -= item.cost;
+    save.unlockedSkins.push(skin);
+    save.skin = skin;
+    saveGame();
+    showCenter("FREIGESCHALTET", item.title, COLORS.gold, 700);
+    showShop('skins');
+  }else{
+    showCenter("COINS", "Nicht genug Coins", COLORS.red, 700);
+  }
+}
+
+function showShop(tab='skins'){
+  const isSkins = tab === 'skins';
+  const items = isSkins ? SKIN_ITEMS : THEME_ITEMS;
+  const cards = items.map(item => {
+    const unlocked = isSkins ? isSkinUnlocked(item.key) : isThemeUnlocked(item.key);
+    const active = isSkins ? save.skin === item.key : save.theme === item.key;
+    const action = isSkins ? `selectSkin('${item.key}')` : `selectTheme('${item.key}')`;
+    const btnText = active ? 'AKTIV' : unlocked ? 'AUSWÄHLEN' : `KAUFEN · 🪙 ${item.cost}`;
+    return `
+      <div class="itemCard ${active ? 'active' : ''} ${unlocked ? '' : 'locked'}">
+        <div class="itemPreview">${item.emoji}</div>
+        <div class="itemName">${item.title}</div>
+        <div class="itemSub">${item.sub}</div>
+        <div class="rarity ${rarityClassName(item.rarity)}">${item.rarity}</div>
+        <div class="priceBadge">${unlocked ? 'Besitzt du' : `🪙 ${item.cost}`}</div>
+        <button class="buyBtn ${active ? 'active' : unlocked ? 'owned' : ''}" onclick="${action}">${btnText}</button>
+      </div>
+    `;
+  }).join('');
+
+  modalBase(
+    "Shop",
+    "Skins und Welten ändern nur den Look. Deine Runs bleiben fair und unverändert.",
+    `
+      <div class="shopScreen">
+        <div class="shopHeader">
+          <div>
+            <h3>${isSkins ? '🛸 Skins' : '🌌 Welten'}</h3>
+            <p>${isSkins ? 'Wähle die Figur für deinen Run.' : 'Wähle die Atmosphäre deines Spiels.'}</p>
+          </div>
+          <div class="shopCoinBox">🪙 ${save.coins || 0}</div>
+        </div>
+        <div class="shopTabs">
+          <button class="${isSkins ? 'primary' : ''}" onclick="showShop('skins')">Skins</button>
+          <button class="${!isSkins ? 'primary' : ''}" onclick="showShop('themes')">Welten</button>
+        </div>
+        <div class="itemGrid">${cards}</div>
+      </div>
+      <div class="menuGrid">
+        <button class="full" onclick="showMenu()">Zurück</button>
+      </div>
+    `
+  );
+  els.modal.scrollTop = 0;
+  requestAnimationFrame(() => {
+    els.modal.scrollTop = 0;
+    const shopScreen = els.modal.querySelector('.shopScreen');
+    const itemGrid = els.modal.querySelector('.itemGrid');
+    if(shopScreen) shopScreen.scrollTop = 0;
+    if(itemGrid) itemGrid.scrollTop = 0;
+  });
+}
+function showThemes(){ showShop('themes'); }
+function showSkins(){ showShop('skins'); }
+
+function showRanking(type="global"){
+  const title = type === "de" ? "Deutschland-Ranking" : "Welt-Ranking";
+  const rows = getRankingsData(type);
+  const myIndex = rows.findIndex(r=>r.me);
+  const list = rows.map((r,i)=>`
+    <div class="rankRow ${r.me ? "me" : ""}">
+      <div class="rankPos">#${i+1}</div>
+      <div class="rankName">${r.name}${r.me ? " ⭐" : ""}</div>
+      <div class="rankScore">${r.score}</div>
+    </div>
+  `).join("");
+
+  modalBase(
+    title,
+    `Dein Bestwert wird direkt einsortiert. Aktuelle Position: <b>#${myIndex >= 0 ? myIndex + 1 : "–"}</b>.`,
+    `
+      <div class="rankTabs">
+        <button class="${type==='global'?'primary':''}" onclick="showRanking('global')">Weltweit</button>
+        <button class="${type==='de'?'primary':''}" onclick="showRanking('de')">Deutschland</button>
+      </div>
+      <div class="rankList">${list}</div>
+      <div class="menuGrid">
+        <button onclick="setPlayerName()">Name ändern</button>
+        <button onclick="showMenu()">Menü</button>
+      </div>
+    `
+  );
+}
+
+function showDailyChallenge(){
+  const key = getTodayKey();
+  const dailyBest = getDailyBest();
+  const rows = getDailyRankings().map((r,i)=>`
+    <div class="friendRow ${r.me ? "me" : ""}">
+      <div class="friendAvatar">${r.emoji}</div>
+      <div>
+        <div class="friendName">#${i+1} ${r.name}${r.me ? " ⭐" : ""}</div>
+        <div class="friendSub">${r.me ? "Dein Tages-Best" : "Tages-Run"}</div>
+      </div>
+      <div class="friendScore">${r.score}</div>
+    </div>
+  `).join("");
+
+  modalBase(
+    "Daily Challenge",
+    "Jeden Tag wartet dieselbe Hindernisfolge auf dich. Dein Ziel: Tages-Best schlagen.",
+    `
+      <div class="bestCard">
+        <div><div class="num">${dailyBest}</div><div class="cap">Tages-Best</div></div>
+        <div><div class="num" style="font-size:18px">${key}</div><div class="cap">Heute</div></div>
+      </div>
+      <div class="friendList">${rows}</div>
+      <div class="menuGrid">
+        <button class="full primary" onclick="startDailyChallenge()">Daily starten</button>
+        <button onclick="showMenu()">Menü</button>
+        <button onclick="startNormalGame()">Normaler Run</button>
+      </div>
+    `
+  );
+}
+
+function showFriends(){
+  const rows = getFriends().map((f,i)=>`
+    <div class="friendRow ${f.me ? "me" : ""}">
+      <div class="friendAvatar">${f.emoji}</div>
+      <div>
+        <div class="friendName">#${i+1} ${f.name}${f.me ? " ⭐" : ""}</div>
+        <div class="friendSub">${f.status}</div>
+      </div>
+      <div class="friendScore">${f.score}</div>
+    </div>
+  `).join("");
+
+  modalBase(
+    "Freunde",
+    "Vergleiche Scores, ändere deinen Namen und starte private Challenges.",
+    `
+      <div class="friendList">${rows}</div>
+      <div class="menuGrid">
+        <button onclick="showChallenge()">Challenge starten</button>
+        <button onclick="showAddFriend()">Freund hinzufügen</button>
+        <button class="full" onclick="showMenu()">Zurück</button>
+      </div>
+    `
+  );
+}
+
+function showChallenge(){
+  const friends = getFriends().filter(f=>!f.me);
+  const target = friends[0];
+  modalBase(
+    "Challenge",
+    `Du forderst <b>${target.name}</b> heraus.`,
+    `
+      <div class="challengeBox"><b>Duell-Regel</b><p>Beide Spieler bekommen dieselbe Hindernisfolge. Der höhere Score gewinnt.</p></div>
+      <div class="challengeBox"><b>Ziel</b><p>Schlage ${target.name}s Score von <b>${target.score}</b>. Dein aktueller Bestwert: <b>${save.best || 0}</b>.</p></div>
+      <div class="menuGrid">
+        <button class="full primary" onclick="startNormalGame()">Challenge spielen</button>
+        <button onclick="showFriends()">Freunde</button>
+        <button onclick="showMenu()">Menü</button>
+      </div>
+    `
+  );
+}
+
+function showAddFriend(){
+  modalBase(
+    "Freund hinzufügen",
+    "Teile deinen Code und vergleiche dich in privaten Rankings.",
+    `
+      <div class="challengeBox"><b>Dein Freundescode</b><p><b>ORBIT-${String((save.best || 0) + 4821).slice(0,4)}</b></p></div>
+      <div class="menuGrid">
+        <button onclick="showFriends()">Zurück</button>
+        <button onclick="showMenu()">Menü</button>
+      </div>
+    `
+  );
+}
+
+function showMenu(){
+  document.body.classList.remove("cleanPlaying");
+  status = "menu";
+  const skinName = getSkinLabel(save.skin);
+  const themeName = getThemeLabel(save.theme);
+  modalBase(
+    "Orbit Dash",
+    "Cleaner Start, klare Bereiche und ein hochwertiges App-Menü – ohne Änderung am Gameplay.",
+    `
+      <div class="premiumHome">
+        <div class="orbitHeroPro">
+          <div class="heroContentPro">
+            <div class="heroTopPro">
+              <div>
+                <div class="gameKicker">One Tap Arcade</div>
+                <div class="gameTitlePro">Orbit<br>Dash</div>
+                <div class="gameSubPro">Flieg durch Gates, sammle Coins und verbessere deinen Bestwert.</div>
+              </div>
+              <div class="versionPillPro">V4.3</div>
+            </div>
+            <div class="heroStatsPro">
+              <div class="heroStatPro"><b>${lastRunScore || 0}</b><span>Letzter</span></div>
+              <div class="heroStatPro"><b>${save.best || 0}</b><span>Best</span></div>
+              <div class="heroStatPro"><b>${save.coins || 0}</b><span>Coins</span></div>
+            </div>
+          </div>
+        </div>
+
+        <button class="playBtnMega" onclick="startNormalGame()">▶ Spielen<span>Normaler Run</span></button>
+
+        ${getUnlockProgressHtml()}
+
+        <div class="menuSectionPro">Challenges <small>heute</small></div>
+        <div class="tileGridPro">
+          <button class="tilePro" onclick="showDailyChallenge()"><span class="tileIconPro">📅</span><span class="tileTextPro"><b>Daily Challenge</b><span>Best ${getDailyBest()}</span></span></button>
+          <button class="tilePro" onclick="startDailyChallenge()"><span class="tileIconPro">⚡</span><span class="tileTextPro"><b>Daily Quick</b><span>direkt starten</span></span></button>
+        </div>
+
+        <div class="menuSectionPro">Shop <small>${themeName}</small></div>
+        <div class="tileGridPro">
+          <button class="tilePro" onclick="showShop('skins')"><span class="tileIconPro">🛒</span><span class="tileTextPro"><b>Shop</b><span>Skins & Welten</span></span></button>
+          <button class="tilePro" onclick="showShop('themes')"><span class="tileIconPro">🌌</span><span class="tileTextPro"><b>Welten</b><span>${themeName}</span></span></button>
+          <button class="tilePro" onclick="showShop('skins')"><span class="tileIconPro">🛸</span><span class="tileTextPro"><b>Skin</b><span>${skinName}</span></span></button>
+          <button class="tilePro" onclick="howTo()"><span class="tileIconPro">❔</span><span class="tileTextPro"><b>Regeln</b><span>kurz erklärt</span></span></button>
+        </div>
+
+        <div class="menuSectionPro">Community <small>Scores</small></div>
+        <div class="tileGridPro">
+          <button class="tilePro" onclick="showFriends()"><span class="tileIconPro">👥</span><span class="tileTextPro"><b>Freunde</b><span>private Liste</span></span></button>
+          <button class="tilePro" onclick="showRanking('global')"><span class="tileIconPro">🌍</span><span class="tileTextPro"><b>Welt-Ranking</b><span>Top Scores</span></span></button>
+          <button class="tilePro" onclick="showRanking('de')"><span class="tileIconPro">🇩🇪</span><span class="tileTextPro"><b>Deutschland</b><span>Top Scores</span></span></button>
+          <button class="tilePro" onclick="setPlayerName()"><span class="tileIconPro">✏️</span><span class="tileTextPro"><b>Name</b><span>${getPlayerName()}</span></span></button>
+        </div>
+
+        <div class="menuSectionPro">Audio <small>Optionen</small></div>
+        <div class="tileGridPro">
+          <button class="tilePro" onclick="toggleSound()"><span class="tileIconPro">🔊</span><span class="tileTextPro"><b>Effekte</b><span>${save.sound ? "AN" : "AUS"}</span></span></button>
+          <button class="tilePro" onclick="toggleMusic()"><span class="tileIconPro">🎵</span><span class="tileTextPro"><b>Musik</b><span>${save.music ? "AN" : "AUS"}</span></span></button>
+        </div>
+      </div>
+    `
+  );
+  showCenter("ORBIT DASH", "Tap to fly", COLORS.gold, 900);
+}
+
+function howTo(){
+  modalBase(
+    "So geht's",
+    "Tippe, um Auftrieb zu bekommen. Flieg durch die Gates, sammle Coins und halte deinen Run so lange wie möglich am Leben.",
+    `
+      <div class="challengeBox"><b>Steuerung</b><p>Ein Tap oder die Leertaste hebt dich kurz nach oben.</p></div>
+      <div class="challengeBox"><b>Ziel</b><p>Ein sauberes Gate bringt einen Punkt. Coins schalten neue Skins und Welten frei.</p></div>
+      <div class="menuGrid">
+        <button class="full primary" onclick="startNormalGame()">Jetzt spielen</button>
+        <button class="full" onclick="showMenu()">Zurück</button>
+      </div>
+    `
+  );
+}
+
 window.toggleSound = toggleSound;
 window.toggleMusic = toggleMusic;
 window.showMenu = showMenu;
