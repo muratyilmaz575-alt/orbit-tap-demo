@@ -1417,6 +1417,17 @@ function showShop(tab='skins'){
       </div>
     `
   );
+
+
+  // Shop nach jedem Öffnen / Tab-Wechsel garantiert oben starten
+  els.modal.scrollTop = 0;
+  requestAnimationFrame(() => {
+    els.modal.scrollTop = 0;
+    const shopScreen = els.modal.querySelector('.shopScreen');
+    if(shopScreen) shopScreen.scrollTop = 0;
+    const itemGrid = els.modal.querySelector('.itemGrid');
+    if(itemGrid) itemGrid.scrollTop = 0;
+  });
 }
 
 
@@ -3161,44 +3172,60 @@ function drawNatureObstacle(x,y,w,h,top=true){
   if(h <= 0) return;
 
   const v = Math.abs(Math.floor(x / 37)) % 4;
-  const woodTop = v === 0 ? "#9b6b3d" : v === 1 ? "#80512e" : v === 2 ? "#a87542" : "#714421";
-  const woodBot = v === 0 ? "#5c3b1e" : v === 1 ? "#4b2f19" : v === 2 ? "#6b421f" : "#3f2716";
-  const leafColor = v === 0 ? "#54c76c" : v === 1 ? "#42b95f" : v === 2 ? "#66d47a" : "#2f9f52";
-  const leafStroke = v === 0 ? "#2f8f4f" : v === 1 ? "#277d43" : v === 2 ? "#379652" : "#22753d";
+  const woodTop = v === 0 ? "#8a5b33" : v === 1 ? "#744826" : v === 2 ? "#96633a" : "#693d20";
+  const woodBot = v === 0 ? "#55331a" : v === 1 ? "#462815" : v === 2 ? "#60381c" : "#3a2313";
+  const barkStroke = v === 0 ? "#b17a4a" : v === 1 ? "#9a663c" : v === 2 ? "#b98753" : "#8c5a32";
+  const leafColor = v === 0 ? "#479d57" : v === 1 ? "#3b8f4e" : v === 2 ? "#56a763" : "#327f44";
+  const leafStroke = v === 0 ? "#2f6d3d" : v === 1 ? "#295f38" : v === 2 ? "#397949" : "#255b34";
 
-  drawRoundedPillarBody(x,y,w,h,woodTop,woodBot,"#d4a373","#8b5a2b");
+  // Matte Holzsäule ohne Glow / ohne Leuchten
+  ctx.save();
+  const grad = ctx.createLinearGradient(x,y,x+w,y+h);
+  grad.addColorStop(0, woodTop);
+  grad.addColorStop(1, woodBot);
+  ctx.fillStyle = grad;
+  ctx.strokeStyle = barkStroke;
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.lineWidth = 2.2;
+  ctx.beginPath();
+  ctx.roundRect(x+3, y, w-6, h, 14);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
 
-  // leaves / kleine Variation, gleiche Hitbox
-  // kein Glow / kein Leuchten mehr in der Natur-Welt
+  // Blätter komplett matt, keine Schatten, kein Glow
   ctx.save();
   ctx.fillStyle = leafColor;
   ctx.strokeStyle = leafStroke;
   ctx.shadowColor = 'transparent';
   ctx.shadowBlur = 0;
-  ctx.lineWidth = 1.2;
-  const count = Math.max(3, Math.floor(h/55));
+  ctx.globalAlpha = 0.96;
+  ctx.lineWidth = 1.1;
+  const count = Math.max(3, Math.floor(h/62));
   for(let i=0;i<count;i++){
-    const yy = y + 14 + i*((h-24)/count);
+    const yy = y + 16 + i*((h-28)/count);
     const side = (i + v) % 2 === 0 ? -1 : 1;
-    const lx = side < 0 ? x+8 : x+w-8;
+    const lx = side < 0 ? x+9 : x+w-9;
     ctx.beginPath();
-    ctx.ellipse(lx, yy, 7 + v, 13 + (v%2)*3, side<0 ? -.7 : .7, 0, Math.PI*2);
+    ctx.ellipse(lx, yy, 6 + (v%2), 11 + (v%2)*2, side<0 ? -.68 : .68, 0, Math.PI*2);
     ctx.fill();
     ctx.stroke();
   }
 
-  // vines / Aststruktur
-  ctx.strokeStyle = v % 2 === 0 ? "#2e8b57" : "#246b42";
-  ctx.lineWidth = 2.5;
+  // dunkle Ranke / Aststruktur ohne Leuchten
+  ctx.globalAlpha = 0.72;
+  ctx.strokeStyle = v % 2 === 0 ? "#2c6a3f" : "#245535";
+  ctx.lineWidth = 2.1;
   ctx.beginPath();
-  ctx.moveTo(x+w*(.22+.06*v), y);
-  ctx.bezierCurveTo(x+w*.05, y+h*.25, x+w*.50, y+h*.55, x+w*.22, y+h);
+  ctx.moveTo(x+w*(.22+.05*v), y+2);
+  ctx.bezierCurveTo(x+w*.08, y+h*.25, x+w*.48, y+h*.55, x+w*.24, y+h-2);
   ctx.stroke();
 
   if(v === 2 || v === 3){
-    ctx.globalAlpha = .45;
-    ctx.strokeStyle = "#d4a373";
-    ctx.lineWidth = 2;
+    ctx.globalAlpha = .28;
+    ctx.strokeStyle = "#8a5d37";
+    ctx.lineWidth = 1.8;
     ctx.beginPath();
     ctx.moveTo(x+w*.68, y+h*.18);
     ctx.lineTo(x+w*.42, y+h*.28);
