@@ -1866,6 +1866,15 @@ function modalBase(title,text,extra){
     <div class="coinBadge">🪙 <span>${save.coins}</span> Coins</div>
     ${extra || ""}
   `;
+
+  // Wichtig für den Shop / längere Menüs:
+  // jedes Overlay soll immer ganz oben starten und nicht an alter Scrollposition hängen bleiben.
+  els.modal.scrollTop = 0;
+  requestAnimationFrame(() => {
+    els.modal.scrollTop = 0;
+    const firstScrollable = els.modal.querySelector('.shopScreen, .rankList, .friendList');
+    if(firstScrollable && typeof firstScrollable.scrollTop === 'number') firstScrollable.scrollTop = 0;
+  });
 }
 function showMenu(){
   document.body.classList.remove("cleanPlaying");
@@ -3155,14 +3164,18 @@ function drawNatureObstacle(x,y,w,h,top=true){
   const woodTop = v === 0 ? "#9b6b3d" : v === 1 ? "#80512e" : v === 2 ? "#a87542" : "#714421";
   const woodBot = v === 0 ? "#5c3b1e" : v === 1 ? "#4b2f19" : v === 2 ? "#6b421f" : "#3f2716";
   const leafColor = v === 0 ? "#54c76c" : v === 1 ? "#42b95f" : v === 2 ? "#66d47a" : "#2f9f52";
+  const leafStroke = v === 0 ? "#2f8f4f" : v === 1 ? "#277d43" : v === 2 ? "#379652" : "#22753d";
 
   drawRoundedPillarBody(x,y,w,h,woodTop,woodBot,"#d4a373","#8b5a2b");
 
   // leaves / kleine Variation, gleiche Hitbox
+  // kein Glow / kein Leuchten mehr in der Natur-Welt
   ctx.save();
   ctx.fillStyle = leafColor;
-  ctx.shadowColor = leafColor;
-  ctx.shadowBlur = 10;
+  ctx.strokeStyle = leafStroke;
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.lineWidth = 1.2;
   const count = Math.max(3, Math.floor(h/55));
   for(let i=0;i<count;i++){
     const yy = y + 14 + i*((h-24)/count);
@@ -3171,6 +3184,7 @@ function drawNatureObstacle(x,y,w,h,top=true){
     ctx.beginPath();
     ctx.ellipse(lx, yy, 7 + v, 13 + (v%2)*3, side<0 ? -.7 : .7, 0, Math.PI*2);
     ctx.fill();
+    ctx.stroke();
   }
 
   // vines / Aststruktur
