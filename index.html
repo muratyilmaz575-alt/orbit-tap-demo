@@ -1523,7 +1523,7 @@ function showShop(tab='skins'){
     const btnText = active ? 'AKTIV' : unlocked ? 'AUSWÄHLEN' : `KAUFEN 🪙 ${item.cost}`;
     return `
       <div class="itemCard ${active ? 'active' : ''} ${unlocked ? '' : 'locked'}">
-        <div class="itemPreview">${item.emoji}</div>
+        <div class="itemPreview">${isSkins ? getSkinPreviewMarkup(item.key, item.title) : item.emoji}</div>
         <div class="itemName">${item.title}</div>
         <div class="itemSub">${item.sub}</div>
         <div class="rarity ${rarityClassName(item.rarity)}">${item.rarity}</div>
@@ -1563,8 +1563,10 @@ function showShop(tab='skins'){
 
 
   // Shop nach jedem Öffnen / Tab-Wechsel garantiert oben starten
+  renderShopSkinPreviews();
   els.modal.scrollTop = 0;
   requestAnimationFrame(() => {
+    renderShopSkinPreviews();
     els.modal.scrollTop = 0;
     const shopScreen = els.modal.querySelector('.shopScreen');
     if(shopScreen) shopScreen.scrollTop = 0;
@@ -1730,7 +1732,7 @@ function showShop(tab='skins'){
     const btnText = active ? 'AKTIV' : unlocked ? 'AUSWÄHLEN' : `KAUFEN 🪙 ${item.cost}`;
     return `
       <div class="itemCard ${active ? 'active' : ''} ${unlocked ? '' : 'locked'}">
-        <div class="itemPreview">${item.emoji}</div>
+        <div class="itemPreview">${isSkins ? getSkinPreviewMarkup(item.key, item.title) : item.emoji}</div>
         <div class="itemName">${item.title}</div>
         <div class="itemSub">${item.sub}</div>
         <div class="rarity ${rarityClassName(item.rarity)}">${item.rarity}</div>
@@ -2302,6 +2304,217 @@ function getSkinPreviewMarkup(key, title){
   return `<canvas class="skinPreviewCanvas" width="96" height="96" data-skin-preview="${key}" title="${title}"></canvas>`;
 }
 
+function drawSkinShape(g, skin, size, opts={}){
+  const s = Math.max(10, size || 48);
+  const r = s / 2;
+  const run = !!opts.run;
+  const glow = opts.glow !== false;
+  skin = (skin || 'orb').toLowerCase();
+
+  const accent = skin === 'comet' ? '#ff6b2e'
+              : skin === 'cube' ? '#35e7ff'
+              : skin === 'star' ? '#ffd166'
+              : skin === 'ufo' ? '#b78cff'
+              : '#1e78ff';
+  const accent2 = skin === 'comet' ? '#ffd166'
+               : skin === 'cube' ? '#b8f7ff'
+               : skin === 'star' ? '#fff4b8'
+               : skin === 'ufo' ? '#e7d7ff'
+               : '#59d8ff';
+
+  g.save();
+  if(glow){
+    g.shadowColor = accent;
+    g.shadowBlur = run ? 18 : 16;
+  }
+
+  if(skin === 'comet'){
+    // Das Bild im Shop und im Spiel: roter Feuer-Komet mit kleinem Schweif.
+    g.save();
+    const tail = g.createLinearGradient(-r*1.85, 0, r*.32, 0);
+    tail.addColorStop(0, 'rgba(255,255,255,0)');
+    tail.addColorStop(.38, 'rgba(255,107,46,.35)');
+    tail.addColorStop(.72, 'rgba(255,107,46,.72)');
+    tail.addColorStop(1, 'rgba(255,209,102,.95)');
+    g.fillStyle = tail;
+    g.beginPath();
+    g.moveTo(-r*.52, -r*.36);
+    g.quadraticCurveTo(-r*1.72, -r*.92, -r*2.10, 0);
+    g.quadraticCurveTo(-r*1.72, r*.92, -r*.52, r*.36);
+    g.closePath();
+    g.fill();
+    g.restore();
+
+    const grad = g.createRadialGradient(-r*.22, -r*.26, r*.10, 0, 0, r*.76);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(.24, '#ffe9aa');
+    grad.addColorStop(.56, '#ff7a32');
+    grad.addColorStop(1, '#d62621');
+    g.fillStyle = grad;
+    g.beginPath();
+    g.ellipse(0, 0, r*.76, r*.68, -0.28, 0, Math.PI*2);
+    g.fill();
+
+    g.shadowBlur = 0;
+    g.strokeStyle = 'rgba(255,240,210,.86)';
+    g.lineWidth = Math.max(1.5, r*.105);
+    g.beginPath();
+    g.ellipse(0, 0, r*.83, r*.73, -0.28, 0, Math.PI*2);
+    g.stroke();
+
+    g.fillStyle = 'rgba(255,255,255,.92)';
+    g.beginPath();
+    g.arc(-r*.22, -r*.22, r*.13, 0, Math.PI*2);
+    g.fill();
+
+  } else if(skin === 'cube'){
+    // Blaues Diamant-/Cube-Bild wie im Shop.
+    g.save();
+    g.rotate(Math.PI/4);
+    const grad = g.createLinearGradient(-r*.62, -r*.62, r*.62, r*.62);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(.28, '#b8f7ff');
+    grad.addColorStop(.65, '#35e7ff');
+    grad.addColorStop(1, '#1285d8');
+    g.fillStyle = grad;
+    roundedRect(g, -r*.55, -r*.55, r*1.10, r*1.10, r*.12);
+    g.fill();
+    g.shadowBlur = 0;
+    g.globalAlpha = .38;
+    g.fillStyle = '#ffffff';
+    g.beginPath();
+    g.moveTo(-r*.45, -r*.45);
+    g.lineTo(r*.12, -r*.45);
+    g.lineTo(r*.45, -r*.12);
+    g.lineTo(r*.45, r*.45);
+    g.lineTo(-r*.45, r*.45);
+    g.closePath();
+    g.fill();
+    g.globalAlpha = 1;
+    g.strokeStyle = 'rgba(255,255,255,.84)';
+    g.lineWidth = Math.max(1.5, r*.09);
+    roundedRect(g, -r*.60, -r*.60, r*1.20, r*1.20, r*.14);
+    g.stroke();
+    g.restore();
+
+    g.save();
+    g.globalAlpha = .55;
+    g.strokeStyle = '#ffffff';
+    g.lineWidth = Math.max(1, r*.055);
+    g.beginPath();
+    g.moveTo(0, -r*.62);
+    g.lineTo(r*.38, 0);
+    g.lineTo(0, r*.62);
+    g.lineTo(-r*.38, 0);
+    g.closePath();
+    g.stroke();
+    g.restore();
+
+  } else if(skin === 'star'){
+    // Gelber Stern wie im Shop.
+    const grad = g.createRadialGradient(-r*.10, -r*.18, r*.06, 0, 0, r*.92);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(.30, '#fff4b8');
+    grad.addColorStop(.70, '#ffd166');
+    grad.addColorStop(1, '#f7a600');
+    g.fillStyle = grad;
+    g.beginPath();
+    for(let i=0;i<10;i++){
+      const rr = i % 2 === 0 ? r*.86 : r*.38;
+      const a = -Math.PI/2 + i*Math.PI/5;
+      const x = Math.cos(a) * rr;
+      const y = Math.sin(a) * rr;
+      if(i === 0) g.moveTo(x,y); else g.lineTo(x,y);
+    }
+    g.closePath();
+    g.fill();
+
+    g.shadowBlur = 0;
+    g.strokeStyle = 'rgba(255,255,255,.85)';
+    g.lineWidth = Math.max(1.5, r*.075);
+    g.stroke();
+
+    g.fillStyle = 'rgba(255,255,255,.92)';
+    g.beginPath();
+    g.arc(-r*.10, -r*.06, r*.14, 0, Math.PI*2);
+    g.fill();
+
+  } else if(skin === 'ufo'){
+    // Flaches UFO wie im Shop.
+    g.save();
+    g.globalAlpha = run ? .20 : .24;
+    const beam = g.createLinearGradient(0, -r*.05, 0, r*1.35);
+    beam.addColorStop(0, 'rgba(255,255,255,.30)');
+    beam.addColorStop(1, 'rgba(53,231,255,0)');
+    g.fillStyle = beam;
+    g.beginPath();
+    g.moveTo(-r*.34, r*.20);
+    g.lineTo(r*.34, r*.20);
+    g.lineTo(r*.94, r*1.26);
+    g.lineTo(-r*.94, r*1.26);
+    g.closePath();
+    g.fill();
+    g.restore();
+
+    const hull = g.createLinearGradient(-r, 0, r, 0);
+    hull.addColorStop(0, '#e7d7ff');
+    hull.addColorStop(.42, '#ffffff');
+    hull.addColorStop(1, '#b78cff');
+    g.fillStyle = hull;
+    g.beginPath();
+    g.ellipse(0, r*.18, r*.98, r*.36, 0, 0, Math.PI*2);
+    g.fill();
+
+    const dome = g.createLinearGradient(0, -r*.68, 0, r*.06);
+    dome.addColorStop(0, '#ffffff');
+    dome.addColorStop(1, '#9cf4ff');
+    g.fillStyle = dome;
+    g.beginPath();
+    g.ellipse(0, -r*.10, r*.48, r*.36, 0, Math.PI, 0, true);
+    g.fill();
+
+    g.shadowBlur = 0;
+    [-.58,-.18,.18,.58].forEach((m,i)=>{
+      g.fillStyle = i%2===0 ? '#35e7ff' : '#ffd166';
+      g.beginPath();
+      g.arc(r*m, r*.30, r*.08, 0, Math.PI*2);
+      g.fill();
+    });
+
+    g.strokeStyle = 'rgba(255,255,255,.82)';
+    g.lineWidth = Math.max(1.5, r*.07);
+    g.beginPath();
+    g.ellipse(0, r*.18, r*.98, r*.36, 0, 0, Math.PI*2);
+    g.stroke();
+
+  } else {
+    // Orb: blauer runder Orb wie im Shop.
+    const grad = g.createRadialGradient(-r*.24, -r*.28, r*.07, 0, 0, r*.80);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(.24, '#59d8ff');
+    grad.addColorStop(.62, '#1e78ff');
+    grad.addColorStop(1, '#183b9b');
+    g.fillStyle = grad;
+    g.beginPath();
+    g.arc(0, 0, r*.74, 0, Math.PI*2);
+    g.fill();
+
+    g.shadowBlur = 0;
+    g.strokeStyle = 'rgba(255,255,255,.72)';
+    g.lineWidth = Math.max(1.5, r*.08);
+    g.beginPath();
+    g.arc(0, 0, r*.81, 0, Math.PI*2);
+    g.stroke();
+
+    g.fillStyle = 'rgba(255,255,255,.92)';
+    g.beginPath();
+    g.arc(-r*.23, -r*.27, r*.13, 0, Math.PI*2);
+    g.fill();
+  }
+
+  g.restore();
+}
+
 function drawMiniSkin(c, skin){
   if(!c || !c.getContext) return;
   const g = c.getContext('2d');
@@ -2309,51 +2522,7 @@ function drawMiniSkin(c, skin){
   g.clearRect(0,0,W,H);
   g.save();
   g.translate(W/2, H/2);
-  const r = 18;
-  const accent = skin === 'comet' ? '#ff6b2e' : skin === 'cube' ? '#35e7ff' : skin === 'star' ? '#ffd166' : skin === 'ufo' ? '#b78cff' : '#35e7ff';
-  const accent2 = skin === 'comet' ? '#ffd166' : skin === 'cube' ? '#b8f7ff' : skin === 'star' ? '#fff4b8' : skin === 'ufo' ? '#e7d7ff' : '#d8fbff';
-
-  if(skin === 'comet'){
-    const tail = g.createLinearGradient(-54,0,8,0);
-    tail.addColorStop(0,'rgba(255,255,255,0)');
-    tail.addColorStop(.45,'rgba(255,107,46,.50)');
-    tail.addColorStop(1,'rgba(255,209,102,.95)');
-    g.fillStyle = tail; g.shadowColor = '#ff6b2e'; g.shadowBlur = 18;
-    g.beginPath(); g.moveTo(-26,-10); g.quadraticCurveTo(-58,-24,-68,0); g.quadraticCurveTo(-58,24,-26,10); g.closePath(); g.fill();
-    const grad = g.createRadialGradient(-8,-8,3,0,0,27);
-    grad.addColorStop(0,'#fff'); grad.addColorStop(.34,accent2); grad.addColorStop(.86,accent); grad.addColorStop(1,'#5ee8ff');
-    g.fillStyle = grad; g.beginPath(); g.arc(0,0,20,0,Math.PI*2); g.fill();
-    g.shadowBlur = 0; g.strokeStyle='rgba(255,255,255,.78)'; g.lineWidth=3; g.beginPath(); g.arc(0,0,23,0,Math.PI*2); g.stroke();
-  } else if(skin === 'cube'){
-    g.shadowColor=accent; g.shadowBlur=18;
-    const grad = g.createLinearGradient(-24,-24,24,24); grad.addColorStop(0,'#fff'); grad.addColorStop(.35,accent2); grad.addColorStop(1,accent);
-    g.fillStyle=grad; roundedRect(g,-23,-23,46,46,9); g.fill();
-    g.shadowBlur=0; g.globalAlpha=.36; g.fillStyle='#fff'; g.beginPath(); g.moveTo(-20,-20); g.lineTo(4,-20); g.lineTo(21,-3); g.lineTo(21,21); g.lineTo(-20,21); g.closePath(); g.fill(); g.globalAlpha=1;
-    g.strokeStyle='rgba(255,255,255,.84)'; g.lineWidth=3; roundedRect(g,-25,-25,50,50,10); g.stroke();
-  } else if(skin === 'star'){
-    g.shadowColor=accent; g.shadowBlur=20;
-    const grad = g.createRadialGradient(0,0,3,0,0,31); grad.addColorStop(0,'#fff'); grad.addColorStop(.28,accent2); grad.addColorStop(1,accent);
-    g.fillStyle=grad; g.beginPath();
-    for(let i=0;i<10;i++){ const rr=i%2===0?29:12; const a=-Math.PI/2+i*Math.PI/5; const x=Math.cos(a)*rr,y=Math.sin(a)*rr; if(i===0)g.moveTo(x,y); else g.lineTo(x,y); }
-    g.closePath(); g.fill(); g.shadowBlur=0; g.fillStyle='#fff'; g.beginPath(); g.arc(0,0,7,0,Math.PI*2); g.fill();
-    g.strokeStyle='rgba(255,255,255,.78)'; g.lineWidth=2.5; g.stroke();
-  } else if(skin === 'ufo'){
-    g.globalAlpha=.24; const beam=g.createLinearGradient(0,-5,0,54); beam.addColorStop(0,'rgba(255,255,255,.30)'); beam.addColorStop(1,'rgba(53,231,255,0)');
-    g.fillStyle=beam; g.beginPath(); g.moveTo(-12,8); g.lineTo(12,8); g.lineTo(34,55); g.lineTo(-34,55); g.closePath(); g.fill(); g.globalAlpha=1;
-    g.shadowColor=accent; g.shadowBlur=18; const hull=g.createLinearGradient(-30,0,30,0); hull.addColorStop(0,accent2); hull.addColorStop(.55,'#fff'); hull.addColorStop(1,accent);
-    g.fillStyle=hull; g.beginPath(); g.ellipse(0,8,34,15,0,0,Math.PI*2); g.fill();
-    const dome=g.createLinearGradient(0,-22,0,2); dome.addColorStop(0,'#fff'); dome.addColorStop(1,'rgba(160,240,255,.88)');
-    g.fillStyle=dome; g.beginPath(); g.ellipse(0,-3,18,14,0,Math.PI,0,true); g.fill();
-    g.shadowBlur=0; [-.65,-.2,.2,.65].forEach((m,i)=>{g.fillStyle=i%2===0?accent:'#ffd166'; g.beginPath(); g.arc(28*m,13,4,0,Math.PI*2); g.fill();});
-    g.strokeStyle='rgba(255,255,255,.78)'; g.lineWidth=2.5; g.beginPath(); g.ellipse(0,8,34,15,0,0,Math.PI*2); g.stroke();
-  } else {
-    const tail=g.createLinearGradient(-54,0,8,0); tail.addColorStop(0,'rgba(255,255,255,0)'); tail.addColorStop(.6,'rgba(53,231,255,.42)'); tail.addColorStop(1,'rgba(216,251,255,.88)');
-    g.globalAlpha=.7; g.fillStyle=tail; g.shadowColor=accent; g.shadowBlur=18; g.beginPath(); g.moveTo(-24,0); g.quadraticCurveTo(-55,-18,-64,0); g.quadraticCurveTo(-55,18,-24,0); g.fill(); g.globalAlpha=1;
-    const grad=g.createRadialGradient(-8,-8,3,0,0,28); grad.addColorStop(0,'#fff'); grad.addColorStop(.3,accent2); grad.addColorStop(.72,accent); grad.addColorStop(1,'#243a7a');
-    g.fillStyle=grad; g.beginPath(); g.arc(0,0,20,0,Math.PI*2); g.fill();
-    g.shadowBlur=0; g.strokeStyle='rgba(255,255,255,.74)'; g.lineWidth=3; g.beginPath(); g.arc(0,0,23,0,Math.PI*2); g.stroke();
-    g.fillStyle='#07101f'; g.beginPath(); g.arc(5,-2,4,0,Math.PI*2); g.fill(); g.fillStyle='#fff'; g.beginPath(); g.arc(7,-4,1.6,0,Math.PI*2); g.fill();
-  }
+  drawSkinShape(g, skin, Math.min(W,H)*0.72, {run:false, glow:true});
   g.restore();
 }
 
@@ -2397,7 +2566,7 @@ function showShop(tab='skins'){
     const btnText = active ? 'AKTIV' : unlocked ? 'AUSWÄHLEN' : `KAUFEN · 🪙 ${item.cost}`;
     return `
       <div class="itemCard ${active ? 'active' : ''} ${unlocked ? '' : 'locked'}">
-        <div class="itemPreview">${item.emoji}</div>
+        <div class="itemPreview">${isSkins ? getSkinPreviewMarkup(item.key, item.title) : item.emoji}</div>
         <div class="itemName">${item.title}</div>
         <div class="itemSub">${item.sub}</div>
         <div class="rarity ${rarityClassName(item.rarity)}">${item.rarity}</div>
@@ -4005,34 +4174,79 @@ function getPlayerAccent(){
 }
 
 function drawTrail(){
-  const accent = getPlayerAccent();
+  const skinKey = (save.skin || 'orb').toLowerCase();
+  const accent = skinKey === 'comet' ? '#ff6b2e'
+              : skinKey === 'cube' ? '#35e7ff'
+              : skinKey === 'star' ? '#ffd166'
+              : skinKey === 'ufo' ? '#b78cff'
+              : '#1e78ff';
+
   for(let i=player.trail.length-1;i>=0;i--){
     const t = player.trail[i];
-    const alpha = (1-i/player.trail.length)*.22;
+    const alpha = (1-i/player.trail.length) * .16;
+    const scale = (1-i/player.trail.length*.55);
+
     ctx.save();
     ctx.globalAlpha = alpha;
-    ctx.fillStyle = accent;
-    ctx.shadowColor = accent;
-    ctx.shadowBlur = 14;
-    ctx.beginPath();
-    ctx.arc(t.x, t.y, player.r*(1-i/player.trail.length*.55), 0, Math.PI*2);
-    ctx.fill();
+    ctx.translate(t.x, t.y);
+
+    // Trail darf den Skin nicht verstecken: nur kleiner, farbiger Nachleuchteffekt.
+    if(skinKey === 'star'){
+      ctx.fillStyle = accent;
+      ctx.shadowColor = accent;
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      for(let k=0;k<10;k++){
+        const rr = (k%2===0 ? player.r*.72 : player.r*.30) * scale;
+        const a = -Math.PI/2 + k*Math.PI/5;
+        const x = Math.cos(a)*rr, y = Math.sin(a)*rr;
+        if(k===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      }
+      ctx.closePath();
+      ctx.fill();
+    } else if(skinKey === 'cube'){
+      ctx.rotate(Math.PI/4);
+      ctx.fillStyle = accent;
+      ctx.shadowColor = accent;
+      ctx.shadowBlur = 12;
+      roundedRect(ctx, -player.r*.45*scale, -player.r*.45*scale, player.r*.9*scale, player.r*.9*scale, 4);
+      ctx.fill();
+    } else if(skinKey === 'ufo'){
+      ctx.fillStyle = accent;
+      ctx.shadowColor = accent;
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, player.r*.75*scale, player.r*.25*scale, 0, 0, Math.PI*2);
+      ctx.fill();
+    } else if(skinKey === 'comet'){
+      ctx.fillStyle = accent;
+      ctx.shadowColor = accent;
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, player.r*.58*scale, player.r*.38*scale, -0.28, 0, Math.PI*2);
+      ctx.fill();
+    } else {
+      ctx.fillStyle = accent;
+      ctx.shadowColor = accent;
+      ctx.shadowBlur = 12;
+      ctx.beginPath();
+      ctx.arc(0, 0, player.r*.52*scale, 0, Math.PI*2);
+      ctx.fill();
+    }
     ctx.restore();
   }
 }
+
 function drawPlayer(){
-  const pulse = Math.sin(bgT*8)*1.3;
+  const pulse = Math.sin(bgT*8)*1.0;
   const r = player.r + pulse;
-  const accent = getPlayerAccent();
   const skinKey = (save.skin || 'orb').toLowerCase();
-  const item = SKIN_ITEMS.find(s => s.key === skinKey) || SKIN_ITEMS[0];
-  const emoji = item.emoji || '🔵';
 
   ctx.save();
   ctx.translate(player.x, player.y);
   ctx.rotate(player.rot);
 
-  // Shield bleibt nur Schutz-Effekt, Skin-Form bleibt unverändert.
+  // Shield bleibt nur Schutz-Effekt. Die Skin-Form bleibt exakt gleich.
   if(shieldActive || shieldGraceTimer > 0){
     ctx.save();
     const auraColor = shieldGraceTimer > 0 ? "#c9ff7d" : "#8dff3a";
@@ -4054,27 +4268,8 @@ function drawPlayer(){
     ctx.restore();
   }
 
-  // Exakter Skin-Match: dieselben Symbole wie im Shop werden auch im Run gezeichnet.
-  // Dadurch kann Comet/Cube/Star/UFO nicht mehr als Orb erscheinen.
-  ctx.save();
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.font = `${Math.round(r * 2.45)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui,sans-serif`;
-  ctx.shadowColor = accent;
-  ctx.shadowBlur = skinKey === 'orb' ? 16 : 22;
-  ctx.fillText(emoji, 0, 1);
-  ctx.restore();
-
-  // Kleiner Lichtpunkt für mehr Premium-Gefühl, ohne die Skin-Form zu verändern.
-  ctx.save();
-  ctx.globalAlpha = .22;
-  ctx.fillStyle = "#ffffff";
-  ctx.shadowColor = "#ffffff";
-  ctx.shadowBlur = 10;
-  ctx.beginPath();
-  ctx.arc(-r*.35, -r*.42, Math.max(2, r*.18), 0, Math.PI*2);
-  ctx.fill();
-  ctx.restore();
+  // EXAKT derselbe Renderer wie im Shop-Bild.
+  drawSkinShape(ctx, skinKey, r*2.65, {run:true, glow:true});
 
   ctx.restore();
 }
