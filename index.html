@@ -1523,7 +1523,7 @@ function showShop(tab='skins'){
     const btnText = active ? 'AKTIV' : unlocked ? 'AUSWÄHLEN' : `KAUFEN 🪙 ${item.cost}`;
     return `
       <div class="itemCard ${active ? 'active' : ''} ${unlocked ? '' : 'locked'}">
-        <div class="itemPreview">${isSkins ? getSkinPreviewMarkup(item.key, item.title) : item.emoji}</div>
+        <div class="itemPreview">${item.emoji}</div>
         <div class="itemName">${item.title}</div>
         <div class="itemSub">${item.sub}</div>
         <div class="rarity ${rarityClassName(item.rarity)}">${item.rarity}</div>
@@ -1671,8 +1671,8 @@ function showRanking(type="global"){
       </div>
       <div class="rankList">${list}</div>
       <div class="menuGrid">
-        <button onclick="setPlayerName()">Name ändern</button>
-        <button onclick="showMenu()">Menü</button>
+        <button data-action="name" onclick="setPlayerName()">Name ändern</button>
+        <button data-action="menu" onclick="showMenu()">Menü</button>
       </div>
     `
   );
@@ -1730,7 +1730,7 @@ function showShop(tab='skins'){
     const btnText = active ? 'AKTIV' : unlocked ? 'AUSWÄHLEN' : `KAUFEN 🪙 ${item.cost}`;
     return `
       <div class="itemCard ${active ? 'active' : ''} ${unlocked ? '' : 'locked'}">
-        <div class="itemPreview">${isSkins ? getSkinPreviewMarkup(item.key, item.title) : item.emoji}</div>
+        <div class="itemPreview">${item.emoji}</div>
         <div class="itemName">${item.title}</div>
         <div class="itemSub">${item.sub}</div>
         <div class="rarity ${rarityClassName(item.rarity)}">${item.rarity}</div>
@@ -1917,7 +1917,7 @@ function showDailyChallenge(){
 
       <div class="menuGrid">
         <button class="full primary" onclick="startDailyChallenge()">Daily starten</button>
-        <button onclick="showMenu()">Menü</button>
+        <button data-action="menu" onclick="showMenu()">Menü</button>
         <button onclick="startNormalGame()">Normaler Run</button>
       </div>
     `
@@ -1987,7 +1987,7 @@ function showChallenge(){
       <div class="menuGrid">
         <button class="full primary" onclick="startGame()">Challenge starten</button>
         <button onclick="showFriends()">Freunde</button>
-        <button onclick="showMenu()">Menü</button>
+        <button data-action="menu" onclick="showMenu()">Menü</button>
       </div>
     `
   );
@@ -2004,7 +2004,7 @@ function showAddFriend(){
       </div>
       <div class="menuGrid">
         <button onclick="showFriends()">Zurück</button>
-        <button onclick="showMenu()">Menü</button>
+        <button data-action="menu" onclick="showMenu()">Menü</button>
       </div>
     `
   );
@@ -2370,8 +2370,20 @@ function renderShopSkinPreviews(){
 }
 
 function bindRankingTabs(){
-  document.querySelectorAll('[data-ranking]').forEach(btn => {
-    btn.onclick = () => showRanking(btn.dataset.ranking || 'global');
+  const root = els && els.modal ? els.modal : document;
+  root.querySelectorAll('[data-ranking]').forEach(btn => {
+    btn.onclick = function(ev){
+      if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+      showRanking(btn.dataset.ranking || 'global');
+    };
+    btn.onpointerup = function(ev){
+      if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+      showRanking(btn.dataset.ranking || 'global');
+    };
+    btn.ontouchend = function(ev){
+      if(ev){ ev.preventDefault(); ev.stopPropagation(); }
+      showRanking(btn.dataset.ranking || 'global');
+    };
   });
 }
 
@@ -2385,7 +2397,7 @@ function showShop(tab='skins'){
     const btnText = active ? 'AKTIV' : unlocked ? 'AUSWÄHLEN' : `KAUFEN · 🪙 ${item.cost}`;
     return `
       <div class="itemCard ${active ? 'active' : ''} ${unlocked ? '' : 'locked'}">
-        <div class="itemPreview">${isSkins ? getSkinPreviewMarkup(item.key, item.title) : item.emoji}</div>
+        <div class="itemPreview">${item.emoji}</div>
         <div class="itemName">${item.title}</div>
         <div class="itemSub">${item.sub}</div>
         <div class="rarity ${rarityClassName(item.rarity)}">${item.rarity}</div>
@@ -2418,11 +2430,9 @@ function showShop(tab='skins'){
       </div>
     `
   );
-  renderShopSkinPreviews();
   els.modal.scrollTop = 0;
   requestAnimationFrame(() => {
-    renderShopSkinPreviews();
-    els.modal.scrollTop = 0;
+      els.modal.scrollTop = 0;
     const shopScreen = els.modal.querySelector('.shopScreen');
     const itemGrid = els.modal.querySelector('.itemGrid');
     if(shopScreen) shopScreen.scrollTop = 0;
@@ -2434,7 +2444,7 @@ function showSkins(){ showShop('skins'); }
 
 function showRanking(type="global"){
   const title = type === "de" ? "Deutschland-Ranking" : "Welt-Ranking";
-  const rows = getRankingsData(type);
+  const rows = getRankingRows(type);
   const myIndex = rows.findIndex(r=>r.me);
   const list = rows.map((r,i)=>`
     <div class="rankRow ${r.me ? "me" : ""}">
@@ -2454,8 +2464,8 @@ function showRanking(type="global"){
       </div>
       <div class="rankList">${list}</div>
       <div class="menuGrid">
-        <button onclick="setPlayerName()">Name ändern</button>
-        <button onclick="showMenu()">Menü</button>
+        <button data-action="name" onclick="setPlayerName()">Name ändern</button>
+        <button data-action="menu" onclick="showMenu()">Menü</button>
       </div>
     `
   );
@@ -2487,7 +2497,7 @@ function showDailyChallenge(){
       <div class="friendList">${rows}</div>
       <div class="menuGrid">
         <button class="full primary" onclick="startDailyChallenge()">Daily starten</button>
-        <button onclick="showMenu()">Menü</button>
+        <button data-action="menu" onclick="showMenu()">Menü</button>
         <button onclick="startNormalGame()">Normaler Run</button>
       </div>
     `
@@ -2532,7 +2542,7 @@ function showChallenge(){
       <div class="menuGrid">
         <button class="full primary" onclick="startNormalGame()">Challenge spielen</button>
         <button onclick="showFriends()">Freunde</button>
-        <button onclick="showMenu()">Menü</button>
+        <button data-action="menu" onclick="showMenu()">Menü</button>
       </div>
     `
   );
@@ -2546,7 +2556,7 @@ function showAddFriend(){
       <div class="challengeBox"><b>Dein Freundescode</b><p><b>ORBIT-${String((save.best || 0) + 4821).slice(0,4)}</b></p></div>
       <div class="menuGrid">
         <button onclick="showFriends()">Zurück</button>
-        <button onclick="showMenu()">Menü</button>
+        <button data-action="menu" onclick="showMenu()">Menü</button>
       </div>
     `
   );
@@ -2600,8 +2610,8 @@ function showMenu(){
         <div class="menuSectionPro">Community <small>Scores</small></div>
         <div class="tileGridPro">
           <button class="tilePro" onclick="showFriends()"><span class="tileIconPro">👥</span><span class="tileTextPro"><b>Freunde</b><span>private Liste</span></span></button>
-          <button class="tilePro" onclick="showRanking('global')"><span class="tileIconPro">🌍</span><span class="tileTextPro"><b>Welt-Ranking</b><span>Top Scores</span></span></button>
-          <button class="tilePro" onclick="showRanking('de')"><span class="tileIconPro">🇩🇪</span><span class="tileTextPro"><b>Deutschland</b><span>Top Scores</span></span></button>
+          <button class="tilePro" data-action="ranking-global" onclick="showRanking('global')"><span class="tileIconPro">🌍</span><span class="tileTextPro"><b>Welt-Ranking</b><span>Top Scores</span></span></button>
+          <button class="tilePro" data-action="ranking-de" onclick="showRanking('de')"><span class="tileIconPro">🇩🇪</span><span class="tileTextPro"><b>Deutschland</b><span>Top Scores</span></span></button>
           <button class="tilePro" onclick="setPlayerName()"><span class="tileIconPro">✏️</span><span class="tileTextPro"><b>Name</b><span>${getPlayerName()}</span></span></button>
         </div>
 
@@ -4014,17 +4024,15 @@ function drawPlayer(){
   const pulse = Math.sin(bgT*8)*1.3;
   const r = player.r + pulse;
   const accent = getPlayerAccent();
-  const accent2 = save.theme === 'lava' ? '#ffd166'
-                  : save.theme === 'nature' ? '#d8ffb7'
-                  : save.theme === 'ice' ? '#ffffff'
-                  : save.theme === 'sunset' ? '#ffe2b8'
-                  : '#d8fbff';
+  const skinKey = (save.skin || 'orb').toLowerCase();
+  const item = SKIN_ITEMS.find(s => s.key === skinKey) || SKIN_ITEMS[0];
+  const emoji = item.emoji || '🔵';
 
   ctx.save();
   ctx.translate(player.x, player.y);
   ctx.rotate(player.rot);
 
-  // shield aura
+  // Shield bleibt nur Schutz-Effekt, Skin-Form bleibt unverändert.
   if(shieldActive || shieldGraceTimer > 0){
     ctx.save();
     const auraColor = shieldGraceTimer > 0 ? "#c9ff7d" : "#8dff3a";
@@ -4043,280 +4051,30 @@ function drawPlayer(){
     ctx.beginPath();
     ctx.arc(0, 0, auraR + 2, 0, Math.PI*2);
     ctx.stroke();
-
-    ctx.lineWidth = 2.2;
-    for(let i=0;i<6;i++){
-      const ang = bgT*2 + i*(Math.PI*2/6);
-      const x1 = Math.cos(ang) * (auraR + 2);
-      const y1 = Math.sin(ang) * (auraR + 2);
-      const x2 = Math.cos(ang) * (auraR + 10);
-      const y2 = Math.sin(ang) * (auraR + 10);
-      ctx.beginPath();
-      ctx.moveTo(x1, y1);
-      ctx.lineTo(x2, y2);
-      ctx.stroke();
-    }
     ctx.restore();
   }
 
-  if(save.skin === 'comet'){
-    // tail
-    ctx.save();
-    ctx.globalAlpha = .40;
-    const tail = ctx.createLinearGradient(-r*5,0,0,0);
-    tail.addColorStop(0, 'rgba(255,255,255,0)');
-    tail.addColorStop(.55, accent);
-    tail.addColorStop(1, accent2);
-    ctx.fillStyle = tail;
-    ctx.shadowColor = accent;
-    ctx.shadowBlur = 26;
-    ctx.beginPath();
-    ctx.moveTo(-r*1.8,-r*.55);
-    ctx.quadraticCurveTo(-r*4.2,-r*1.25,-r*5.1,0);
-    ctx.quadraticCurveTo(-r*4.2,r*1.25,-r*1.8,r*.55);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
+  // Exakter Skin-Match: dieselben Symbole wie im Shop werden auch im Run gezeichnet.
+  // Dadurch kann Comet/Cube/Star/UFO nicht mehr als Orb erscheinen.
+  ctx.save();
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.font = `${Math.round(r * 2.45)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",system-ui,sans-serif`;
+  ctx.shadowColor = accent;
+  ctx.shadowBlur = skinKey === 'orb' ? 16 : 22;
+  ctx.fillText(emoji, 0, 1);
+  ctx.restore();
 
-    // core
-    const grad = ctx.createRadialGradient(-r*.35,-r*.35,r*.15,0,0,r*1.55);
-    grad.addColorStop(0, '#ffffff');
-    grad.addColorStop(.35, accent2);
-    grad.addColorStop(.85, accent);
-    grad.addColorStop(1, '#5ee8ff');
-    ctx.fillStyle = grad;
-    ctx.shadowColor = accent;
-    ctx.shadowBlur = 30;
-    ctx.beginPath();
-    ctx.arc(0,0,r*1.02,0,Math.PI*2);
-    ctx.fill();
-
-    // hot core
-    ctx.fillStyle = 'rgba(255,255,255,.95)';
-    ctx.beginPath();
-    ctx.arc(-r*.15,-r*.12,r*.26,0,Math.PI*2);
-    ctx.fill();
-
-    // ring
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = 'rgba(255,255,255,.75)';
-    ctx.lineWidth = 2.5;
-    ctx.beginPath();
-    ctx.arc(0,0,r*1.18,0,Math.PI*2);
-    ctx.stroke();
-
-  } else if(save.skin === 'cube'){
-    // shadow glow
-    ctx.save();
-    ctx.shadowColor = accent;
-    ctx.shadowBlur = 24;
-    const grad = ctx.createLinearGradient(-r,-r,r,r);
-    grad.addColorStop(0, '#ffffff');
-    grad.addColorStop(.35, accent2);
-    grad.addColorStop(1, accent);
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.roundRect(-r*1.02,-r*1.02,r*2.04,r*2.04,7);
-    ctx.fill();
-    ctx.restore();
-
-    // 3D face overlay
-    ctx.save();
-    ctx.globalAlpha = .38;
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.moveTo(-r*.95,-r*.95);
-    ctx.lineTo(r*.15,-r*.95);
-    ctx.lineTo(r*.95,-r*.15);
-    ctx.lineTo(r*.95,r*.95);
-    ctx.lineTo(-r*.95,r*.95);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-
-    ctx.strokeStyle = 'rgba(255,255,255,.82)';
-    ctx.lineWidth = 2.4;
-    ctx.beginPath();
-    ctx.roundRect(-r*1.15,-r*1.15,r*2.3,r*2.3,9);
-    ctx.stroke();
-
-    // facet lines
-    ctx.save();
-    ctx.globalAlpha = .35;
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.moveTo(-r*.7,-r*.4);
-    ctx.lineTo(0,-r*.9);
-    ctx.lineTo(r*.72,-r*.48);
-    ctx.moveTo(0,-r*.9);
-    ctx.lineTo(0,r*.92);
-    ctx.moveTo(-r*.7,-r*.4);
-    ctx.lineTo(0,.05);
-    ctx.lineTo(r*.72,-r*.48);
-    ctx.stroke();
-    ctx.restore();
-
-  } else if(save.skin === 'star'){
-    // star glow
-    ctx.save();
-    ctx.shadowColor = accent;
-    ctx.shadowBlur = 28;
-    const grad = ctx.createRadialGradient(0,0,r*.1,0,0,r*1.6);
-    grad.addColorStop(0, '#ffffff');
-    grad.addColorStop(.3, accent2);
-    grad.addColorStop(1, accent);
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    for(let i=0;i<10;i++){
-      const rr = i % 2 === 0 ? r*1.24 : r*.52;
-      const a = -Math.PI/2 + i*Math.PI/5;
-      const x = Math.cos(a)*rr;
-      const y = Math.sin(a)*rr;
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    }
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-
-    // center gem
-    ctx.save();
-    ctx.fillStyle = '#ffffff';
-    ctx.globalAlpha = .9;
-    ctx.beginPath();
-    ctx.arc(0,0,r*.32,0,Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-
-    // outline
-    ctx.strokeStyle = 'rgba(255,255,255,.78)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    for(let i=0;i<10;i++){
-      const rr = i % 2 === 0 ? r*1.32 : r*.56;
-      const a = -Math.PI/2 + i*Math.PI/5;
-      const x = Math.cos(a)*rr;
-      const y = Math.sin(a)*rr;
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    }
-    ctx.closePath();
-    ctx.stroke();
-
-  } else if(save.skin === 'ufo'){
-    // beam
-    ctx.save();
-    ctx.globalAlpha = .18 + Math.abs(Math.sin(bgT*6))* .12;
-    const beam = ctx.createLinearGradient(0,-r*.2,0,r*2.7);
-    beam.addColorStop(0, 'rgba(255,255,255,.18)');
-    beam.addColorStop(1, 'rgba(53,231,255,0)');
-    ctx.fillStyle = beam;
-    ctx.beginPath();
-    ctx.moveTo(-r*.55,r*.2);
-    ctx.lineTo(r*.55,r*.2);
-    ctx.lineTo(r*1.35,r*2.4);
-    ctx.lineTo(-r*1.35,r*2.4);
-    ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-
-    // hull
-    ctx.save();
-    ctx.shadowColor = accent;
-    ctx.shadowBlur = 24;
-    const hull = ctx.createLinearGradient(-r,0,r,0);
-    hull.addColorStop(0, accent2);
-    hull.addColorStop(.55, '#ffffff');
-    hull.addColorStop(1, accent);
-    ctx.fillStyle = hull;
-    ctx.beginPath();
-    ctx.ellipse(0, r*.18, r*1.45, r*.68, 0, 0, Math.PI*2);
-    ctx.fill();
-
-    // dome
-    const dome = ctx.createLinearGradient(0,-r,0,r*.15);
-    dome.addColorStop(0, 'rgba(255,255,255,.95)');
-    dome.addColorStop(1, 'rgba(160,240,255,.88)');
-    ctx.fillStyle = dome;
-    ctx.beginPath();
-    ctx.ellipse(0, -r*.22, r*.78, r*.58, 0, Math.PI, 0, true);
-    ctx.fill();
-    ctx.restore();
-
-    // lights
-    const lights = [-.72,-.24,.24,.72];
-    lights.forEach((m,i)=>{
-      ctx.fillStyle = i%2===0 ? accent : '#ffd166';
-      ctx.shadowColor = ctx.fillStyle;
-      ctx.shadowBlur = 12;
-      ctx.beginPath();
-      ctx.arc(r*m, r*.38, r*.12, 0, Math.PI*2);
-      ctx.fill();
-    });
-
-    ctx.strokeStyle = 'rgba(255,255,255,.75)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.ellipse(0, r*.18, r*1.45, r*.68, 0, 0, Math.PI*2);
-    ctx.stroke();
-
-  } else { // orb
-    // tail aura
-    ctx.save();
-    ctx.globalAlpha = .32;
-    const tail = ctx.createLinearGradient(-r*3.2,0,0,0);
-    tail.addColorStop(0,'rgba(255,255,255,0)');
-    tail.addColorStop(.6, accent);
-    tail.addColorStop(1, accent2);
-    ctx.fillStyle = tail;
-    ctx.shadowColor = accent;
-    ctx.shadowBlur = 24;
-    ctx.beginPath();
-    ctx.moveTo(-r*1.5,0);
-    ctx.quadraticCurveTo(-r*3.0,-r*0.95,-r*3.55,0);
-    ctx.quadraticCurveTo(-r*3.0,r*0.95,-r*1.5,0);
-    ctx.fill();
-    ctx.restore();
-
-    // orb core
-    ctx.shadowColor = accent;
-    ctx.shadowBlur = 28;
-    const grad = ctx.createRadialGradient(-r*.38,-r*.38,r*.15,0,0,r*1.5);
-    grad.addColorStop(0, '#ffffff');
-    grad.addColorStop(.3, accent2);
-    grad.addColorStop(.72, accent);
-    grad.addColorStop(1, '#243a7a');
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(0,0,r*1.02,0,Math.PI*2);
-    ctx.fill();
-
-    // outer ring
-    ctx.shadowBlur = 0;
-    ctx.strokeStyle = 'rgba(255,255,255,.72)';
-    ctx.lineWidth = 2.4;
-    ctx.beginPath();
-    ctx.arc(0,0,r*1.18,0,Math.PI*2);
-    ctx.stroke();
-
-    // highlight
-    ctx.save();
-    ctx.globalAlpha = .82;
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(-r*.28,-r*.30,r*.23,0,Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-
-    // eye
-    ctx.fillStyle = '#07101f';
-    ctx.beginPath();
-    ctx.arc(r*0.24,-r*0.10, r*0.18, 0, Math.PI*2);
-    ctx.fill();
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(r*0.31,-r*0.18, r*0.06, 0, Math.PI*2);
-    ctx.fill();
-  }
+  // Kleiner Lichtpunkt für mehr Premium-Gefühl, ohne die Skin-Form zu verändern.
+  ctx.save();
+  ctx.globalAlpha = .22;
+  ctx.fillStyle = "#ffffff";
+  ctx.shadowColor = "#ffffff";
+  ctx.shadowBlur = 10;
+  ctx.beginPath();
+  ctx.arc(-r*.35, -r*.42, Math.max(2, r*.18), 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
 
   ctx.restore();
 }
@@ -4420,6 +4178,35 @@ els.overlay.addEventListener("pointerdown", function(e){
 els.overlay.addEventListener("click", function(e){
   e.stopPropagation();
 });
+
+
+// Extra robuste Menü-/Ranking-Klicks für iPhone/Safari.
+// Falls inline onclick auf dynamisch eingesetzten Buttons nicht greift, übernimmt diese Delegation.
+(function(){
+  function handleModalAction(ev){
+    const target = ev.target && ev.target.closest ? ev.target.closest("[data-ranking],[data-action]") : null;
+    if(!target) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+
+    if(target.dataset.ranking){
+      showRanking(target.dataset.ranking || "global");
+      return;
+    }
+
+    const action = target.dataset.action;
+    if(action === "ranking-global") return showRanking("global");
+    if(action === "ranking-de") return showRanking("de");
+    if(action === "menu") return showMenu();
+    if(action === "name") return setPlayerName();
+  }
+
+  if(els && els.modal){
+    els.modal.addEventListener("click", handleModalAction, true);
+    els.modal.addEventListener("pointerup", handleModalAction, true);
+    els.modal.addEventListener("touchend", handleModalAction, true);
+  }
+})();
 
 els.touchArea.addEventListener("pointerdown", onTap);
 document.getElementById("startBtn").onclick = ()=>{ unlockAudio(); startGame(); };
