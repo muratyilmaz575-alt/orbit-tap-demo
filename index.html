@@ -4120,7 +4120,7 @@ function drawSkinShape(g, skin, size, opts={}){
 
   g.save();
   g.shadowColor = accent;
-  g.shadowBlur = opts.glow === false ? 0 : 18;
+  g.shadowBlur = opts.glow === false ? 0 : 24;
 
   if(skin === 'comet'){
     // roter/oranger Comet wie Shop-Bild
@@ -4296,7 +4296,7 @@ function drawTrail(){
 
   for(let i=player.trail.length-1;i>=0;i--){
     const t = player.trail[i];
-    const alpha = (1-i/player.trail.length) * .16;
+    const alpha = (1-i/player.trail.length) * .11;
     const scale = (1-i/player.trail.length*.55);
 
     ctx.save();
@@ -4382,7 +4382,7 @@ function drawPlayer(){
   }
 
   // EXAKT derselbe Renderer wie im Shop-Bild.
-  drawSkinShape(ctx, skinKey, r*2.65, {run:true, glow:true});
+  drawSkinShape(ctx, skinKey, r*3.55, {run:true, glow:true});
 
   ctx.restore();
 }
