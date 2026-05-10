@@ -916,6 +916,16 @@ body.cleanPlaying .runEndCard{display:none!important}
 .challengeBox{border-radius:24px!important;background:linear-gradient(145deg,rgba(255,255,255,.10),rgba(255,255,255,.045))!important}
 @media (max-width:390px){.gameTitlePro{font-size:36px}.heroStatsPro{margin-top:74px}.tilePro{min-height:67px!important}.modal{padding:13px!important}.itemGrid{grid-template-columns:1fr!important}}
 
+
+/* CleanHUD + exact skin preview polish */
+.skinPreviewCanvas{
+  width:64px;height:64px;display:block;margin:0 auto;
+  filter:drop-shadow(0 0 14px rgba(255,255,255,.18));
+}
+.itemCard.active .skinPreviewCanvas{filter:drop-shadow(0 0 18px rgba(255,209,102,.32));}
+.rankTabs button{cursor:pointer;position:relative;z-index:3;pointer-events:auto;}
+.versionPillPro{display:none!important;}
+
 </style>
 </head>
 <body>
@@ -945,7 +955,6 @@ body.cleanPlaying .runEndCard{display:none!important}
         <div class="hudPill">Score: <span id="score">0</span></div>
         <div class="hudPill coinHud">🪙 <span id="runCoinsHud">0</span></div>
         <div class="hudPill">Best: <span id="best">0</span></div>
-        <div class="hudPill">Speed: <span id="speed">1.0</span>x</div>
         <div class="hudPill">Power: <span id="powerHud">–</span></div>
       </div>
 
@@ -1071,7 +1080,7 @@ function updateHud(){
   els.score.textContent = score;
   if(els.runCoinsHud) els.runCoinsHud.textContent = coinsRun;
   els.best.textContent = save.best;
-  els.speed.textContent = gameSpeed.toFixed(1);
+  if(els.speed) els.speed.textContent = gameSpeed.toFixed(1);
   if(els.bigScore) els.bigScore.textContent = score;
   if(els.powerHud){
     const active = [];
@@ -1438,7 +1447,7 @@ const THEME_ITEMS = [
 
 const SKIN_ITEMS = [
   {key:'orb', emoji:'🔵', title:'Orb', sub:'Classic', cost:0, rarity:'Common'},
-  {key:'comet', emoji:'☄️', title:'Comet', sub:'Fast', cost:250, rarity:'Common'},
+  {key:'comet', emoji:'☄️', title:'Comet', sub:'Flame', cost:250, rarity:'Common'},
   {key:'cube', emoji:'💠', title:'Cube', sub:'Sharp', cost:450, rarity:'Rare'},
   {key:'star', emoji:'⭐', title:'Star', sub:'Spark', cost:750, rarity:'Epic'},
   {key:'ufo', emoji:'🛸', title:'UFO', sub:'Alien', cost:1100, rarity:'Legendary'}
@@ -1514,7 +1523,7 @@ function showShop(tab='skins'){
     const btnText = active ? 'AKTIV' : unlocked ? 'AUSWÄHLEN' : `KAUFEN 🪙 ${item.cost}`;
     return `
       <div class="itemCard ${active ? 'active' : ''} ${unlocked ? '' : 'locked'}">
-        <div class="itemPreview">${item.emoji}</div>
+        <div class="itemPreview">${isSkins ? getSkinPreviewMarkup(item.key, item.title) : item.emoji}</div>
         <div class="itemName">${item.title}</div>
         <div class="itemSub">${item.sub}</div>
         <div class="rarity ${rarityClassName(item.rarity)}">${item.rarity}</div>
@@ -1657,8 +1666,8 @@ function showRanking(type="global"){
     "Dein Bestwert wird direkt einsortiert. Trage einen Namen ein und vergleiche dich mit der Rangliste.",
     `
       <div class="rankTabs">
-        <button class="${type==='global'?'primary':''}" onclick="showRanking('global')">Weltweit</button>
-        <button class="${type==='de'?'primary':''}" onclick="showRanking('de')">Deutschland</button>
+        <button class="${type==='global'?'primary':''}" type="button" data-ranking="global" onclick="showRanking('global')">Welt</button>
+        <button class="${type==='de'?'primary':''}" type="button" data-ranking="de" onclick="showRanking('de')">Deutschland</button>
       </div>
       <div class="rankList">${list}</div>
       <div class="menuGrid">
@@ -1721,7 +1730,7 @@ function showShop(tab='skins'){
     const btnText = active ? 'AKTIV' : unlocked ? 'AUSWÄHLEN' : `KAUFEN 🪙 ${item.cost}`;
     return `
       <div class="itemCard ${active ? 'active' : ''} ${unlocked ? '' : 'locked'}">
-        <div class="itemPreview">${item.emoji}</div>
+        <div class="itemPreview">${isSkins ? getSkinPreviewMarkup(item.key, item.title) : item.emoji}</div>
         <div class="itemName">${item.title}</div>
         <div class="itemSub">${item.sub}</div>
         <div class="rarity ${rarityClassName(item.rarity)}">${item.rarity}</div>
@@ -1791,7 +1800,7 @@ function showThemes(){
 function showSkins(){
   const skins = [
     {key:'orb', emoji:'🔵', title:'Orb', sub:'Classic'},
-    {key:'comet', emoji:'☄️', title:'Comet', sub:'Fast'},
+    {key:'comet', emoji:'☄️', title:'Comet', sub:'Flame'},
     {key:'cube', emoji:'🟦', title:'Cube', sub:'Sharp'},
     {key:'star', emoji:'⭐', title:'Star', sub:'Spark'},
     {key:'ufo', emoji:'🛸', title:'UFO', sub:'Alien'}
@@ -2221,7 +2230,9 @@ function modalBase(title,text,extra){
     ${extra || ""}
   `;
   els.modal.scrollTop = 0;
+  bindRankingTabs();
   requestAnimationFrame(() => {
+    bindRankingTabs();
     els.modal.scrollTop = 0;
     const firstScrollable = els.modal.querySelector('.shopScreen, .rankList, .friendList, .itemGrid');
     if(firstScrollable && typeof firstScrollable.scrollTop === 'number') firstScrollable.scrollTop = 0;
@@ -2286,6 +2297,84 @@ function selectSkin(skin){
   }
 }
 
+
+function getSkinPreviewMarkup(key, title){
+  return `<canvas class="skinPreviewCanvas" width="96" height="96" data-skin-preview="${key}" title="${title}"></canvas>`;
+}
+
+function drawMiniSkin(c, skin){
+  if(!c || !c.getContext) return;
+  const g = c.getContext('2d');
+  const W = c.width, H = c.height;
+  g.clearRect(0,0,W,H);
+  g.save();
+  g.translate(W/2, H/2);
+  const r = 18;
+  const accent = skin === 'comet' ? '#ff6b2e' : skin === 'cube' ? '#35e7ff' : skin === 'star' ? '#ffd166' : skin === 'ufo' ? '#b78cff' : '#35e7ff';
+  const accent2 = skin === 'comet' ? '#ffd166' : skin === 'cube' ? '#b8f7ff' : skin === 'star' ? '#fff4b8' : skin === 'ufo' ? '#e7d7ff' : '#d8fbff';
+
+  if(skin === 'comet'){
+    const tail = g.createLinearGradient(-54,0,8,0);
+    tail.addColorStop(0,'rgba(255,255,255,0)');
+    tail.addColorStop(.45,'rgba(255,107,46,.50)');
+    tail.addColorStop(1,'rgba(255,209,102,.95)');
+    g.fillStyle = tail; g.shadowColor = '#ff6b2e'; g.shadowBlur = 18;
+    g.beginPath(); g.moveTo(-26,-10); g.quadraticCurveTo(-58,-24,-68,0); g.quadraticCurveTo(-58,24,-26,10); g.closePath(); g.fill();
+    const grad = g.createRadialGradient(-8,-8,3,0,0,27);
+    grad.addColorStop(0,'#fff'); grad.addColorStop(.34,accent2); grad.addColorStop(.86,accent); grad.addColorStop(1,'#5ee8ff');
+    g.fillStyle = grad; g.beginPath(); g.arc(0,0,20,0,Math.PI*2); g.fill();
+    g.shadowBlur = 0; g.strokeStyle='rgba(255,255,255,.78)'; g.lineWidth=3; g.beginPath(); g.arc(0,0,23,0,Math.PI*2); g.stroke();
+  } else if(skin === 'cube'){
+    g.shadowColor=accent; g.shadowBlur=18;
+    const grad = g.createLinearGradient(-24,-24,24,24); grad.addColorStop(0,'#fff'); grad.addColorStop(.35,accent2); grad.addColorStop(1,accent);
+    g.fillStyle=grad; roundedRect(g,-23,-23,46,46,9); g.fill();
+    g.shadowBlur=0; g.globalAlpha=.36; g.fillStyle='#fff'; g.beginPath(); g.moveTo(-20,-20); g.lineTo(4,-20); g.lineTo(21,-3); g.lineTo(21,21); g.lineTo(-20,21); g.closePath(); g.fill(); g.globalAlpha=1;
+    g.strokeStyle='rgba(255,255,255,.84)'; g.lineWidth=3; roundedRect(g,-25,-25,50,50,10); g.stroke();
+  } else if(skin === 'star'){
+    g.shadowColor=accent; g.shadowBlur=20;
+    const grad = g.createRadialGradient(0,0,3,0,0,31); grad.addColorStop(0,'#fff'); grad.addColorStop(.28,accent2); grad.addColorStop(1,accent);
+    g.fillStyle=grad; g.beginPath();
+    for(let i=0;i<10;i++){ const rr=i%2===0?29:12; const a=-Math.PI/2+i*Math.PI/5; const x=Math.cos(a)*rr,y=Math.sin(a)*rr; if(i===0)g.moveTo(x,y); else g.lineTo(x,y); }
+    g.closePath(); g.fill(); g.shadowBlur=0; g.fillStyle='#fff'; g.beginPath(); g.arc(0,0,7,0,Math.PI*2); g.fill();
+    g.strokeStyle='rgba(255,255,255,.78)'; g.lineWidth=2.5; g.stroke();
+  } else if(skin === 'ufo'){
+    g.globalAlpha=.24; const beam=g.createLinearGradient(0,-5,0,54); beam.addColorStop(0,'rgba(255,255,255,.30)'); beam.addColorStop(1,'rgba(53,231,255,0)');
+    g.fillStyle=beam; g.beginPath(); g.moveTo(-12,8); g.lineTo(12,8); g.lineTo(34,55); g.lineTo(-34,55); g.closePath(); g.fill(); g.globalAlpha=1;
+    g.shadowColor=accent; g.shadowBlur=18; const hull=g.createLinearGradient(-30,0,30,0); hull.addColorStop(0,accent2); hull.addColorStop(.55,'#fff'); hull.addColorStop(1,accent);
+    g.fillStyle=hull; g.beginPath(); g.ellipse(0,8,34,15,0,0,Math.PI*2); g.fill();
+    const dome=g.createLinearGradient(0,-22,0,2); dome.addColorStop(0,'#fff'); dome.addColorStop(1,'rgba(160,240,255,.88)');
+    g.fillStyle=dome; g.beginPath(); g.ellipse(0,-3,18,14,0,Math.PI,0,true); g.fill();
+    g.shadowBlur=0; [-.65,-.2,.2,.65].forEach((m,i)=>{g.fillStyle=i%2===0?accent:'#ffd166'; g.beginPath(); g.arc(28*m,13,4,0,Math.PI*2); g.fill();});
+    g.strokeStyle='rgba(255,255,255,.78)'; g.lineWidth=2.5; g.beginPath(); g.ellipse(0,8,34,15,0,0,Math.PI*2); g.stroke();
+  } else {
+    const tail=g.createLinearGradient(-54,0,8,0); tail.addColorStop(0,'rgba(255,255,255,0)'); tail.addColorStop(.6,'rgba(53,231,255,.42)'); tail.addColorStop(1,'rgba(216,251,255,.88)');
+    g.globalAlpha=.7; g.fillStyle=tail; g.shadowColor=accent; g.shadowBlur=18; g.beginPath(); g.moveTo(-24,0); g.quadraticCurveTo(-55,-18,-64,0); g.quadraticCurveTo(-55,18,-24,0); g.fill(); g.globalAlpha=1;
+    const grad=g.createRadialGradient(-8,-8,3,0,0,28); grad.addColorStop(0,'#fff'); grad.addColorStop(.3,accent2); grad.addColorStop(.72,accent); grad.addColorStop(1,'#243a7a');
+    g.fillStyle=grad; g.beginPath(); g.arc(0,0,20,0,Math.PI*2); g.fill();
+    g.shadowBlur=0; g.strokeStyle='rgba(255,255,255,.74)'; g.lineWidth=3; g.beginPath(); g.arc(0,0,23,0,Math.PI*2); g.stroke();
+    g.fillStyle='#07101f'; g.beginPath(); g.arc(5,-2,4,0,Math.PI*2); g.fill(); g.fillStyle='#fff'; g.beginPath(); g.arc(7,-4,1.6,0,Math.PI*2); g.fill();
+  }
+  g.restore();
+}
+
+function roundedRect(g,x,y,w,h,r){
+  g.beginPath();
+  g.moveTo(x+r,y); g.lineTo(x+w-r,y); g.quadraticCurveTo(x+w,y,x+w,y+r);
+  g.lineTo(x+w,y+h-r); g.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  g.lineTo(x+r,y+h); g.quadraticCurveTo(x,y+h,x,y+h-r);
+  g.lineTo(x,y+r); g.quadraticCurveTo(x,y,x+r,y); g.closePath();
+}
+
+function renderShopSkinPreviews(){
+  document.querySelectorAll('[data-skin-preview]').forEach(c => drawMiniSkin(c, c.dataset.skinPreview));
+}
+
+function bindRankingTabs(){
+  document.querySelectorAll('[data-ranking]').forEach(btn => {
+    btn.onclick = () => showRanking(btn.dataset.ranking || 'global');
+  });
+}
+
 function showShop(tab='skins'){
   const isSkins = tab === 'skins';
   const items = isSkins ? SKIN_ITEMS : THEME_ITEMS;
@@ -2296,7 +2385,7 @@ function showShop(tab='skins'){
     const btnText = active ? 'AKTIV' : unlocked ? 'AUSWÄHLEN' : `KAUFEN · 🪙 ${item.cost}`;
     return `
       <div class="itemCard ${active ? 'active' : ''} ${unlocked ? '' : 'locked'}">
-        <div class="itemPreview">${item.emoji}</div>
+        <div class="itemPreview">${isSkins ? getSkinPreviewMarkup(item.key, item.title) : item.emoji}</div>
         <div class="itemName">${item.title}</div>
         <div class="itemSub">${item.sub}</div>
         <div class="rarity ${rarityClassName(item.rarity)}">${item.rarity}</div>
@@ -2329,8 +2418,10 @@ function showShop(tab='skins'){
       </div>
     `
   );
+  renderShopSkinPreviews();
   els.modal.scrollTop = 0;
   requestAnimationFrame(() => {
+    renderShopSkinPreviews();
     els.modal.scrollTop = 0;
     const shopScreen = els.modal.querySelector('.shopScreen');
     const itemGrid = els.modal.querySelector('.itemGrid');
@@ -2358,8 +2449,8 @@ function showRanking(type="global"){
     `Dein Bestwert wird direkt einsortiert. Aktuelle Position: <b>#${myIndex >= 0 ? myIndex + 1 : "–"}</b>.`,
     `
       <div class="rankTabs">
-        <button class="${type==='global'?'primary':''}" onclick="showRanking('global')">Weltweit</button>
-        <button class="${type==='de'?'primary':''}" onclick="showRanking('de')">Deutschland</button>
+        <button class="${type==='global'?'primary':''}" type="button" data-ranking="global" onclick="showRanking('global')">Welt</button>
+        <button class="${type==='de'?'primary':''}" type="button" data-ranking="de" onclick="showRanking('de')">Deutschland</button>
       </div>
       <div class="rankList">${list}</div>
       <div class="menuGrid">
@@ -2368,6 +2459,7 @@ function showRanking(type="global"){
       </div>
     `
   );
+  bindRankingTabs();
 }
 
 function showDailyChallenge(){
@@ -2467,7 +2559,7 @@ function showMenu(){
   const themeName = getThemeLabel(save.theme);
   modalBase(
     "Orbit Dash",
-    "Cleaner Start, klare Bereiche und ein hochwertiges App-Menü – ohne Änderung am Gameplay.",
+    "Ein Tap. Ein Orbit. Wie weit kommst du? Flieg durch Gates, sammle Coins und knacke deinen Highscore.",
     `
       <div class="premiumHome">
         <div class="orbitHeroPro">
@@ -2478,7 +2570,6 @@ function showMenu(){
                 <div class="gameTitlePro">Orbit<br>Dash</div>
                 <div class="gameSubPro">Flieg durch Gates, sammle Coins und verbessere deinen Bestwert.</div>
               </div>
-              <div class="versionPillPro">V4.3</div>
             </div>
             <div class="heroStatsPro">
               <div class="heroStatPro"><b>${lastRunScore || 0}</b><span>Letzter</span></div>
