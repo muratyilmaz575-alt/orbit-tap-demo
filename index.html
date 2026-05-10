@@ -4104,6 +4104,188 @@ function getPlayerAccent(){
   return COLORS.cyan;
 }
 
+
+// Sicherer Skin-Renderer für den Run.
+// Muss vor drawPlayer existieren, sonst startet das Spiel und der Loop bricht ab.
+function drawSkinShape(g, skin, size, opts={}){
+  const s = Math.max(16, size || 44);
+  const r = s / 2;
+  skin = (skin || 'orb').toLowerCase();
+
+  const accent = skin === 'comet' ? '#ff6b2e'
+              : skin === 'cube' ? '#35e7ff'
+              : skin === 'star' ? '#ffd166'
+              : skin === 'ufo' ? '#b78cff'
+              : '#1e78ff';
+
+  g.save();
+  g.shadowColor = accent;
+  g.shadowBlur = opts.glow === false ? 0 : 18;
+
+  if(skin === 'comet'){
+    // roter/oranger Comet wie Shop-Bild
+    const tail = g.createLinearGradient(-r*2.0,0,r*.25,0);
+    tail.addColorStop(0,'rgba(255,255,255,0)');
+    tail.addColorStop(.45,'rgba(255,107,46,.45)');
+    tail.addColorStop(1,'rgba(255,209,102,.95)');
+    g.fillStyle = tail;
+    g.beginPath();
+    g.moveTo(-r*.46,-r*.32);
+    g.quadraticCurveTo(-r*1.75,-r*.90,-r*2.10,0);
+    g.quadraticCurveTo(-r*1.75,r*.90,-r*.46,r*.32);
+    g.closePath();
+    g.fill();
+
+    const grad = g.createRadialGradient(-r*.18,-r*.22,r*.08,0,0,r*.72);
+    grad.addColorStop(0,'#ffffff');
+    grad.addColorStop(.25,'#ffe9aa');
+    grad.addColorStop(.58,'#ff7a32');
+    grad.addColorStop(1,'#d62621');
+    g.fillStyle = grad;
+    g.beginPath();
+    g.ellipse(0,0,r*.72,r*.64,-0.28,0,Math.PI*2);
+    g.fill();
+
+    g.shadowBlur = 0;
+    g.strokeStyle = 'rgba(255,245,220,.86)';
+    g.lineWidth = Math.max(2, r*.10);
+    g.beginPath();
+    g.ellipse(0,0,r*.80,r*.70,-0.28,0,Math.PI*2);
+    g.stroke();
+
+    g.fillStyle = 'rgba(255,255,255,.92)';
+    g.beginPath();
+    g.arc(-r*.20,-r*.20,r*.12,0,Math.PI*2);
+    g.fill();
+
+  } else if(skin === 'cube'){
+    // blaues Diamant-/Cube-Bild
+    g.save();
+    g.rotate(Math.PI/4);
+    const grad = g.createLinearGradient(-r*.6,-r*.6,r*.6,r*.6);
+    grad.addColorStop(0,'#ffffff');
+    grad.addColorStop(.30,'#b8f7ff');
+    grad.addColorStop(.66,'#35e7ff');
+    grad.addColorStop(1,'#1285d8');
+    g.fillStyle = grad;
+    roundedRect(g,-r*.55,-r*.55,r*1.10,r*1.10,r*.12);
+    g.fill();
+    g.shadowBlur = 0;
+    g.globalAlpha = .34;
+    g.fillStyle = '#ffffff';
+    g.beginPath();
+    g.moveTo(-r*.45,-r*.45);
+    g.lineTo(r*.12,-r*.45);
+    g.lineTo(r*.45,-r*.12);
+    g.lineTo(r*.45,r*.45);
+    g.lineTo(-r*.45,r*.45);
+    g.closePath();
+    g.fill();
+    g.globalAlpha = 1;
+    g.strokeStyle = 'rgba(255,255,255,.84)';
+    g.lineWidth = Math.max(2, r*.09);
+    roundedRect(g,-r*.60,-r*.60,r*1.20,r*1.20,r*.14);
+    g.stroke();
+    g.restore();
+
+  } else if(skin === 'star'){
+    // gelber Stern wie Shop-Bild
+    const grad = g.createRadialGradient(-r*.10,-r*.18,r*.05,0,0,r*.90);
+    grad.addColorStop(0,'#ffffff');
+    grad.addColorStop(.32,'#fff4b8');
+    grad.addColorStop(.72,'#ffd166');
+    grad.addColorStop(1,'#f7a600');
+    g.fillStyle = grad;
+    g.beginPath();
+    for(let i=0;i<10;i++){
+      const rr = i%2===0 ? r*.86 : r*.38;
+      const a = -Math.PI/2 + i*Math.PI/5;
+      const x = Math.cos(a)*rr;
+      const y = Math.sin(a)*rr;
+      if(i===0) g.moveTo(x,y); else g.lineTo(x,y);
+    }
+    g.closePath();
+    g.fill();
+    g.shadowBlur = 0;
+    g.strokeStyle = 'rgba(255,255,255,.86)';
+    g.lineWidth = Math.max(2, r*.075);
+    g.stroke();
+
+  } else if(skin === 'ufo'){
+    // flaches UFO wie Shop-Bild
+    g.globalAlpha = .22;
+    const beam = g.createLinearGradient(0,-r*.05,0,r*1.35);
+    beam.addColorStop(0,'rgba(255,255,255,.30)');
+    beam.addColorStop(1,'rgba(53,231,255,0)');
+    g.fillStyle = beam;
+    g.beginPath();
+    g.moveTo(-r*.34,r*.20);
+    g.lineTo(r*.34,r*.20);
+    g.lineTo(r*.94,r*1.26);
+    g.lineTo(-r*.94,r*1.26);
+    g.closePath();
+    g.fill();
+    g.globalAlpha = 1;
+
+    const hull = g.createLinearGradient(-r,0,r,0);
+    hull.addColorStop(0,'#e7d7ff');
+    hull.addColorStop(.45,'#ffffff');
+    hull.addColorStop(1,'#b78cff');
+    g.fillStyle = hull;
+    g.beginPath();
+    g.ellipse(0,r*.18,r*.98,r*.36,0,0,Math.PI*2);
+    g.fill();
+
+    const dome = g.createLinearGradient(0,-r*.68,0,r*.06);
+    dome.addColorStop(0,'#ffffff');
+    dome.addColorStop(1,'#9cf4ff');
+    g.fillStyle = dome;
+    g.beginPath();
+    g.ellipse(0,-r*.10,r*.48,r*.36,0,Math.PI,0,true);
+    g.fill();
+
+    g.shadowBlur = 0;
+    [-.58,-.18,.18,.58].forEach((m,i)=>{
+      g.fillStyle = i%2===0 ? '#35e7ff' : '#ffd166';
+      g.beginPath();
+      g.arc(r*m,r*.30,r*.08,0,Math.PI*2);
+      g.fill();
+    });
+
+    g.strokeStyle = 'rgba(255,255,255,.82)';
+    g.lineWidth = Math.max(2, r*.07);
+    g.beginPath();
+    g.ellipse(0,r*.18,r*.98,r*.36,0,0,Math.PI*2);
+    g.stroke();
+
+  } else {
+    // Orb blau wie Shop-Bild
+    const grad = g.createRadialGradient(-r*.24,-r*.28,r*.07,0,0,r*.80);
+    grad.addColorStop(0,'#ffffff');
+    grad.addColorStop(.25,'#59d8ff');
+    grad.addColorStop(.64,'#1e78ff');
+    grad.addColorStop(1,'#183b9b');
+    g.fillStyle = grad;
+    g.beginPath();
+    g.arc(0,0,r*.74,0,Math.PI*2);
+    g.fill();
+
+    g.shadowBlur = 0;
+    g.strokeStyle = 'rgba(255,255,255,.75)';
+    g.lineWidth = Math.max(2, r*.08);
+    g.beginPath();
+    g.arc(0,0,r*.82,0,Math.PI*2);
+    g.stroke();
+
+    g.fillStyle = 'rgba(255,255,255,.92)';
+    g.beginPath();
+    g.arc(-r*.23,-r*.27,r*.13,0,Math.PI*2);
+    g.fill();
+  }
+
+  g.restore();
+}
+
 function drawTrail(){
   const skinKey = (save.skin || 'orb').toLowerCase();
   const accent = skinKey === 'comet' ? '#ff6b2e'
@@ -4254,8 +4436,20 @@ function draw(){
   drawShockwaves();
   drawSpeedLines();
   if(player){
-    drawTrail();
-    drawPlayer();
+    try{
+      drawTrail();
+      drawPlayer();
+    }catch(e){
+      // Notfall: Ein Skin-Fehler darf nie den Run blockieren.
+      ctx.save();
+      ctx.fillStyle = "#35e7ff";
+      ctx.shadowColor = "#35e7ff";
+      ctx.shadowBlur = 20;
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, player.r*1.1, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    }
   }
   drawParticles();
   drawCoinPopups();
