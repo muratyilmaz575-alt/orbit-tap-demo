@@ -926,6 +926,19 @@ body.cleanPlaying .runEndCard{display:none!important}
 .rankTabs button{cursor:pointer;position:relative;z-index:3;pointer-events:auto;}
 .versionPillPro{display:none!important;}
 
+
+.skinSvgPreview{
+  width:82px;
+  height:62px;
+  display:block;
+  margin:0 auto 2px;
+  overflow:visible;
+  filter:drop-shadow(0 0 14px rgba(53,231,255,.24));
+}
+.itemCard.active .skinSvgPreview{
+  filter:drop-shadow(0 0 18px rgba(255,209,102,.35));
+}
+
 </style>
 </head>
 <body>
@@ -1563,10 +1576,10 @@ function showShop(tab='skins'){
 
 
   // Shop nach jedem Öffnen / Tab-Wechsel garantiert oben starten
-  renderShopSkinPreviews();
+  
   els.modal.scrollTop = 0;
   requestAnimationFrame(() => {
-    renderShopSkinPreviews();
+    
     els.modal.scrollTop = 0;
     const shopScreen = els.modal.querySelector('.shopScreen');
     if(shopScreen) shopScreen.scrollTop = 0;
@@ -2301,218 +2314,136 @@ function selectSkin(skin){
 
 
 function getSkinPreviewMarkup(key, title){
-  return `<canvas class="skinPreviewCanvas" width="96" height="96" data-skin-preview="${key}" title="${title}"></canvas>`;
+  return skinSvgMarkup(key, title);
 }
 
-function drawSkinShape(g, skin, size, opts={}){
-  const s = Math.max(10, size || 48);
-  const r = s / 2;
-  const run = !!opts.run;
-  const glow = opts.glow !== false;
-  skin = (skin || 'orb').toLowerCase();
+function skinSvgMarkup(key, title){
+  key = (key || 'orb').toLowerCase();
+  const label = (title || key).replace(/"/g, '&quot;');
 
-  const accent = skin === 'comet' ? '#ff6b2e'
-              : skin === 'cube' ? '#35e7ff'
-              : skin === 'star' ? '#ffd166'
-              : skin === 'ufo' ? '#b78cff'
-              : '#1e78ff';
-  const accent2 = skin === 'comet' ? '#ffd166'
-               : skin === 'cube' ? '#b8f7ff'
-               : skin === 'star' ? '#fff4b8'
-               : skin === 'ufo' ? '#e7d7ff'
-               : '#59d8ff';
-
-  g.save();
-  if(glow){
-    g.shadowColor = accent;
-    g.shadowBlur = run ? 18 : 16;
+  if(key === 'comet'){
+    return `
+      <svg class="skinSvgPreview" viewBox="0 0 120 90" role="img" aria-label="${label}">
+        <defs>
+          <linearGradient id="cometTail" x1="0" y1="45" x2="78" y2="45" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#ffffff" stop-opacity="0"/>
+            <stop offset=".42" stop-color="#ff6b2e" stop-opacity=".42"/>
+            <stop offset=".78" stop-color="#ff6b2e" stop-opacity=".8"/>
+            <stop offset="1" stop-color="#ffd166" stop-opacity=".98"/>
+          </linearGradient>
+          <radialGradient id="cometCore" cx="44%" cy="35%" r="62%">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset=".25" stop-color="#ffe9aa"/>
+            <stop offset=".58" stop-color="#ff7a32"/>
+            <stop offset="1" stop-color="#d62621"/>
+          </radialGradient>
+          <filter id="cometGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <path d="M45 34 C16 20 6 28 2 45 C6 62 16 70 45 56 Z" fill="url(#cometTail)" filter="url(#cometGlow)"/>
+        <ellipse cx="65" cy="45" rx="25" ry="22" transform="rotate(-16 65 45)" fill="url(#cometCore)" filter="url(#cometGlow)"/>
+        <ellipse cx="65" cy="45" rx="28" ry="24" transform="rotate(-16 65 45)" fill="none" stroke="rgba(255,245,220,.88)" stroke-width="4"/>
+        <circle cx="57" cy="37" r="5" fill="rgba(255,255,255,.94)"/>
+      </svg>
+    `;
   }
 
-  if(skin === 'comet'){
-    // Das Bild im Shop und im Spiel: roter Feuer-Komet mit kleinem Schweif.
-    g.save();
-    const tail = g.createLinearGradient(-r*1.85, 0, r*.32, 0);
-    tail.addColorStop(0, 'rgba(255,255,255,0)');
-    tail.addColorStop(.38, 'rgba(255,107,46,.35)');
-    tail.addColorStop(.72, 'rgba(255,107,46,.72)');
-    tail.addColorStop(1, 'rgba(255,209,102,.95)');
-    g.fillStyle = tail;
-    g.beginPath();
-    g.moveTo(-r*.52, -r*.36);
-    g.quadraticCurveTo(-r*1.72, -r*.92, -r*2.10, 0);
-    g.quadraticCurveTo(-r*1.72, r*.92, -r*.52, r*.36);
-    g.closePath();
-    g.fill();
-    g.restore();
-
-    const grad = g.createRadialGradient(-r*.22, -r*.26, r*.10, 0, 0, r*.76);
-    grad.addColorStop(0, '#ffffff');
-    grad.addColorStop(.24, '#ffe9aa');
-    grad.addColorStop(.56, '#ff7a32');
-    grad.addColorStop(1, '#d62621');
-    g.fillStyle = grad;
-    g.beginPath();
-    g.ellipse(0, 0, r*.76, r*.68, -0.28, 0, Math.PI*2);
-    g.fill();
-
-    g.shadowBlur = 0;
-    g.strokeStyle = 'rgba(255,240,210,.86)';
-    g.lineWidth = Math.max(1.5, r*.105);
-    g.beginPath();
-    g.ellipse(0, 0, r*.83, r*.73, -0.28, 0, Math.PI*2);
-    g.stroke();
-
-    g.fillStyle = 'rgba(255,255,255,.92)';
-    g.beginPath();
-    g.arc(-r*.22, -r*.22, r*.13, 0, Math.PI*2);
-    g.fill();
-
-  } else if(skin === 'cube'){
-    // Blaues Diamant-/Cube-Bild wie im Shop.
-    g.save();
-    g.rotate(Math.PI/4);
-    const grad = g.createLinearGradient(-r*.62, -r*.62, r*.62, r*.62);
-    grad.addColorStop(0, '#ffffff');
-    grad.addColorStop(.28, '#b8f7ff');
-    grad.addColorStop(.65, '#35e7ff');
-    grad.addColorStop(1, '#1285d8');
-    g.fillStyle = grad;
-    roundedRect(g, -r*.55, -r*.55, r*1.10, r*1.10, r*.12);
-    g.fill();
-    g.shadowBlur = 0;
-    g.globalAlpha = .38;
-    g.fillStyle = '#ffffff';
-    g.beginPath();
-    g.moveTo(-r*.45, -r*.45);
-    g.lineTo(r*.12, -r*.45);
-    g.lineTo(r*.45, -r*.12);
-    g.lineTo(r*.45, r*.45);
-    g.lineTo(-r*.45, r*.45);
-    g.closePath();
-    g.fill();
-    g.globalAlpha = 1;
-    g.strokeStyle = 'rgba(255,255,255,.84)';
-    g.lineWidth = Math.max(1.5, r*.09);
-    roundedRect(g, -r*.60, -r*.60, r*1.20, r*1.20, r*.14);
-    g.stroke();
-    g.restore();
-
-    g.save();
-    g.globalAlpha = .55;
-    g.strokeStyle = '#ffffff';
-    g.lineWidth = Math.max(1, r*.055);
-    g.beginPath();
-    g.moveTo(0, -r*.62);
-    g.lineTo(r*.38, 0);
-    g.lineTo(0, r*.62);
-    g.lineTo(-r*.38, 0);
-    g.closePath();
-    g.stroke();
-    g.restore();
-
-  } else if(skin === 'star'){
-    // Gelber Stern wie im Shop.
-    const grad = g.createRadialGradient(-r*.10, -r*.18, r*.06, 0, 0, r*.92);
-    grad.addColorStop(0, '#ffffff');
-    grad.addColorStop(.30, '#fff4b8');
-    grad.addColorStop(.70, '#ffd166');
-    grad.addColorStop(1, '#f7a600');
-    g.fillStyle = grad;
-    g.beginPath();
-    for(let i=0;i<10;i++){
-      const rr = i % 2 === 0 ? r*.86 : r*.38;
-      const a = -Math.PI/2 + i*Math.PI/5;
-      const x = Math.cos(a) * rr;
-      const y = Math.sin(a) * rr;
-      if(i === 0) g.moveTo(x,y); else g.lineTo(x,y);
-    }
-    g.closePath();
-    g.fill();
-
-    g.shadowBlur = 0;
-    g.strokeStyle = 'rgba(255,255,255,.85)';
-    g.lineWidth = Math.max(1.5, r*.075);
-    g.stroke();
-
-    g.fillStyle = 'rgba(255,255,255,.92)';
-    g.beginPath();
-    g.arc(-r*.10, -r*.06, r*.14, 0, Math.PI*2);
-    g.fill();
-
-  } else if(skin === 'ufo'){
-    // Flaches UFO wie im Shop.
-    g.save();
-    g.globalAlpha = run ? .20 : .24;
-    const beam = g.createLinearGradient(0, -r*.05, 0, r*1.35);
-    beam.addColorStop(0, 'rgba(255,255,255,.30)');
-    beam.addColorStop(1, 'rgba(53,231,255,0)');
-    g.fillStyle = beam;
-    g.beginPath();
-    g.moveTo(-r*.34, r*.20);
-    g.lineTo(r*.34, r*.20);
-    g.lineTo(r*.94, r*1.26);
-    g.lineTo(-r*.94, r*1.26);
-    g.closePath();
-    g.fill();
-    g.restore();
-
-    const hull = g.createLinearGradient(-r, 0, r, 0);
-    hull.addColorStop(0, '#e7d7ff');
-    hull.addColorStop(.42, '#ffffff');
-    hull.addColorStop(1, '#b78cff');
-    g.fillStyle = hull;
-    g.beginPath();
-    g.ellipse(0, r*.18, r*.98, r*.36, 0, 0, Math.PI*2);
-    g.fill();
-
-    const dome = g.createLinearGradient(0, -r*.68, 0, r*.06);
-    dome.addColorStop(0, '#ffffff');
-    dome.addColorStop(1, '#9cf4ff');
-    g.fillStyle = dome;
-    g.beginPath();
-    g.ellipse(0, -r*.10, r*.48, r*.36, 0, Math.PI, 0, true);
-    g.fill();
-
-    g.shadowBlur = 0;
-    [-.58,-.18,.18,.58].forEach((m,i)=>{
-      g.fillStyle = i%2===0 ? '#35e7ff' : '#ffd166';
-      g.beginPath();
-      g.arc(r*m, r*.30, r*.08, 0, Math.PI*2);
-      g.fill();
-    });
-
-    g.strokeStyle = 'rgba(255,255,255,.82)';
-    g.lineWidth = Math.max(1.5, r*.07);
-    g.beginPath();
-    g.ellipse(0, r*.18, r*.98, r*.36, 0, 0, Math.PI*2);
-    g.stroke();
-
-  } else {
-    // Orb: blauer runder Orb wie im Shop.
-    const grad = g.createRadialGradient(-r*.24, -r*.28, r*.07, 0, 0, r*.80);
-    grad.addColorStop(0, '#ffffff');
-    grad.addColorStop(.24, '#59d8ff');
-    grad.addColorStop(.62, '#1e78ff');
-    grad.addColorStop(1, '#183b9b');
-    g.fillStyle = grad;
-    g.beginPath();
-    g.arc(0, 0, r*.74, 0, Math.PI*2);
-    g.fill();
-
-    g.shadowBlur = 0;
-    g.strokeStyle = 'rgba(255,255,255,.72)';
-    g.lineWidth = Math.max(1.5, r*.08);
-    g.beginPath();
-    g.arc(0, 0, r*.81, 0, Math.PI*2);
-    g.stroke();
-
-    g.fillStyle = 'rgba(255,255,255,.92)';
-    g.beginPath();
-    g.arc(-r*.23, -r*.27, r*.13, 0, Math.PI*2);
-    g.fill();
+  if(key === 'cube'){
+    return `
+      <svg class="skinSvgPreview" viewBox="0 0 120 90" role="img" aria-label="${label}">
+        <defs>
+          <linearGradient id="cubeGrad" x1="32" y1="16" x2="88" y2="74" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset=".3" stop-color="#b8f7ff"/>
+            <stop offset=".66" stop-color="#35e7ff"/>
+            <stop offset="1" stop-color="#1285d8"/>
+          </linearGradient>
+          <filter id="cubeGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g transform="translate(60 45) rotate(45)" filter="url(#cubeGlow)">
+          <rect x="-24" y="-24" width="48" height="48" rx="7" fill="url(#cubeGrad)"/>
+          <path d="M-19 -19 L7 -19 L21 -5 L21 21 L-19 21 Z" fill="rgba(255,255,255,.34)"/>
+          <rect x="-27" y="-27" width="54" height="54" rx="8" fill="none" stroke="rgba(255,255,255,.86)" stroke-width="4"/>
+        </g>
+        <path d="M60 13 L83 45 L60 77 L37 45 Z" fill="none" stroke="rgba(255,255,255,.52)" stroke-width="2"/>
+      </svg>
+    `;
   }
 
-  g.restore();
+  if(key === 'star'){
+    return `
+      <svg class="skinSvgPreview" viewBox="0 0 120 90" role="img" aria-label="${label}">
+        <defs>
+          <radialGradient id="starGrad" cx="43%" cy="36%" r="65%">
+            <stop offset="0" stop-color="#ffffff"/>
+            <stop offset=".32" stop-color="#fff4b8"/>
+            <stop offset=".72" stop-color="#ffd166"/>
+            <stop offset="1" stop-color="#f7a600"/>
+          </radialGradient>
+          <filter id="starGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <path d="M60 9 L69 33 L95 33 L74 49 L82 75 L60 60 L38 75 L46 49 L25 33 L51 33 Z"
+              fill="url(#starGrad)" stroke="rgba(255,255,255,.86)" stroke-width="4" filter="url(#starGlow)" stroke-linejoin="round"/>
+        <circle cx="56" cy="43" r="6" fill="rgba(255,255,255,.92)"/>
+      </svg>
+    `;
+  }
+
+  if(key === 'ufo'){
+    return `
+      <svg class="skinSvgPreview" viewBox="0 0 120 90" role="img" aria-label="${label}">
+        <defs>
+          <linearGradient id="ufoHull" x1="25" y1="49" x2="95" y2="49" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#e7d7ff"/>
+            <stop offset=".45" stop-color="#ffffff"/>
+            <stop offset="1" stop-color="#b78cff"/>
+          </linearGradient>
+          <linearGradient id="ufoBeam" x1="60" y1="48" x2="60" y2="90" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#ffffff" stop-opacity=".28"/>
+            <stop offset="1" stop-color="#35e7ff" stop-opacity="0"/>
+          </linearGradient>
+          <filter id="ufoGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <path d="M49 49 L71 49 L96 90 L24 90 Z" fill="url(#ufoBeam)"/>
+        <path d="M25 50 C34 35 86 35 95 50 C86 66 34 66 25 50 Z" fill="url(#ufoHull)" stroke="rgba(255,255,255,.82)" stroke-width="4" filter="url(#ufoGlow)"/>
+        <path d="M43 46 C46 25 74 25 77 46 Z" fill="#9cf4ff" stroke="rgba(255,255,255,.78)" stroke-width="3"/>
+        <circle cx="42" cy="54" r="4" fill="#35e7ff"/>
+        <circle cx="54" cy="57" r="4" fill="#ffd166"/>
+        <circle cx="66" cy="57" r="4" fill="#35e7ff"/>
+        <circle cx="78" cy="54" r="4" fill="#ffd166"/>
+      </svg>
+    `;
+  }
+
+  return `
+    <svg class="skinSvgPreview" viewBox="0 0 120 90" role="img" aria-label="${label}">
+      <defs>
+        <radialGradient id="orbGrad" cx="40%" cy="34%" r="64%">
+          <stop offset="0" stop-color="#ffffff"/>
+          <stop offset=".25" stop-color="#59d8ff"/>
+          <stop offset=".64" stop-color="#1e78ff"/>
+          <stop offset="1" stop-color="#183b9b"/>
+        </radialGradient>
+        <filter id="orbGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <circle cx="60" cy="45" r="28" fill="url(#orbGrad)" stroke="rgba(255,255,255,.75)" stroke-width="4" filter="url(#orbGlow)"/>
+      <circle cx="51" cy="34" r="6" fill="rgba(255,255,255,.92)"/>
+    </svg>
+  `;
 }
 
 function drawMiniSkin(c, skin){
